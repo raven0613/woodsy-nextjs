@@ -7,7 +7,7 @@ import { Iuser } from '../pages/index'
 
 interface hollowProps {
   hollows: Ihollow[],
-  handleAddArt: void,
+  handleAddArt: (article: Iarticle) => void,
   currentUser: Iuser
 }
 
@@ -75,9 +75,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
                 )
             })}
             <button onClick={() => {
-                flushSync(() => {
-                    setArticle({...article, id: `a${idNum}`})
-                })
+                setArticle({...article, id: `a${idNum + 1}`})
                 handleAddArt(article)
                 setInputVal('')
                 setTextVal('')

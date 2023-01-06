@@ -182,8 +182,6 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
   })
 }
 
-
-
 export default function Home() {
 
   const [articles, setArticles] = useState<Iarticle[]>(articlesWithHollowName(dummyHotHollows, dummyHotArticles))
