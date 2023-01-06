@@ -10,7 +10,7 @@ interface Iarticle {
 }; 
 
 
-export default function ArticleInputWindow () {
+export default function ArticleInputPanel () {
 
     return (
         <>

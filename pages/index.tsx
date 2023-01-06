@@ -46,7 +46,7 @@ export interface Iarticle {
     description?: string
 };
 
-const currentUser = {
+const currentUser: Iuser = {
   id: 'u1',
   name: '白文鳥',
   articles: 5,
@@ -196,7 +196,7 @@ export default function Home() {
     <>
       <ArticleInput hollows={dummyHotHollows} currentUser={currentUser} handleAddArt={handleAddArt}/>
 
-      <HollowCreatePanel currentUser={currentUser}/>
+      <HollowCreatePanel currentUser={currentUser} hollows={dummyHotHollows}/>
 
       <h1>大家關心的話題</h1>
       {articles && articles.map(art => {
