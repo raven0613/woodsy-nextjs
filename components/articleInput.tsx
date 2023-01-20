@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { flushSync } from 'react-dom';
-import { Ihollow } from '../pages/index'
-import { Iarticle } from '../pages/index'
-import { Iuser } from '../pages/index'
+import { Ihollow } from '../pages'
+import { Iarticle } from '../pages'
+import { Iuser } from '../pages'
 
 interface hollowProps {
   hollows: Ihollow[],
@@ -17,7 +17,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     const [inputVal, setInputVal] = useState<string>('')
     const [textVal, setTextVal] = useState<string>('')
     
-    const [selectedHollow, setSelectHollow] = useState<Ihollow | null>(null)
+    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
     const [article, setArticle] = useState<Iarticle>({
         id: `a${idNum}`,
         title: '',
@@ -27,9 +27,10 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
         comments: 0,
         collectedCounts: 0,
         likedCounts: 0,
-        unlikedCounts: 0,
+        reportedCounts: 0,
         isCollected: false,
         isLiked: false,
+        reportedAt: '20230106',
         createdAt: '20230106',
         hollowName: '',
         description: ''
@@ -40,30 +41,37 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
         setArticle({...article, hollowId: hollow.id, hollowName: hollow.name})
     }
     function handleInputChange (event: React.FormEvent<HTMLInputElement>) {
-        if (!event.currentTarget.value.trim()) return
-        setInputVal(event.currentTarget.value.trim())
+        setInputVal(event.currentTarget.value)
         setArticle({...article, title: event.currentTarget.value.trim() || ''})
     }
     function handleContentChange (event: React.FormEvent<HTMLTextAreaElement>) {
-        if (!event.currentTarget.value.trim()) return
-
-        const des = article.content.length < 10? article.content : article.content.trim().slice(0, 10) + '...'
-        setTextVal(event.currentTarget.value.trim())
+        const value = event.currentTarget.value
+        const des = value.trim().length < 10? value : value.trim().slice(0, 10) + '...'
+        setTextVal(event.currentTarget.value)
         setArticle({...article, content: event.currentTarget.value.trim(), description: des})
+    }
+    function handleSubmit (e: React.MouseEvent) {
+        e.preventDefault()
+        e.stopPropagation()
+        handleAddArt(article)
+        setInputVal('')
+        setTextVal('')
+        setArticle({...article, id: `a${idNum + 1}`, title: '', content: '', description: ''})
+        setIdNum(pre => pre + 1)
     }
 
     return (
-        <>
+        <div className='mt-16 md:w-4/5 lg:w-3/5 m-auto'>
             <p>向樹洞說說話</p>
             <input 
                 value={inputVal}
                 onChange={handleInputChange} 
                 placeholder='請輸入標題' type="text" />
 
-            <textarea value={textVal} onChange={handleContentChange} name="" id="" cols={30} rows={10}></textarea>
+            <textarea value={textVal} onChange={handleContentChange} name="" id="" cols={80} rows={8}></textarea>
 
             <p>選擇樹洞</p>
-            {selectedHollow && <div>{selectedHollow.name}</div>}
+            {selectHollow && <div>{selectHollow.name}</div>}
 
             <input placeholder='請輸入樹洞名稱' type="text" />
 
@@ -74,13 +82,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
                     </button>
                 )
             })}
-            <button onClick={() => {
-                setArticle({...article, id: `a${idNum + 1}`})
-                handleAddArt(article)
-                setInputVal('')
-                setTextVal('')
-                setIdNum(pre => pre + 1)
-            }}>送出</button>
-        </>
+            <button type="button" onClick={handleSubmit}>送出</button>
+        </div>
     )
 }

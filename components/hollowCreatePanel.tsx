@@ -1,19 +1,23 @@
 import { useRouter } from 'next/router'
 import { useState, useRef } from 'react'
-import { Ihollow } from '../pages/index'
-import { Iuser } from '../pages/index'
+import { Ihollow } from '../pages'
+import { Iuser } from '../pages'
 import Link from 'next/link'
 
 interface HollowCreateProps {
   hollows: Ihollow[],
-  currentUser: Iuser
+  currentUser: Iuser,
+  handleAddHollow: (hollow: Ihollow) => void,
 }
 
-export default function HollowCreatePanel ({ hollows, currentUser }: HollowCreateProps) {
+export default function HollowCreatePanel ({ hollows, currentUser, handleAddHollow }: HollowCreateProps) {
+    const [idNum, setIdNum] = useState<number>(8)
     const [inputVal, setInputVal] = useState<string>('')
     const [hollow, setHollow] = useState<Ihollow>({
-        id: '',
+        id: `h${idNum}`,
         name: '',
+        type: 'public',
+        userId: currentUser.id,
         article: 0,
         isSub: false,
         subCounts: 0,
@@ -24,9 +28,9 @@ export default function HollowCreatePanel ({ hollows, currentUser }: HollowCreat
 
     //得到 input 值存進 hollow
     function handleInputHollow (event: React.FormEvent<HTMLInputElement>) {
-        
-        setInputVal(event.currentTarget.value.trim())
-        setHollow({...hollow, name: event.currentTarget.value.trim()})
+        const value = event.currentTarget.value
+        setInputVal(value.trim())
+        setHollow({...hollow, name: value.trim()})
     }
     function handleCheckExist (event: React.FormEvent<HTMLInputElement>) {
         if (!event.currentTarget.value.trim()) {
@@ -41,6 +45,14 @@ export default function HollowCreatePanel ({ hollows, currentUser }: HollowCreat
         //找相同
         const exist: Ihollow | null = hollows.find(h => h.name === event.currentTarget.value.trim()) || null
         setExistHollow(exist)
+    }
+    function handleSubmit (e: React.MouseEvent) {
+        e.preventDefault()
+        e.stopPropagation()
+        setInputVal('')
+        setHollow({...hollow, id: `h${idNum + 1}`, name: ''})
+        setIdNum(pre => pre + 1)
+        handleAddHollow(hollow)
     }
     return (
         <div>
@@ -78,10 +90,7 @@ export default function HollowCreatePanel ({ hollows, currentUser }: HollowCreat
                 }}
                 placeholder='請輸入樹洞名稱' type="text" />
 
-            <button onClick={() => {
-                console.log('132')
-                setInputVal('')
-            }}>送出</button>
+            <button onClick={handleSubmit}>送出</button>
         </div>
     )
 }
