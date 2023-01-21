@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
@@ -6,7 +7,8 @@ import Link from 'next/link'
 import HollowCard from '../components/hollowCard'
 import ArticleCard from '../components/articleCard'
 import ArticleInput from '../components/articleInput'
-import { useState } from 'react'
+import Navbar from '../components/navbar'
+import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollowCreatePanel"
 
 const inter = Inter({ subsets: ['latin'] })
@@ -14,8 +16,9 @@ const inter = Inter({ subsets: ['latin'] })
 export interface Iuser {
     id: string,
     name: string,
+    account: string,
     articles: number,
-    subCounts: number,
+    subHollows: number,
     createAt: string,
     role: string
 }; 
@@ -23,11 +26,13 @@ export interface Iuser {
 export interface Ihollow {
     id: string,
     name: string,
+    type: string,
+    userId: string,
     article: number,
     isSub: boolean,
     subCounts: number,
     createdAt: string,
-}; 
+};
 
 export interface Iarticle {
     id: string,
@@ -38,28 +43,45 @@ export interface Iarticle {
     comments: number,
     collectedCounts: number,
     likedCounts: number,
-    unlikedCounts: number,
+    reportedCounts: number,
     isCollected: boolean,
     isLiked: boolean,
+    reportedAt: string,
     createdAt: string,
     hollowName?: string,
     description?: string
 };
 
-const currentUser = {
-  id: 'u1',
-  name: '白文鳥',
-  articles: 5,
-  subCounts: 2,
-  createAt: '20230106',
-  role: 'user'
+export interface Icomment {
+    id: string,
+    articleId: string,
+    userId: string,
+    content: string,
+    likedCounts: number,
+    reportedCounts: number,
+    isLiked: boolean,
+    reportedAt: string,
+    createdAt: string,
+    description?: string
+};
+
+const currentUser: Iuser = {
+    id: 'u1',
+    name: '白文鳥',
+    account: 'abc123',
+    articles: 5,
+    subHollows: 2,
+    createAt: '20230106',
+    role: 'user'
 }
 
 
-const dummyHotHollows: Ihollow[] = [
+const dummyHollows: Ihollow[] = [
   {
     id: 'h1',
     name: '心情',
+    type: 'public',
+    userId: 'u0',
     article: 10,
     isSub: true,
     subCounts: 100,
@@ -68,6 +90,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h2',
     name: '八點檔',
+    type: 'public',
+    userId: 'u0',
     article: 5,
     isSub: false,
     subCounts: 500,
@@ -76,6 +100,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h3',
     name: '股票',
+    type: 'public',
+    userId: 'u0',
     article: 5,
     isSub: false,
     subCounts: 35,
@@ -84,6 +110,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h4',
     name: '寵物',
+    type: 'public',
+    userId: 'u0',
     article: 16,
     isSub: false,
     subCounts: 600,
@@ -92,6 +120,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h5',
     name: '遊戲',
+    type: 'public',
+    userId: 'u0',
     article: 8,
     isSub: true,
     subCounts: 1000,
@@ -100,6 +130,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h6',
     name: '仙境傳說',
+    type: 'public',
+    userId: 'u0',
     article: 8,
     isSub: true,
     subCounts: 250,
@@ -108,6 +140,8 @@ const dummyHotHollows: Ihollow[] = [
   {
     id: 'h7',
     name: '寶可夢',
+    type: 'public',
+    userId: 'u0',
     article: 30,
     isSub: true,
     subCounts: 800,
@@ -115,7 +149,7 @@ const dummyHotHollows: Ihollow[] = [
   },
 ]
 
-const dummyHotArticles: Iarticle[] = [
+const dummyArticles: Iarticle[] = [
   {
     id: 'a1',
     title: '找工作嗚嗚',
@@ -125,9 +159,10 @@ const dummyHotArticles: Iarticle[] = [
     comments: 2,
     collectedCounts: 20,
     likedCounts: 50,
-    unlikedCounts: 1,
+    reportedCounts: 1,
     isCollected: false,
     isLiked: false,
+    reportedAt: '20230105',
     createdAt: '20230105'
   },
   {
@@ -139,9 +174,10 @@ const dummyHotArticles: Iarticle[] = [
     comments: 18,
     collectedCounts: 2,
     likedCounts: 100,
-    unlikedCounts: 0,
+    reportedCounts: 0,
     isCollected: false,
     isLiked: false,
+    reportedAt: '20230105',
     createdAt: '20230105'
   },
   {
@@ -153,9 +189,10 @@ const dummyHotArticles: Iarticle[] = [
     comments: 8,
     collectedCounts: 0,
     likedCounts: 20,
-    unlikedCounts: 5,
+    reportedCounts: 5,
     isCollected: false,
     isLiked: false,
+    reportedAt: '20230105',
     createdAt: '20230105'
   },
   {
@@ -167,9 +204,10 @@ const dummyHotArticles: Iarticle[] = [
     comments: 16,
     collectedCounts: 1,
     likedCounts: 3,
-    unlikedCounts: 27,
+    reportedCounts: 27,
     isCollected: false,
     isLiked: false,
+    reportedAt: '20230105',
     createdAt: '20230105'
   },
 ]
@@ -182,39 +220,62 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
   })
 }
 
-
-
 export default function Home() {
 
-  const [articles, setArticles] = useState<Iarticle[]>(articlesWithHollowName(dummyHotHollows, dummyHotArticles))
+    const [articles, setArticles] = useState<Iarticle[]>(articlesWithHollowName(dummyHollows, dummyArticles))
+    const [hollows, setHollows] = useState<Ihollow[]>(dummyHollows)
 
-  function handleAddArt (article: Iarticle) {
-    setArticles([...articles, article])
-  }
+    function handleAddArt (article: Iarticle) {
+        setArticles([...articles, article])
+    }
+    function handleAddHollow (hollow: Ihollow) {
+        setHollows([...hollows, hollow])
+    }
 
-  return (
+    return (
     <>
-      <ArticleInput hollows={dummyHotHollows} currentUser={currentUser} handleAddArt={handleAddArt}/>
+        <Navbar />
+        <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+            <ArticleInput 
+            hollows={hollows} 
+            currentUser={currentUser} 
+            handleAddArt={handleAddArt}/>
 
-      <HollowCreatePanel currentUser={currentUser}/>
+            <HollowCreatePanel 
+            currentUser={currentUser} 
+            hollows={hollows} 
+            handleAddHollow={handleAddHollow}/>
 
-      <h1>大家關心的話題</h1>
-      {articles && articles.map(art => {
-        return (
-          <Link href={`/articles/${art.id}`} key={art.id}>
-            <ArticleCard art={art}/>
-          </Link>
-        )
-      })}
-      
-      <h1>大家關心的樹洞</h1>
-      {dummyHotHollows && dummyHotHollows.map(hollow => {
-        return (
-          <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-            <HollowCard hollow={hollow}/>
-          </Link>
-        )
-      })}
+
+            <div className='flex justify-between'>
+                <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
+                <Link href={`/hollows`}>
+                    <span>查看所有樹洞</span>
+                </Link>
+            </div>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                {hollows && hollows.map(hollow => {
+                    return (
+                        <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
+                            <HollowCard hollow={hollow}/>
+                        </Link>
+                    )
+                })}
+            </div>
+        </div>
+        <div className='mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
+            <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
+            <div className='flex-col justify-center w-full'>
+                {articles && articles.map(art => {
+                return (
+                <Link href={`/articles/${art.id}`} key={art.id} >
+                    <ArticleCard art={art}/>
+                </Link>
+                )
+                })}
+            </div>
+        </div>
+        <ToTopButton />
     </>
-  )
+    )
 }
