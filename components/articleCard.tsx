@@ -12,7 +12,6 @@ export default function ArticleCard ({ art }: articleProps) {
             <p className='text-gray-500'>{art.description}</p>
             <p>回應數：{art.comments}</p>
             <span className='border rounded border-lime-500 text-lime-500 px-1.5 py-0.5'>{art.hollowName}</span>
-
         </div>
     )
 }

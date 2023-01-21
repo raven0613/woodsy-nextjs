@@ -32,7 +32,7 @@ export interface Ihollow {
     isSub: boolean,
     subCounts: number,
     createdAt: string,
-}; 
+};
 
 export interface Iarticle {
     id: string,
@@ -49,6 +49,19 @@ export interface Iarticle {
     reportedAt: string,
     createdAt: string,
     hollowName?: string,
+    description?: string
+};
+
+export interface Icomment {
+    id: string,
+    articleId: string,
+    userId: string,
+    content: string,
+    likedCounts: number,
+    reportedCounts: number,
+    isLiked: boolean,
+    reportedAt: string,
+    createdAt: string,
     description?: string
 };
 

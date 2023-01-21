@@ -176,19 +176,17 @@ export default function Hollow () {
         <>
             <Navbar />
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+                
                 {dummyHollow && <h1 className='text-2xl font-semibold'>{dummyHollow.name}</h1>}
                 <ArticleInput handleAddArt={handleAddArt} currentUser={currentUser} hollows={dummyHollows} />
                 
                 {dummyArticles && dummyArticles.map(art => {
                     return (
-                        <>
-                            <Link href={`/articles/${art.id}`} key={art.id} >
-                                <ArticleCard art={art}/>
-                            </Link>
-                        </>
+                        <Link href={`/articles/${art.id}`} key={art.id} >
+                            <ArticleCard art={art}/>
+                        </Link>
                     )
-                })
-                }
+                })}
             </div>
         </>
     )

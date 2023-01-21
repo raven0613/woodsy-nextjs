@@ -1,23 +1,8 @@
 import { useRouter } from 'next/router'
-import posts from '../../posts.json'
+import Navbar from '../../components/navbar'
+import { Iarticle, Icomment } from '../home'
+import CommentCard from "../../components/commentCard"
 
-interface Iarticle {
-    id: string,
-    title: string,
-    hollowId: string,
-    userId: string,
-    content: string,
-    comments: number,
-    collectedCounts: number,
-    likedCounts: number,
-    reportedCounts: number,
-    isCollected: boolean,
-    isLiked: boolean,
-    reportedAt: string,
-    createdAt: string,
-    hollowName?: string,
-    description?: string
-}; 
 const dummyArticle: Iarticle = {
     id: 'a1',
     title: '找工作嗚嗚',
@@ -33,12 +18,60 @@ const dummyArticle: Iarticle = {
     reportedAt: '20230105',
     createdAt: '20230105'
 }
+const dummyComments: Icomment[] = [
+    {
+        id: 'c1',
+        articleId: 'a1',
+        userId: 'u1',
+        content: '年後比較好找啦',
+        likedCounts: 10,
+        reportedCounts: 0,
+        isLiked: false,
+        reportedAt: '',
+        createdAt: '20230121'
+    },
+    {
+        id: 'c2',
+        articleId: 'a1',
+        userId: 'u1',
+        content: '我也好想要工作',
+        likedCounts: 0,
+        reportedCounts: 0,
+        isLiked: false,
+        reportedAt: '',
+        createdAt: '20230121'
+    },
+    {
+        id: 'c3',
+        articleId: 'a1',
+        userId: 'u1',
+        content: '一起加油啊',
+        likedCounts: 5,
+        reportedCounts: 0,
+        isLiked: false,
+        reportedAt: '',
+        createdAt: '20230121'
+    },
+]
+
 
 export default function Article () {
 
     return (
         <>
-
+            <Navbar />
+            {dummyArticle && <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+                <h1 className='text-2xl font-semibold'>{dummyArticle.title}</h1>
+                <article>{dummyArticle.content}</article>
+                
+                <div className='w-full'>
+                    {dummyComments && dummyComments.map(comment => {
+                        return (
+                            <CommentCard comment={comment} key={comment.id}/>
+                        )
+                    })}
+                </div>
+            </div>}
         </>
     )
 }
