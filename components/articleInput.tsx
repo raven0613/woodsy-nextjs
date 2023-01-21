@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { flushSync } from 'react-dom';
-import { Ihollow } from '../pages'
-import { Iarticle } from '../pages'
-import { Iuser } from '../pages'
+import { Ihollow } from '../pages/home'
+import { Iarticle } from '../pages/home'
+import { Iuser } from '../pages/home'
 
 interface hollowProps {
   hollows: Ihollow[],
@@ -61,14 +61,20 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     }
 
     return (
-        <div className='mt-16 md:w-4/5 lg:w-3/5 m-auto'>
+        <div className='w-full'>
             <p>向樹洞說說話</p>
             <input 
+                className='border'
                 value={inputVal}
                 onChange={handleInputChange} 
                 placeholder='請輸入標題' type="text" />
 
-            <textarea value={textVal} onChange={handleContentChange} name="" id="" cols={80} rows={8}></textarea>
+            <textarea 
+                className='border'
+                value={textVal} 
+                onChange={handleContentChange} 
+                name="" id="" cols={80} rows={8}>
+            </textarea>
 
             <p>選擇樹洞</p>
             {selectHollow && <div>{selectHollow.name}</div>}

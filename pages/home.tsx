@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
@@ -7,7 +8,7 @@ import HollowCard from '../components/hollowCard'
 import ArticleCard from '../components/articleCard'
 import ArticleInput from '../components/articleInput'
 import Navbar from '../components/navbar'
-import { useState } from 'react'
+import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollowCreatePanel"
 
 const inter = Inter({ subsets: ['latin'] })
@@ -52,13 +53,13 @@ export interface Iarticle {
 };
 
 const currentUser: Iuser = {
-  id: 'u1',
-  name: '白文鳥',
-  account: 'abc123',
-  articles: 5,
-  subHollows: 2,
-  createAt: '20230106',
-  role: 'user'
+    id: 'u1',
+    name: '白文鳥',
+    account: 'abc123',
+    articles: 5,
+    subHollows: 2,
+    createAt: '20230106',
+    role: 'user'
 }
 
 
@@ -206,60 +207,62 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
   })
 }
 
-
-
 export default function Home() {
 
-  const [articles, setArticles] = useState<Iarticle[]>(articlesWithHollowName(dummyHollows, dummyArticles))
-  const [hollows, setHollows] = useState<Ihollow[]>(dummyHollows)
+    const [articles, setArticles] = useState<Iarticle[]>(articlesWithHollowName(dummyHollows, dummyArticles))
+    const [hollows, setHollows] = useState<Ihollow[]>(dummyHollows)
 
-  function handleAddArt (article: Iarticle) {
-    setArticles([...articles, article])
-  }
-  function handleAddHollow (hollow: Ihollow) {
-    setHollows([...hollows, hollow])
-  }
+    function handleAddArt (article: Iarticle) {
+        setArticles([...articles, article])
+    }
+    function handleAddHollow (hollow: Ihollow) {
+        setHollows([...hollows, hollow])
+    }
 
-  return (
+    return (
     <>
-      <Navbar />
+        <Navbar />
+        <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+            <ArticleInput 
+            hollows={hollows} 
+            currentUser={currentUser} 
+            handleAddArt={handleAddArt}/>
 
-      <ArticleInput 
-      hollows={hollows} 
-      currentUser={currentUser} 
-      handleAddArt={handleAddArt}/>
+            <HollowCreatePanel 
+            currentUser={currentUser} 
+            hollows={hollows} 
+            handleAddHollow={handleAddHollow}/>
 
-      <HollowCreatePanel 
-        currentUser={currentUser} 
-        hollows={hollows} 
-        handleAddHollow={handleAddHollow}/>
 
-      <div className='mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
-        <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
-        <div className='flex flex-wrap justify-between'>
-          {hollows && hollows.map(hollow => {
-            return (
-              <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-                <HollowCard hollow={hollow}/>
-              </Link>
-            )
-          })}
+            <div className='flex justify-between'>
+                <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
+                <Link href={`/hollows`}>
+                    <span>查看所有樹洞</span>
+                </Link>
+            </div>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                {hollows && hollows.map(hollow => {
+                    return (
+                        <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
+                            <HollowCard hollow={hollow}/>
+                        </Link>
+                    )
+                })}
+            </div>
         </div>
-      </div>
-      <div className='mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
-        <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
-        <div className='flex-col justify-center w-full'>
-          {articles && articles.map(art => {
-            return (
-              <Link href={`/articles/${art.id}`} key={art.id} >
-                <ArticleCard art={art}/>
-              </Link>
-            )
-          })}
+        <div className='mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
+            <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
+            <div className='flex-col justify-center w-full'>
+                {articles && articles.map(art => {
+                return (
+                <Link href={`/articles/${art.id}`} key={art.id} >
+                    <ArticleCard art={art}/>
+                </Link>
+                )
+                })}
+            </div>
         </div>
-      </div>
-
-
+        <ToTopButton />
     </>
-  )
+    )
 }

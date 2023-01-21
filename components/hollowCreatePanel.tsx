@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useState, useRef } from 'react'
-import { Ihollow } from '../pages'
-import { Iuser } from '../pages'
+import { Ihollow } from '../pages/home'
+import { Iuser } from '../pages/home'
 import Link from 'next/link'
 
 interface HollowCreateProps {

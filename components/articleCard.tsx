@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Iarticle } from '../pages'
+import { Iarticle } from '../pages/home'
 
 interface articleProps {
   art: Iarticle
