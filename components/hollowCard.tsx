@@ -11,7 +11,7 @@ export default function HollowCard ({ hollow }: hollowProps) {
         <div className='bg-gray-50 rounded-lg py-3 px-4 h-28'>
             <h2>{hollow.name}</h2>
             <p>文章數：{hollow.article}</p>
-            {hollow.isSub && <p>已訂閱</p>}
+            {hollow.isSub && <p>已關注</p>}
         </div>
     )
 }

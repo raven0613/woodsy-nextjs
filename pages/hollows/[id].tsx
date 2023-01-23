@@ -176,8 +176,12 @@ export default function Hollow () {
         <>
             <Navbar />
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
-                
-                {dummyHollow && <h1 className='text-2xl font-semibold'>{dummyHollow.name}</h1>}
+                <div className='grid grid-cols-12'>
+                    <button className=''>back</button>
+                    {dummyHollow && <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>{dummyHollow.name}</h1>}
+                    <button>關注樹洞</button>
+                </div>
+
                 <ArticleInput handleAddArt={handleAddArt} currentUser={currentUser} hollows={dummyHollows} />
                 
                 {dummyArticles && dummyArticles.map(art => {

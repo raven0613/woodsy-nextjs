@@ -1,9 +1,8 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { flushSync } from 'react-dom';
-import { Ihollow } from '../pages/home'
-import { Iarticle } from '../pages/home'
-import { Iuser } from '../pages/home'
+import { Ihollow, Iarticle, Iuser } from '../pages/home'
+
 
 interface hollowProps {
   hollows: Ihollow[],

@@ -11,9 +11,9 @@ export default function CommentCard ({ comment }: commentProps) {
         <div className='w-full border-b px-4 py-2'>
             <span>白文鳥</span>
             <span className='text-sm text-slate-300'>@Vg2X8</span>
-            <article className='py-2'>
+            <p className='py-2 whitespace-pre-wrap'>
                 {comment.content}
-            </article>
+            </p>
         </div>
     )
 }
