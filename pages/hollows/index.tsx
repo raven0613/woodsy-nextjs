@@ -84,7 +84,6 @@ const dummyHollows: Ihollow[] = [
 export default function HollowList () {
     return (
         <>
-            <Navbar />
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
                 <h1 className='text-3xl font-bold'>Hollow</h1>
                 <input className='border w-60 h-10 px-4' type="text" placeholder='請輸入樹洞名稱'/>

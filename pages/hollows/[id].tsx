@@ -174,7 +174,6 @@ export default function Hollow () {
     }
     return (
         <>
-            <Navbar />
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
                 <div className='grid grid-cols-12'>
                     <button className=''>back</button>
