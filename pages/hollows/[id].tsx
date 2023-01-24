@@ -1,25 +1,17 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import useSWR from 'swr';
+import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
 import { Iarticle, Ihollow, Iuser } from '../home'
-import Navbar from '../../components/navbar'
 import ArticleCard from '../../components/articleCard'
 import ArticleInput from '../../components/articleInput'
+
 
 interface hollowProps {
     art: Iarticle
 }
 
-const dummyHollow: Ihollow = {
-    id: 'h1',
-    name: '心情',
-    type: 'public',
-    userId: 'u0',
-    article: 10,
-    isSub: true,
-    subCounts: 100,
-    createdAt: '20230105'
-  }
 
 const dummyArticles: Iarticle[] = [
     {
@@ -168,16 +160,26 @@ const currentUser: Iuser = {
 }
 
 export default function Hollow () {
+    const router = useRouter()
+    const { id } = router.query
+    const { data, error } = useSWR(id, fetchHollow);
+    const hollowData = data?.data
     const [articles, setArticles] = useState<Iarticle[]>(dummyArticles)
     function handleAddArt (article: Iarticle) {
         setArticles([...articles, article])
     }
+
     return (
         <>
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
                 <div className='grid grid-cols-12'>
                     <button className=''>back</button>
-                    {dummyHollow && <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>{dummyHollow.name}</h1>}
+
+                    {hollowData? 
+                    <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>{hollowData.name}</h1> :
+                     <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
+                    }
+
                     <button>關注樹洞</button>
                 </div>
 
@@ -193,4 +195,13 @@ export default function Hollow () {
             </div>
         </>
     )
+}
+
+async function fetchHollow (id: string) {
+    try {
+        const res = await getHollow(id)
+        return res
+    } catch (err) {
+        console.log(err)
+    }
 }
