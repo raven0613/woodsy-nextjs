@@ -4,12 +4,12 @@ import { Icomment, Iuser } from '../../../home'
 
 
 export default function getComments(req: NextApiRequest, res: NextApiResponse<Icomment[]>) {
-    const { id, page, limit } = req.query;
+    // const { id, page, limit } = req.query;
     // console.log('id: ' + id + ' page: '+ page + ' limit: ' + limit)
     res.status(200).json(comments)
 }
 
-const comments: Icomment[] = [
+let comments: Icomment[] = [
     {
         id: 'c1',
         articleId: 'a1',
@@ -44,3 +44,18 @@ const comments: Icomment[] = [
         createdAt: '20230121'
     },
 ]
+
+export function addCom (comment: Icomment) {
+    comments = [...comments, comment]
+}
+export function delCom (commentId: string) {
+    comments = comments.filter(com => com.id !== commentId)
+}
+export function editCom (comment: Icomment) {
+    comments = comments.map(com => {
+        if (com.id === comment.id) {
+            return { ...com, content: comment.content}
+        }
+        return { ...com }
+    })
+}

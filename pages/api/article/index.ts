@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Iarticle, Icomment, Iuser } from '../../home'
 
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+export default function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
     const { page, limit } = req.query;
     console.log('page: '+ page + ' limit: ' + limit)
     res.status(200).json(articles)

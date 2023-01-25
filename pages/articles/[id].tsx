@@ -7,7 +7,7 @@ import { Iarticle, Icomment, Iuser, param } from '../home'
 import CommentCard from "../../components/commentCard"
 import CommentInput from "../../components/commentInput"
 import { getArticle } from '../../api_helpers/apis/article'
-import { getComments, addComments } from '../../api_helpers/apis/comments'
+import { getComments, addComment, editComment, deleteComment } from '../../api_helpers/apis/comments'
 import { AxiosResponse } from 'axios'
 
 const currentUser: Iuser = {
@@ -23,8 +23,9 @@ const currentUser: Iuser = {
 const params: param = { page: 1, limit: 15 }
 
 export default function Article () {
-    const [comment, setComment] = useState<Icomment | null>(null)
+
     const [comments, setComments] = useState<Icomment[]>([])
+    
 
     const router = useRouter()
     const { id } = router.query
@@ -36,9 +37,11 @@ export default function Article () {
     const article: Iarticle = articleData? articleData.data : {}
     
     // 新增一條回覆
-    const { trigger, isMutating, data: addedCommentData, error: addedCommentsError } = useSWRMutation<Icomment, Error>(`comment`, fetchAddComments);
-
-
+    const { trigger: addTrigger, isMutating: addIsMutating, data: addedCommentData, error: addedCommentsError } = useSWRMutation<Icomment, Error>(`comment`, fetchAddComments);
+    // 刪除一條回覆
+    const { trigger: deleteTrigger, isMutating: deleteIsMutating, data: deletedCommentData, error: deletedCommentsError } = useSWRMutation<Icomment, Error>(`comment`, fetchDeleteComments);
+    // 編輯一條回覆
+    const { trigger: editTrigger, isMutating: editIsMutating, data: editCommentData, error: editCommentsError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
 
 
     useEffect(() => {
@@ -48,10 +51,24 @@ export default function Article () {
 
 
     function handleAddComment (comment: Icomment) {
-        trigger(comment)
+        addTrigger(comment)
         setComments([...comments, comment])
     }
-
+    function handleEditComment (comment: Icomment) {
+        const newComments = comments.map(com => {
+            if (com.id === comment.id) {
+                return { ...com, content: comment.content}
+            }
+            return { ...com }
+        })
+        setComments(newComments)
+        editTrigger(comment)
+    }
+    function handleDeleteComment (commentId: string) {
+        const updatedData = comments.filter(com => com.id !== commentId)
+        setComments(updatedData)
+        deleteTrigger(commentId)
+    }
     return (
         <>
             <Navbar />
@@ -64,7 +81,11 @@ export default function Article () {
                     <div className='w-full'>
                         {comments && comments.map(comment => {
                             return (
-                                <CommentCard comment={comment} key={comment.id}/>
+                                <CommentCard 
+                                comment={comment} 
+                                key={comment.id} 
+                                handleDeleteComment={handleDeleteComment}
+                                handleEditComment={handleEditComment}/>
                             )
                         })}
                     </div>
@@ -98,13 +119,33 @@ async function fetchComments (url: string, { page, limit }: param) {
 type arg = {
     arg: Icomment
 }
+type deleteArg = {
+    arg: string
+}
 
 async function fetchAddComments (url: string, { arg }: arg) {
     try {
-        const { data } = await addComments(url, arg)
+        const { data } = await addComment(url, arg)
         return data
     } catch (err) {
         console.log(err)
     }
 }
 
+async function fetchEditComments (url: string, { arg }: arg) {
+    try {
+        const { data } = await editComment(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchDeleteComments (url: string, { arg }: deleteArg) {
+    try {
+        const { data } = await deleteComment(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
