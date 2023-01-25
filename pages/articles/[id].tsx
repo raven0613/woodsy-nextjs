@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import useSWR from 'swr';
 import Navbar from '../../components/navbar'
 import { Iarticle, Icomment, Iuser } from '../home'
 import CommentCard from "../../components/commentCard"
 import CommentInput from "../../components/commentInput"
+import { getArticle } from '../../api_helpers/apis/article'
 
 const dummyArticle: Iarticle = {
     id: 'a1',
@@ -69,6 +71,8 @@ export default function Article () {
     const router = useRouter()
     const { id } = router.query
     const [comments, setComments] = useState<Icomment[]>(dummyComments)
+    const { data: articleData, error: articleError } = useSWR(id, fetchArticle);
+    const article: Iarticle = articleData? articleData.data : {}
 
     function handleAddComment (comment: Icomment) {
         setComments([...comments, comment])
@@ -77,11 +81,11 @@ export default function Article () {
     return (
         <>
             <Navbar />
-            {dummyArticle && <div className='h-screen mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5 flex flex-col justify-between pb-8'>
+            {article && <div className='h-screen mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5 flex flex-col justify-between pb-8'>
 
                 <div className='pt-20 flex-1'>
-                    <h1 className='text-2xl font-semibold '>{dummyArticle.title}</h1>
-                    <article className='whitespace-pre-wrap'>{dummyArticle.content}</article>
+                    <h1 className='text-2xl font-semibold '>{article.title}</h1>
+                    <article className='whitespace-pre-wrap'>{article.content}</article>
                     
                     <div className='w-full'>
                         {comments && comments.map(comment => {
@@ -97,4 +101,22 @@ export default function Article () {
 
         </>
     )
+}
+
+async function fetchArticle (id: string) {
+    try {
+        const res = await getArticle(id)
+        return res
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchComments (id: string) {
+    try {
+        const res = await getArticle(id)
+        return res
+    } catch (err) {
+        console.log(err)
+    }
 }

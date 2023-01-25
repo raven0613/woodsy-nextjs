@@ -1,12 +1,9 @@
 /** @type {import('next').NextConfig} */
+import withBundleAnalyzer from '@next/bundle-analyzer'
+
 const nextConfig = {
   async redirects() {
     return [
-      {
-        source: '/',
-        destination: '/home',
-        permanent: true,
-      },
       {
         source: '/articles',
         destination: '/home',
@@ -14,7 +11,11 @@ const nextConfig = {
       },
     ]
   },
-  reactStrictMode: true,
+  reactStrictMode: true
 }
+
+export const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true'
+})
 
 export default nextConfig

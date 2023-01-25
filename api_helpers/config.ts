@@ -15,7 +15,7 @@ declare module 'axios' {
 const baseURL: string = 'http://localhost:3000/api/'
 
 export const apiHelper = axios.create({
-  baseURL,
-  headers: { 'Content-Type': 'application/json' },
-  timeout: 20000
+    baseURL,
+    headers: { 'Content-Type': 'application/json' },
+    timeout: 20000
 });

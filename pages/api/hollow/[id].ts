@@ -20,6 +20,7 @@ export default function handleHollows(req: NextApiRequest, res: NextApiResponse<
     }
 }
 
+
 function getHollow (res: NextApiResponse<Ihollow>) {
     console.log('get')
     res.status(200).json(hollow)
