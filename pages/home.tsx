@@ -65,7 +65,7 @@ export interface Icomment {
     createdAt: string,
     description?: string
 };
-type param = {
+export type param = {
     page: number
     limit: number
 }

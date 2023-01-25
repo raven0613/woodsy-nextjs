@@ -4,8 +4,8 @@ import { Icomment, Iuser } from '../../../home'
 
 
 export default function getComments(req: NextApiRequest, res: NextApiResponse<Icomment[]>) {
-    const { page, limit } = req.query;
-    console.log('page: '+ page + ' limit: ' + limit)
+    const { id, page, limit } = req.query;
+    // console.log('id: ' + id + ' page: '+ page + ' limit: ' + limit)
     res.status(200).json(comments)
 }
 

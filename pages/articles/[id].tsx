@@ -1,62 +1,15 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import useSWR from 'swr';
+import { useState, useEffect } from 'react'
+import useSWR, { Key, Fetcher } from 'swr'
+import useSWRMutation from 'swr/mutation'
 import Navbar from '../../components/navbar'
-import { Iarticle, Icomment, Iuser } from '../home'
+import { Iarticle, Icomment, Iuser, param } from '../home'
 import CommentCard from "../../components/commentCard"
 import CommentInput from "../../components/commentInput"
 import { getArticle } from '../../api_helpers/apis/article'
+import { getComments, addComments } from '../../api_helpers/apis/comments'
+import { AxiosResponse } from 'axios'
 
-const dummyArticle: Iarticle = {
-    id: 'a1',
-    title: '找工作嗚嗚',
-    hollowId: 'h1',
-    userId: 'u1',
-    content: '好想趕快找到工作，過年後就想要找工作懂否',
-    comments: 2,
-    collectedCounts: 20,
-    likedCounts: 50,
-    reportedCounts: 1,
-    isCollected: false,
-    isLiked: false,
-    reportedAt: '20230105',
-    createdAt: '20230105'
-}
-const dummyComments: Icomment[] = [
-    {
-        id: 'c1',
-        articleId: 'a1',
-        userId: 'u1',
-        content: '年後比較好找啦',
-        likedCounts: 10,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-    {
-        id: 'c2',
-        articleId: 'a1',
-        userId: 'u1',
-        content: '我也好想要工作',
-        likedCounts: 0,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-    {
-        id: 'c3',
-        articleId: 'a1',
-        userId: 'u1',
-        content: '一起加油啊',
-        likedCounts: 5,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-]
 const currentUser: Iuser = {
     id: 'u1',
     name: '白文鳥',
@@ -67,14 +20,35 @@ const currentUser: Iuser = {
     role: 'user'
 }
 
+const params: param = { page: 1, limit: 15 }
+
 export default function Article () {
+    const [comment, setComment] = useState<Icomment | null>(null)
+    const [comments, setComments] = useState<Icomment[]>([])
+
     const router = useRouter()
     const { id } = router.query
-    const [comments, setComments] = useState<Icomment[]>(dummyComments)
+    // fetch 全部回覆
+    const { data: commentsData, error: commentsError } = useSWR([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
+    
+
     const { data: articleData, error: articleError } = useSWR(id, fetchArticle);
     const article: Iarticle = articleData? articleData.data : {}
+    
+    // 新增一條回覆
+    const { trigger, isMutating, data: addedCommentData, error: addedCommentsError } = useSWRMutation<Icomment, Error>(`comment`, fetchAddComments);
+
+
+
+
+    useEffect(() => {
+        const comments: Icomment[] = commentsData? commentsData.data : []
+        setComments(comments)
+    }, [commentsData])
+
 
     function handleAddComment (comment: Icomment) {
+        trigger(comment)
         setComments([...comments, comment])
     }
 
@@ -112,11 +86,25 @@ async function fetchArticle (id: string) {
     }
 }
 
-async function fetchComments (id: string) {
+async function fetchComments (url: string, { page, limit }: param) {
     try {
-        const res = await getArticle(id)
+        const res = await getComments(url, page, limit)
         return res
     } catch (err) {
         console.log(err)
     }
 }
+
+type arg = {
+    arg: Icomment
+}
+
+async function fetchAddComments (url: string, { arg }: arg) {
+    try {
+        const { data } = await addComments(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
