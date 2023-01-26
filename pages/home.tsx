@@ -3,11 +3,11 @@ import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import useSWR from 'swr';
-import HollowCard from '../components/hollowCard'
-import ArticleCard from '../components/articleCard'
-import ArticleInput from '../components/articleInput'
+import HollowCard from '../components/hollow/hollowCard'
+import ArticleCard from '../components/article/articleCard'
+import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
-import HollowCreatePanel from "../components/hollowCreatePanel"
+import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
 import { getArticles } from '../api_helpers/apis/article'
 import { type } from 'os';

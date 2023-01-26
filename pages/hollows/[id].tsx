@@ -4,8 +4,8 @@ import useSWR from 'swr';
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
 import { Iarticle, Ihollow, Iuser } from '../home'
-import ArticleCard from '../../components/articleCard'
-import ArticleInput from '../../components/articleInput'
+import ArticleCard from '../../components/article/articleCard'
+import ArticleInput from '../../components/article/articleInput'
 
 
 interface hollowProps {

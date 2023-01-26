@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Ihollow } from '../home'
-import HollowCreatePanel from "../../components/hollowCreatePanel"
-import HollowCard from '../../components/hollowCard'
+import HollowCreatePanel from "../../components/hollow/hollowCreatePanel"
+import HollowCard from '../../components/hollow/hollowCard'
 import Navbar from '../../components/navbar'
 
 const dummyHollows: Ihollow[] = [

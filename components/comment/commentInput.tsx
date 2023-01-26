@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Icomment, Iuser } from '../pages/home'
+import { Icomment, Iuser } from '../../pages/home'
 
 interface IcommentProps {
   handleAddComment: (article: Icomment) => void,

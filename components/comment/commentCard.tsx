@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Icomment } from '../pages/home'
+import { Icomment } from '../../pages/home'
 import { useState } from 'react'
 
 interface commentProps {
