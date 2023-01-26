@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Ihollow } from '../pages/home'
+import { Ihollow } from '../../pages/home'
 
 
 interface hollowProps {

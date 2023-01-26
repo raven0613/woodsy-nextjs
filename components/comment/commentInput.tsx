@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Icomment, Iuser } from '../pages/home'
+import { Icomment, Iuser } from '../../pages/home'
 
 interface IcommentProps {
   handleAddComment: (article: Icomment) => void,
@@ -33,6 +33,7 @@ export default function CommentInput ({ handleAddComment, currentUser }: Icommen
     function handleSubmit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        if (!comment.content) return console.log('沒有內容')
         handleAddComment(comment)
         setTextVal('')
         setComment({...comment, id: `a${idNum + 1}`, content: '', description: ''})
