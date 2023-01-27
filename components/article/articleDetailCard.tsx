@@ -9,6 +9,7 @@ interface articleProps {
 
 export default function ArticleDetailCard ({ article, handleDeleteArt }: articleProps) {
     const [isEditing, setIsEditing] = useState<boolean>(false)
+    
 
     function handleEdit () {
         setIsEditing(true)

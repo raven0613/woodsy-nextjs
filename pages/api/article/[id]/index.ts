@@ -1,11 +1,18 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
 import { Iarticle, Icomment, Iuser } from '../../../home'
+import db from '../../../../models/index';
+
+// db.sequelize.sync();
+const DB: any = db;
+// const Article = db.Article;
+const { Article } = DB;
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle | Icomment>) {
     switch (req.method) {
         case 'GET':
-            getArticle(res)
+            getArticle(req, res)
             break
         case 'POST':
             addArticle(res)
@@ -22,8 +29,10 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-function getArticle (res: NextApiResponse<Iarticle>) {
-    console.log('get')
+async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+    const { id } = req.query
+    const idNum = Number(id)
+    const article = await Article.findByPk(idNum)
     res.status(200).json(article)
 }
 
@@ -43,7 +52,7 @@ function deleteArticle (res: NextApiResponse<Iarticle>) {
 }
 
 const article: Iarticle = {
-    id: 'a1',
+    id: 1,
     title: '找工作嗚嗚',
     hollowId: 'h1',
     userId: 'u1',
