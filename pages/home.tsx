@@ -36,7 +36,7 @@ export interface Ihollow {
 };
 
 export interface Iarticle {
-    id: string,
+    id: number,
     title: string,
     hollowId: string,
     userId: string,

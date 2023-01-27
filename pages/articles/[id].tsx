@@ -38,7 +38,10 @@ export default function Article () {
     // fetch 全部回覆
     const { data: commentsData, error: commentsError } = useSWR([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
     
-
+    useEffect(() => {
+        const fetchedArt: Iarticle = articleData? articleData.data : {}
+        setArticle(fetchedArt)
+    }, [articleData])
 
     
     // 新增一條回覆
@@ -54,10 +57,7 @@ export default function Article () {
         setComments(comments)
     }, [commentsData])
 
-    useEffect(() => {
-        const fetchedArt: Iarticle = articleData? articleData.data : {}
-        setArticle(fetchedArt)
-    }, [articleData])
+
 
     function handleAddComment (comment: Icomment) {
         addComTrigger(comment)

@@ -12,7 +12,7 @@ export default function getArticles(req: NextApiRequest, res: NextApiResponse<Ia
 
 const articles: Iarticle[] = [
   {
-    id: 'a1',
+    id: 1,
     title: '找工作嗚嗚',
     hollowId: 'h1',
     userId: 'u1',
@@ -27,7 +27,7 @@ const articles: Iarticle[] = [
     createdAt: '20230105'
   },
   {
-    id: 'a2',
+    id: 2,
     title: '好好玩喔',
     hollowId: 'h7',
     userId: 'u1',
@@ -42,7 +42,7 @@ const articles: Iarticle[] = [
     createdAt: '20230105'
   },
   {
-    id: 'a3',
+    id: 3,
     title: '本多終勝',
     hollowId: 'h3',
     userId: 'u1',
@@ -57,7 +57,7 @@ const articles: Iarticle[] = [
     createdAt: '20230105'
   },
   {
-    id: 'a4',
+    id: 4,
     title: '求牧師配點',
     hollowId: 'h6',
     userId: 'u1',
