@@ -52,6 +52,7 @@ export default function Article () {
     const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
     // 刪除一篇文章
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
+    
     useEffect(() => {
         const comments: Icomment[] = commentsData? commentsData.data : []
         setComments(comments)
@@ -177,6 +178,7 @@ async function fetchEditArticle (url: string, { arg }: articleArg) {
 
 async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
     try {
+        
         const { data } = await deleteArticle(url, arg)
         return data
     } catch (err) {

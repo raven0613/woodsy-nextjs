@@ -1,12 +1,28 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Iarticle, Icomment, Iuser } from '../../home'
+import db from '../../../models/index';
+const { Users, Articles, Comments } = db;
 
+function getOffset (page: number, limit: number) {
+  return (page - 1) * limit
+}
 
-export default function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
-    const { page, limit } = req.query;
+export default async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+    const { page: p, limit: l } = req.query;
+    const page = Number(p), limit = Number(l)
     console.log('page: '+ page + ' limit: ' + limit)
-    res.status(200).json(articles)
+
+    const articles = await Articles.findAndCountAll({
+      include: [
+        { model: Users, attributes: ['id', 'name'] }, 
+        { model: Comments, attributes: ['id', 'content'] }],
+      limit,
+      offset: getOffset(page, limit),
+      nest: true, 
+    })
+    if (articles === null) return res.status(405).end({ message: '找不到文章' })
+    res.status(200).json(articles)  //回傳的是 count 和 data
 }
 
 

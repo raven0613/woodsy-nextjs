@@ -2,16 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Ihollow, Icomment, Iuser } from '../../home'
 import db from '../../../models/index';
-// db.sequelize.sync();
-// const DB: any = db;
-// const Article = db.Article;
-const { User, Article } = db;
+const { Users, Articles } = db;
 
 
 export default function handleUser(req: NextApiRequest, res: NextApiResponse<Iuser> ) {
   switch (req.method) {
       case 'GET':
-          addUser(req, res)
+          getUser(req, res)
           break
       case 'POST':
           addUser(req, res)
@@ -23,7 +20,6 @@ export default function handleUser(req: NextApiRequest, res: NextApiResponse<Ius
           res.status(405).end() //Method Not Allowed
           break
   }
-  res.status(200).json(currentUser)
 }
 
 const currentUser: Iuser = {
@@ -38,20 +34,23 @@ const currentUser: Iuser = {
 
 async function addUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
   console.log('add')
+  res.status(200).json(currentUser)
 }
 async function editUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
-
+    
+  res.status(200).json(currentUser)
 }
 
 async function getUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
     const { id } = req.query
     const idNum = Number(id)
-    const user = await User.findByPk(idNum, {
+    const user = await Users.findByPk(idNum, {
         include: [
-          { model: Article, as: 'Articles' }
+          { model: Articles, as: 'Articles' }
         ]
     })
     if (user === null) return res.status(405).end() //Method Not Allowed
     const userData: Iuser = user.toJSON()
+    console.log(user)
     res.status(200).json(userData)
 }

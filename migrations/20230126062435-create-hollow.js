@@ -15,20 +15,20 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
-      articleCounts: {
+      article_counts: {
         type: Sequelize.INTEGER
       },
-      subCounts: {
+      sub_counts: {
         type: Sequelize.INTEGER
       },
-      isSub: {
-        type: Sequelize.BOOLEAN
+      reported_counts: {
+        type: Sequelize.INTEGER
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }

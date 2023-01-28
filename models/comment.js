@@ -10,17 +10,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Comment.belongsTo(models.Users);
+      Comment.belongsTo(models.Articles);
     }
   }
   Comment.init({
     content: DataTypes.STRING,
     likedCounts: DataTypes.INTEGER,
-    reportedCounts: DataTypes.INTEGER,
-    isLiked: DataTypes.BOOLEAN
+    reportedCounts: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Comment',
+    modelName: 'Comments',
+    tableName: 'comments',
+    underscored: true
   });
   return Comment;
 };

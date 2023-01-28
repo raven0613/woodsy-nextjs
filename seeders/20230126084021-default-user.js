@@ -19,29 +19,40 @@ module.exports = {
       email: SEED_USER.email,
       password: bcrypt.hashSync(SEED_USER.password, bcrypt.genSaltSync(saltRounds), null),
       role: SEED_USER.role,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
+    }], {});
+    const hollowId = await queryInterface.bulkInsert('Hollows',
+      [{
+      name: 'hollow-1',
+      type: 'public',
+      article_counts: 10,
+      sub_counts: 0,
+      reported_counts: 0,
+      User_id: userId,
+      created_at: new Date(),
+      updated_at: new Date()
     }], {});
     return await queryInterface.bulkInsert('Articles',
       Array.from({ length: 10 }).map((_, i) => (
         {
-          title: `article-${i}`,
-          content: `content-${i}`,
-          collectedCounts: 0,
-          likedCounts: 0,
-          reportedCounts: 0,
-          isCollected: false,
-          isLiked: false,
-          isReported: false,
-          UserId: userId,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          title: `article-${i + 1}`,
+          content: `content-${i + 1}`,
+          comment_counts: 1,
+          collected_counts: 0,
+          liked_counts: 0,
+          reported_counts: 0,
+          User_id: userId,
+          Hollow_id: hollowId,
+          created_at: new Date(),
+          updated_at: new Date()
         })
       ), {});
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Articles', null, {});
+    await queryInterface.bulkDelete('Hollows', null, {});
     return await queryInterface.bulkDelete('Users', null, {});
   }
 };

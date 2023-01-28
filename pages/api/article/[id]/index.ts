@@ -3,11 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
 import { Iarticle, Icomment, Iuser } from '../../../home'
 import db from '../../../../models/index';
+const { Users, Articles, Comments } = db;
 
-// db.sequelize.sync();
-const DB: any = db;
-// const Article = db.Article;
-const { Article } = DB;
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle | Icomment>) {
     switch (req.method) {
@@ -15,13 +12,13 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
             getArticle(req, res)
             break
         case 'POST':
-            addArticle(res)
+            addArticle(req, res)
             break
         case 'PUT':
-            editArticle(res)
+            editArticle(req, res)
             break
         case 'DELETE':
-            deleteArticle(res)
+            deleteArticle(req, res)
             break
         default:
             res.status(405).end() //Method Not Allowed
@@ -32,22 +29,53 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
     const { id } = req.query
     const idNum = Number(id)
-    const article = await Article.findByPk(idNum)
+    const article: Iarticle = await Articles.findByPk(idNum, {
+      raw: true,
+      nest: true,
+      include: [
+        { model: Users, as: 'User' }, 
+        { model: Comments, as: 'Comments' }]
+    })
+    if (article === null) return res.status(405).end({ message: '找不到文章' })
     res.status(200).json(article)
 }
 
-function addArticle (res: NextApiResponse<Iarticle>) {
-    console.log('post')
+async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+    console.log(req)
     res.status(200).json(article)
 }
 
-function editArticle (res: NextApiResponse<Iarticle>) {
+async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+    const { id } = req.query
+    const idNum = Number(id)
+
+    const article = await Articles.destroy({
+        where: {
+            id: idNum
+        }
+    })
+    if (article === null) return res.status(405).end({ message: '找不到文章' })
     console.log('put')
+
     res.status(200).json(article)
 }
 
-function deleteArticle (res: NextApiResponse<Iarticle>) {
-    console.log('delete')
+async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+    const { id } = req.query
+    const idNum = Number(id)
+    const comment = await Comments.destroy({
+        where: {
+            articleId: idNum
+        }
+    })
+    if (comment === null) return res.status(405).end({ message: '找不到評論' })
+    const article = await Articles.destroy({
+        where: {
+            id: idNum
+        }
+    })
+    if (article === null) return res.status(405).end({ message: '找不到文章' })
+
     res.status(200).json(article)
 }
 

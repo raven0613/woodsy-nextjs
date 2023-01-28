@@ -10,23 +10,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Article.belongsTo(models.User)
+      Article.belongsTo(models.Users);
+      Article.hasMany(models.Comments, { onDelete: 'SET NULL', foreignKey: 'articleId' });
     }
   }
   Article.init({
     title: DataTypes.STRING,
     content: DataTypes.STRING,
+    commentCounts: DataTypes.INTEGER,
     collectedCounts: DataTypes.INTEGER,
     likedCounts: DataTypes.INTEGER,
     reportedCounts: DataTypes.INTEGER,
-    isCollected: DataTypes.BOOLEAN,
-    isLiked: DataTypes.BOOLEAN,
-    isReported: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'Article',
-    tableName: 'Articles',
-    // underscored: true
+    modelName: 'Articles',
+    tableName: 'articles',
+    underscored: true
   });
   return Article;
 };

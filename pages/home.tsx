@@ -78,8 +78,12 @@ const currentUser: Iuser = {
     createAt: '20230106',
     role: 'user'
 }
-
-
+export type serverProps = {
+    articleCounts: number
+    hollowCounts: number
+    articleRows: Iarticle[]
+    hollowRows: Ihollow[]
+}
 const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
     return articles.map(article => {
         const targetHollow = hollows.find(h => article.hollowId === h.id)
@@ -89,21 +93,21 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
 }
 const params: param = { page: 1, limit: 10 }
 
-export default function Home() {
-    const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
-    const { data: artData, error: artError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
+export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows }: serverProps) {
+    // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
+    // const { data: artData, error: artError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
 
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
 
     
     useEffect(() => {
-        const hotHollows: Ihollow[] = hollowData? hollowData.data : []
-        const hotArticles: Iarticle[] = artData? artData.data : []
+        const hotHollows: Ihollow[] = hollowRows? hollowRows : []
+        const hotArticles: Iarticle[] = articleRows? articleRows : []
         const arts = articlesWithHollowName(hotHollows, hotArticles)
         setHollows(hotHollows)
         setArticles(arts)
-    }, [artData, hollowData])
+    }, [articleRows, hollowRows])
 
 
     function handleAddArt (article: Iarticle) {
@@ -160,9 +164,27 @@ export default function Home() {
     )
 }
 
+export async function getServerSideProps() {
+    try {
+        const [articles, hollows] = await Promise.all([
+            fetchHotArticles('article', { page: 1, limit: 10 }),
+            fetchHotHollows('hollow', { page: 1, limit: 10 })
+        ])
+        const { count: articleCounts, rows: articleRows } = articles?.data
+        const { count: hollowCounts, rows: hollowRows } = hollows?.data
+        return {
+            props: { articleCounts, articleRows, hollowCounts, hollowRows }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
 async function fetchHotHollows (url: string, { page, limit }: param) {
     try {
         const res = await getHollows(url, page, limit)
+        console.log(res)
         return res
     } catch (err) {
         console.log(err)
@@ -177,3 +199,5 @@ async function fetchHotArticles (url: string, { page, limit }: param) {
         console.log(err)
     }
 }
+
+
