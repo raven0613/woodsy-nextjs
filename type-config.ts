@@ -1,3 +1,5 @@
+import NextAuth, { DefaultSession } from "next-auth"
+
 
 export interface Iuser {
     id?: number
@@ -10,10 +12,9 @@ export interface Iuser {
     createAt?: string
     role: string
 }; 
-export interface ILoginuser extends Iuser {
-    email: string
-    password: string
+export interface ILoginuser{
     account: string
+    password: string
 }; 
 
 export interface Ihollow {
@@ -67,6 +68,7 @@ export type serverProps = {
     hollowCounts: number
     articleRows: Iarticle[]
     hollowRows: Ihollow[]
+    csrfToken: string
 }
 export type userArg = {
     arg: Iuser
@@ -82,4 +84,21 @@ export type articleArg = {
 }
 export type deleteArg = {
     arg: string
+}
+
+
+declare module "next-auth" {
+  /**
+   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    accessToken: string | unknown
+    user: {
+      /** The user's postal address. */
+      id: number
+      name: string
+      account: string
+      email: string
+    } & DefaultSession["user"]
+  }
 }

@@ -31,7 +31,7 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
         setAccount('')
         setPassword('')
     }
-    function handleClickLogin (e: React.MouseEvent) {
+    function handleChangeToLogin (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         router.push('/login')
@@ -64,7 +64,7 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
                     <button className='w-20 h-8 border' onClick={handleSubmitRegister}>送出</button>
 
                     <span>已經有帳戶了嗎？ </span>
-                    <button onClick={handleClickLogin}>登入</button>
+                    <button onClick={handleChangeToLogin}>登入</button>
 
                 </form>
                 

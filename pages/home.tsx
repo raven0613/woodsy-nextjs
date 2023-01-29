@@ -13,6 +13,8 @@ import { getHollows } from '../api_helpers/apis/hollow'
 import { getArticles, addArticle } from '../api_helpers/apis/article'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg } from '../type-config';
+import { getCsrfToken } from 'next-auth/react';
+import { CtxOrReq } from 'next-auth/client/_utils';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,9 +35,9 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
         return { ...article, hollowName: targetHollow?.name || '', description: des}
     })
 }
-const params: param = { page: 1, limit: 10 }
 
-export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows }: serverProps) {
+
+export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
     // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
@@ -43,7 +45,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
 
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
-
     
     useEffect(() => {
         const hotHollows: Ihollow[] = hollowRows? hollowRows : []
@@ -65,10 +66,10 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     return (
     <>
         <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
-            <ArticleInput 
+            {csrfToken && <ArticleInput 
             hollows={hollows} 
             currentUser={currentUser} 
-            handleAddArt={handleAddArt}/>
+            handleAddArt={handleAddArt}/>}
 
             <HollowCreatePanel 
             currentUser={currentUser} 
@@ -109,16 +110,18 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     )
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: CtxOrReq | undefined) {
+    const params: param = { page: 1, limit: 10 }
     try {
         const [articles, hollows] = await Promise.all([
-            fetchHotArticles('article', { page: 1, limit: 10 }),
-            fetchHotHollows('hollow', { page: 1, limit: 10 })
+            fetchHotArticles('article', params),
+            fetchHotHollows('hollow', params)
         ])
         const { count: articleCounts, rows: articleRows } = articles?.data
         const { count: hollowCounts, rows: hollowRows } = hollows?.data
+        const csrfToken = await getCsrfToken(context)
         return {
-            props: { articleCounts, articleRows, hollowCounts, hollowRows }
+            props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }
         }
     } catch (err) {
         console.log(err)

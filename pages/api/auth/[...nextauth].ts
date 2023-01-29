@@ -1,24 +1,73 @@
-import type { Adapter } from "next-auth/adapters"
-import { JWT } from "next-auth/jwt"
+import type { Adapter, AdapterUser } from "next-auth/adapters"
+import { JWT, getToken } from "next-auth/jwt"
 
-import NextAuth from "next-auth"
+
+import NextAuth, { Session, User, DefaultSession  } from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import EmailProvider from "next-auth/providers/email"
+import CredentialsProvider from "next-auth/providers/credentials"
 
-export const authOptions = {
+
+import { userRegister, userLogin } from '../../../api_helpers/apis/user'
+import { ILoginuser } from "../../../type-config"
+
+export default NextAuth({
     session: {
         strategy: "jwt",
-        jwt: true,
     },
     providers: [
-        EmailProvider({
-            server: process.env.EMAIL_SERVER,
-            from: process.env.EMAIL_FROM,
-            // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
-            type: 'email'
+        CredentialsProvider({
+            id: 'credentials',
+            name: 'emailAndPassword',
+            credentials: {
+                account: {
+                    label: 'account',
+                    type: 'account',
+                    placeholder: 'jsmith',
+                },
+                password: { label: 'Password', type: 'password' }
+            },
+            async authorize(credentials, req) {  //確認授權的邏輯
+                const payload: ILoginuser = {
+                    account: credentials?.account || '',
+                    password: credentials?.password || '',
+                }
+                const res = await userLogin('/auth/signin', payload)
+                console.log(res)
+                const user = res.data
+                // 如果登入資訊正確   .statusText === 'ok'
+                if (res.status === 200 && user) {
+                    return user   // 例如 { name: 'J Smith', email: 'jsmith@example.com' }
+                }
+                return null
+            }
         })
-        // ...add more providers here
     ],
-}
+    secret: process.env.NEXTAUTH_SECRET,
+    pages: {
+        signIn: '/login',
+    },
+    callbacks: {
+        async jwt({ token, user, account }) {
+            if (account) {
+                console.log(account)
+                return {
+                    accessToken: account.access_token,
+                    refreshToken: account.refresh_token,
+                    user
+                }
+            }
+            return token
+        },
+        async session({ session, token }) {
+            const { id, name, account, email } = JSON.parse(JSON.stringify(token.user))
+            session.user = { id, name, account, email }
+            session.accessToken = token.accessToken
 
-export default NextAuth(authOptions)
+            return session
+        }
+    },
+    debug: true
+})
+
+

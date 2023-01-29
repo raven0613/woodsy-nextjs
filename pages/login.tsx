@@ -6,26 +6,33 @@ import { Ihollow, Iarticle, Iuser, ILoginuser, userLoginArg } from '../type-conf
 import { userLogin } from '../api_helpers/apis/user'
 import LoginPanel from '../components/loginPanel';
 
+import { getCsrfToken } from "next-auth/react"
+
+import { useSession, signIn } from "next-auth/react"
 
 export default function Login () {
-    // user 登入
-    const { trigger: loginUserTrigger, isMutating: loginUserIsMutating, data: loginUserData, error: loginUserError } = useSWRMutation<Iuser, Error>(`auth/signIn`, fetchLoginUser);
-
-    function handleLogin (user: ILoginuser) {
-        loginUserTrigger(user)
-    }
+    const router = useRouter()
+    // status: "loading" | "authenticated" | "unauthenticated"
+    const { data: session, status } = useSession({
+        required: true,
+        onUnauthenticated() {
+        },
+    })
+    if (session) {
+        router.push('/home')
+    } 
+    
     return (
         <>
-            <LoginPanel handleLogin={handleLogin} type={1}/>
+            <LoginPanel handleLogin={handleLogin}/>
         </>
     )
 }
 
-async function fetchLoginUser (url: string, { arg }: userLoginArg) {
-    try {
-        const { data } = await userLogin(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
+export async function handleLogin (user: ILoginuser) {
+    await signIn('credentials', {
+        redirect: false,
+        account: user.account,
+        password: user.password,
+    })
 }

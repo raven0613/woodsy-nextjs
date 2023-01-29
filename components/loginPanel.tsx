@@ -4,15 +4,17 @@ import { FC, PropsWithChildren } from 'react';
 import { flushSync } from 'react-dom';
 import { Ihollow, Iarticle, Iuser, ILoginuser } from '../type-config'
 
+
 interface IuserProps {
   handleLogin: (user: ILoginuser) => void
-  type: number   //0: 註冊, 1: 登入
 } 
 
-export default function LoginPanel ({ handleLogin, type }: IuserProps) {
+export default function LoginPanel ({ handleLogin }: IuserProps) {
     const router = useRouter()
     const [account, setAccount] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+    const [isFetching, setIsFetching] = useState<boolean>(false)
+
 
     function handleSetValue (e: React.FormEvent<HTMLInputElement>, setter: (value: string) => void) {
         const value = e.currentTarget.value
@@ -22,18 +24,18 @@ export default function LoginPanel ({ handleLogin, type }: IuserProps) {
     function handleSubmitLogin (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        setIsFetching(true)
         handleLogin({
-            account, password,
+            account, password
         })
         setAccount('')
         setPassword('')
     }
-    function handleClickRegister (e: React.MouseEvent) {
+    function handleChangeToRegister (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         router.push('/register')
     }
-
     return (
         <>
             <div className='fixed right-2/4 bottom-2/4 translate-x-1/2 translate-y-1/2 w-8/12 h-96 border'>
@@ -49,10 +51,11 @@ export default function LoginPanel ({ handleLogin, type }: IuserProps) {
                     onChange={e => {handleSetValue(e, setPassword)}} 
                     placeholder='請輸入密碼' type="password" />
 
+                    {isFetching && <button className='w-20 h-8 border' disabled onClick={handleSubmitLogin}>登入</button>}
 
-                    <button className='w-20 h-8 border' onClick={handleSubmitLogin}>登入</button>
+                    {!isFetching && <button className='w-20 h-8 border' onClick={handleSubmitLogin}>登入</button>}
                     <span>還沒有加入 Woodsy？ </span>
-                    <button onClick={handleClickRegister}>註冊</button>
+                    <button type='button' onClick={handleChangeToRegister}>立即加入</button>
                 </form>
                 
             </div>
