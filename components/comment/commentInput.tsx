@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Icomment, Iuser } from '../../pages/home'
+import { Icomment, Iuser } from '../../type-config'
 
 interface IcommentProps {
   handleAddComment: (article: Icomment) => void,
@@ -11,7 +11,7 @@ export default function CommentInput ({ handleAddComment, currentUser }: Icommen
     const [idNum, setIdNum] = useState<number>(4)
     const [textVal, setTextVal] = useState<string>('')
     const [comment, setComment] = useState<Icomment>({
-        id: 'c04',
+        id: 4,
         articleId: 'a01',
         userId: 'u01',
         content: '',

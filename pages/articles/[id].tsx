@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import useSWR, { Key, Fetcher } from 'swr'
 import useSWRMutation from 'swr/mutation'
 import Navbar from '../../components/navbar'
-import { Iarticle, Icomment, Iuser, param } from '../home'
+import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg } from '../../type-config'
 import CommentCard from "../../components/comment/commentCard"
 import CommentInput from "../../components/comment/commentInput"
 import ArticleDetailCard from "../../components/article/articleDetailCard"
@@ -13,7 +13,7 @@ import { getComments, addComment, editComment, deleteComment } from '../../api_h
 import { AxiosResponse } from 'axios'
 
 const currentUser: Iuser = {
-    id: 'u1',
+    id: 1,
     name: '白文鳥',
     account: 'abc123',
     articles: 5,
@@ -52,6 +52,7 @@ export default function Article () {
     const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
     // 刪除一篇文章
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
+    
     useEffect(() => {
         const comments: Icomment[] = commentsData? commentsData.data : []
         setComments(comments)
@@ -129,15 +130,7 @@ async function fetchComments (url: string, { page, limit }: param) {
     }
 }
 
-type commentArg = {
-    arg: Icomment
-}
-type articleArg = {
-    arg: Iarticle
-}
-type deleteArg = {
-    arg: string
-}
+
 
 async function fetchAddComments (url: string, { arg }: commentArg) {
     try {
@@ -177,6 +170,7 @@ async function fetchEditArticle (url: string, { arg }: articleArg) {
 
 async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
     try {
+        
         const { data } = await deleteArticle(url, arg)
         return data
     } catch (err) {

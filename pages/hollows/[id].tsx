@@ -3,7 +3,7 @@ import { useState } from 'react'
 import useSWR from 'swr';
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
-import { Iarticle, Ihollow, Iuser } from '../home'
+import { Iarticle, Ihollow, Iuser } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
 

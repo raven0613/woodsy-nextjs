@@ -11,8 +11,8 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-const Article = require('./article');
-const User = require('./user');
+// const Article = require('./article');
+// const User = require('./user');
 
 let sequelize;
 if (config.use_env_variable) {
@@ -47,7 +47,7 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.Article = Article(sequelize, Sequelize);
-db.User = User(sequelize, Sequelize);
+// db.Article = Article(sequelize, Sequelize);
+// db.User = User(sequelize, Sequelize);
 
 module.exports = db;

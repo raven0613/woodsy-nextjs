@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Ihollow } from '../home'
+import { Ihollow } from '../../type-config'
 import HollowCreatePanel from "../../components/hollow/hollowCreatePanel"
 import HollowCard from '../../components/hollow/hollowCard'
 import Navbar from '../../components/navbar'

@@ -1,5 +1,5 @@
 import { apiHelper } from '../config'
-import { Iarticle, Icomment, Iuser, param } from '../../pages/home'
+import { Iarticle, Icomment, Iuser, param } from '../../type-config'
 
 export function getArticles (url: string, page: number, limit: number) {
     return apiHelper.get(url, { params: { page, limit } })

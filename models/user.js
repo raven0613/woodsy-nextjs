@@ -11,7 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasMany(models.Article)
+      User.hasMany(models.Articles);
+      User.hasMany(models.Comments, {
+          foreignKey: 'userId',
+      });
+      User.hasMany(models.Hollows, {
+          foreignKey: 'userId',
+      });
     }
   }
   User.init({
@@ -22,9 +28,9 @@ module.exports = (sequelize, DataTypes) => {
     role: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'User',
-    tableName: 'Users',
-    // underscored: true
+    modelName: 'Users',
+    tableName: 'users',
+    underscored: true
   });
   return User;
 };

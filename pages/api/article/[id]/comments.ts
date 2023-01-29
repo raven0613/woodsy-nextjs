@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Icomment, Iuser } from '../../../home'
+import { Icomment, Iuser } from '../../../../type-config'
 
 
 export default function getComments(req: NextApiRequest, res: NextApiResponse<Icomment[]>) {

@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Hollow.belongsTo(models.Users);
+      Hollow.hasMany(models.Articles, { foreignKey: 'hollowId' });
     }
   }
   Hollow.init({
@@ -18,10 +19,12 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.STRING,
     articleCounts: DataTypes.INTEGER,
     subCounts: DataTypes.INTEGER,
-    isSub: DataTypes.BOOLEAN
+    reportedCounts: DataTypes.INTEGER,
   }, {
     sequelize,
-    modelName: 'Hollow',
+    modelName: 'Hollows',
+    tableName: 'hollows',
+    underscored: true
   });
   return Hollow;
 };

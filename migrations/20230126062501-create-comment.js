@@ -12,20 +12,17 @@ module.exports = {
       content: {
         type: Sequelize.STRING
       },
-      likedCounts: {
+      liked_counts: {
         type: Sequelize.INTEGER
       },
-      reportedCounts: {
+      reported_counts: {
         type: Sequelize.INTEGER
       },
-      isLiked: {
-        type: Sequelize.BOOLEAN
-      },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }
