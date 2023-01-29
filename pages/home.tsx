@@ -3,74 +3,21 @@ import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation'
 import HollowCard from '../components/hollow/hollowCard'
 import ArticleCard from '../components/article/articleCard'
 import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { getArticles } from '../api_helpers/apis/article'
+import { getArticles, addArticle } from '../api_helpers/apis/article'
 import { type } from 'os';
+import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg } from '../type-config';
 
 const inter = Inter({ subsets: ['latin'] })
 
-export interface Iuser {
-    id: string,
-    name: string,
-    account: string,
-    articles: number,
-    subHollows: number,
-    createAt: string,
-    role: string
-}; 
-
-export interface Ihollow {
-    id: string,
-    name: string,
-    type: string,
-    userId: string,
-    article: number,
-    isSub: boolean,
-    subCounts: number,
-    createdAt: string,
-};
-
-export interface Iarticle {
-    id: number,
-    title: string,
-    hollowId: string,
-    userId: string,
-    content: string,
-    comments: number,
-    collectedCounts: number,
-    likedCounts: number,
-    reportedCounts: number,
-    isCollected: boolean,
-    isLiked: boolean,
-    reportedAt: string,
-    createdAt: string,
-    hollowName?: string,
-    description?: string
-};
-
-export interface Icomment {
-    id: string,
-    articleId: string,
-    userId: string,
-    content: string,
-    likedCounts: number,
-    reportedCounts: number,
-    isLiked: boolean,
-    reportedAt: string,
-    createdAt: string,
-    description?: string
-};
-export type param = {
-    page: number
-    limit: number
-}
 const currentUser: Iuser = {
-    id: 'u1',
+    id: 1,
     name: '白文鳥',
     account: 'abc123',
     articles: 5,
@@ -78,12 +25,7 @@ const currentUser: Iuser = {
     createAt: '20230106',
     role: 'user'
 }
-export type serverProps = {
-    articleCounts: number
-    hollowCounts: number
-    articleRows: Iarticle[]
-    hollowRows: Ihollow[]
-}
+
 const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
     return articles.map(article => {
         const targetHollow = hollows.find(h => article.hollowId === h.id)
@@ -94,6 +36,8 @@ const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarti
 const params: param = { page: 1, limit: 10 }
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows }: serverProps) {
+    // 新增一則文章
+    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
     // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
     // const { data: artData, error: artError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
 
@@ -111,6 +55,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
 
 
     function handleAddArt (article: Iarticle) {
+        addArtTrigger(article)
         setArticles([...articles, article])
     }
     function handleAddHollow (hollow: Ihollow) {
@@ -184,7 +129,6 @@ export async function getServerSideProps() {
 async function fetchHotHollows (url: string, { page, limit }: param) {
     try {
         const res = await getHollows(url, page, limit)
-        console.log(res)
         return res
     } catch (err) {
         console.log(err)
@@ -200,4 +144,11 @@ async function fetchHotArticles (url: string, { page, limit }: param) {
     }
 }
 
-
+async function fetchAddArt (url: string, { arg }: articleArg) {
+    try {
+        const { data } = await addArticle(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}

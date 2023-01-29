@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { flushSync } from 'react-dom';
-import { Ihollow, Iarticle, Iuser } from '../../pages/home'
+import { Ihollow, Iarticle, Iuser } from '../../type-config'
 
 
 interface hollowProps {
@@ -12,25 +12,19 @@ interface hollowProps {
 
 
 export default function ArticleInput ({ hollows, handleAddArt, currentUser }: hollowProps) {
-    const [idNum, setIdNum] = useState<number>(5)
     const [inputVal, setInputVal] = useState<string>('')
     const [textVal, setTextVal] = useState<string>('')
     
     const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
     const [article, setArticle] = useState<Iarticle>({
-        id: `a${idNum}`,
         title: '',
-        hollowId: '',
+        hollowId: 0,
         userId: currentUser.id,
         content: '',
-        comments: 0,
+        commentCounts: 0,
         collectedCounts: 0,
         likedCounts: 0,
         reportedCounts: 0,
-        isCollected: false,
-        isLiked: false,
-        reportedAt: '20230106',
-        createdAt: '20230106',
         hollowName: '',
         description: ''
     })
@@ -55,8 +49,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
         handleAddArt(article)
         setInputVal('')
         setTextVal('')
-        setArticle({...article, id: `a${idNum + 1}`, title: '', content: '', description: ''})
-        setIdNum(pre => pre + 1)
+        setArticle({...article, title: '', content: '', description: ''})
     }
 
     return (

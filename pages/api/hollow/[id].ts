@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser } from '../../home'
+import { Ihollow, Icomment, Iuser } from '../../../type-config'
 
 
 export default function handleHollows(req: NextApiRequest, res: NextApiResponse<Ihollow>) {
@@ -21,17 +21,17 @@ export default function handleHollows(req: NextApiRequest, res: NextApiResponse<
 }
 
 
-function getHollow (res: NextApiResponse<Ihollow>) {
+async function getHollow (res: NextApiResponse<Ihollow>) {
     console.log('get')
     res.status(200).json(hollow)
 }
 
-function addHollow (res: NextApiResponse<Ihollow>) {
+async function addHollow (res: NextApiResponse<Ihollow>) {
     console.log('post')
     res.status(200).json(hollow)
 }
 
-function editHollow (res: NextApiResponse<Ihollow>) {
+async function editHollow (res: NextApiResponse<Ihollow>) {
     console.log('put')
     res.status(200).json(hollow)
 }

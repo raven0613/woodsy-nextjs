@@ -1,5 +1,5 @@
 import { apiHelper } from '../config'
-
+import { Iarticle, Icomment, Iuser, param } from '../../type-config'
 
 export function getHollow (id: string) {
     return apiHelper.get(`hollow/${id}`)

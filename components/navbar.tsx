@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Iarticle } from '../pages/home'
+import { Iarticle } from '../type-config'
 
 
 export default function Navbar () {

@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Hollow.belongsTo(models.Users);
+      Hollow.hasMany(models.Articles, { foreignKey: 'hollowId' });
     }
   }
   Hollow.init({

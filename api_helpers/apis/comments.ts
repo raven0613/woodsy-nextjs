@@ -1,5 +1,5 @@
 import { apiHelper } from '../config'
-import { Iarticle, Icomment, Iuser, param } from '../../pages/home'
+import { Iarticle, Icomment, Iuser, param } from '../../type-config'
 import { AxiosResponse } from 'axios'
 
 export function getComments (url: string, page: number, limit: number) {
