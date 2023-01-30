@@ -11,9 +11,9 @@ export default function getComments(req: NextApiRequest, res: NextApiResponse<Ic
 
 let comments: Icomment[] = [
     {
-        id: 'c1',
-        articleId: 'a1',
-        userId: 'u1',
+        id: 1,
+        articleId: 1,
+        userId: 1,
         content: '年後比較好找啦',
         likedCounts: 10,
         reportedCounts: 0,
@@ -22,9 +22,9 @@ let comments: Icomment[] = [
         createdAt: '20230121'
     },
     {
-        id: 'c2',
-        articleId: 'a1',
-        userId: 'u1',
+        id: 2,
+        articleId: 1,
+        userId: 1,
         content: '我也好想要工作',
         likedCounts: 0,
         reportedCounts: 0,
@@ -33,9 +33,9 @@ let comments: Icomment[] = [
         createdAt: '20230121'
     },
     {
-        id: 'c3',
-        articleId: 'a1',
-        userId: 'u1',
+        id: 3,
+        articleId: 1,
+        userId: 1,
         content: '一起加油啊',
         likedCounts: 5,
         reportedCounts: 0,
@@ -48,7 +48,7 @@ let comments: Icomment[] = [
 export function addCom (comment: Icomment) {
     comments = [...comments, comment]
 }
-export function delCom (commentId: string) {
+export function delCom (commentId: number) {
     comments = comments.filter(com => com.id !== commentId)
 }
 export function editCom (comment: Icomment) {
