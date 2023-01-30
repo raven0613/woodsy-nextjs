@@ -4,7 +4,7 @@ import { Iarticle } from '../../type-config'
 
 interface articleProps {
   article: Iarticle
-  handleDeleteArt: (articleId: string) => void
+  handleDeleteArt: (articleId: number) => void
 }
 
 export default function ArticleDetailCard ({ article, handleDeleteArt }: articleProps) {
@@ -14,7 +14,7 @@ export default function ArticleDetailCard ({ article, handleDeleteArt }: article
     function handleEdit () {
         setIsEditing(true)
     }
-    function handleDelete (articleId: string) {
+    function handleDelete (articleId: number) {
         handleDeleteArt(articleId)
     }
     return (
@@ -23,7 +23,10 @@ export default function ArticleDetailCard ({ article, handleDeleteArt }: article
             <article className='whitespace-pre-wrap'>{article.content}</article>
 
             {!isEditing && <button onClick={handleEdit}>編輯</button>}
-            <button onClick={() => {handleDelete(article.id)}}>刪除</button>
+            <button onClick={() => {
+                if (!article.id) return
+                handleDelete(article.id)
+            }}>刪除</button>
         </div>
     )
 }

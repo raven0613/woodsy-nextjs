@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 interface commentProps {
     comment: Icomment
-    handleDeleteComment: (commentId: string) => void,
+    handleDeleteComment: (commentId: number) => void,
     handleEditComment: (comment: Icomment) => void
 }
 
@@ -17,7 +17,7 @@ export default function CommentCard ({ comment, handleDeleteComment, handleEditC
         setIsEditing(true)
     }
 
-    function handleDelete (commentId: string) {
+    function handleDelete (commentId: number) {
         handleDeleteComment(commentId)
     }
 

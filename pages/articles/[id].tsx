@@ -19,7 +19,9 @@ const currentUser: Iuser = {
     articles: 5,
     subHollows: 2,
     createAt: '20230106',
-    role: 'user'
+    role: 'user',
+    email: '',
+    password: ''
 }
 
 const params: param = { page: 1, limit: 15 }
@@ -74,13 +76,13 @@ export default function Article () {
         setComments(newComments)
         editComTrigger(comment)
     }
-    function handleDeleteComment (commentId: string) {
+    function handleDeleteComment (commentId: number) {
         const updatedData = comments.filter(com => com.id !== commentId)
         setComments(updatedData)
         deleteComTrigger(commentId)
     }
 
-    function handleDeleteArt (articleId: string) {
+    function handleDeleteArt (articleId: number) {
         deleteArtTrigger(articleId)
         router.push('/home')
     }
