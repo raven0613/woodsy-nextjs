@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Iarticle } from '../../pages/home'
+import { Iarticle } from '../../type-config'
 
 interface articleProps {
   article: Iarticle
