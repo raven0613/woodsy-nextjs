@@ -25,7 +25,9 @@ const currentUser: Iuser = {
     articles: 5,
     subHollows: 2,
     createAt: '20230106',
-    role: 'user'
+    role: 'user',
+    email: '',
+    password: ''
 }
 
 const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {

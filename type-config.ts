@@ -1,4 +1,5 @@
 import NextAuth, { DefaultSession } from "next-auth"
+import { ReactNode } from "react"
 
 
 export interface Iuser {
@@ -29,27 +30,28 @@ export interface Ihollow {
 };
 
 export interface Iarticle {
-    id?: number,
-    title: string,
-    hollowId: number,
-    userId: number,
-    content: string,
-    commentCounts: number,
-    collectedCounts: number,
-    likedCounts: number,
-    reportedCounts: number,
-    isCollected?: boolean,
-    isLiked?: boolean,
-    reportedAt?: string,
-    createdAt?: string,
-    hollowName?: string,
+    id?: number
+    title: string
+    hollowId: number
+    userId: number
+    content: string
+    commentCounts: number
+    collectedCounts: number
+    likedCounts: number
+    reportedCounts: number
+    isCollected?: boolean
+    isLiked?: boolean
+    reportedAt?: string
+    createdAt?: string
+    hollowName?: string
     description?: string
+    comments?: ReactNode
 };
 
 export interface Icomment {
     id: number,
-    articleId: string,
-    userId: string,
+    articleId: number,
+    userId: number,
     content: string,
     likedCounts: number,
     reportedCounts: number,

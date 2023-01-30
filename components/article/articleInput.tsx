@@ -19,7 +19,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     const [article, setArticle] = useState<Iarticle>({
         title: '',
         hollowId: 0,
-        userId: currentUser.id,
+        userId: 0,
         content: '',
         commentCounts: 0,
         collectedCounts: 0,
