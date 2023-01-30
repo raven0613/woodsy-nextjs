@@ -38,10 +38,10 @@ async function editHollow (res: NextApiResponse<Ihollow>) {
 
 
 const hollow: Ihollow = {
-    id: 'h1',
+    id: 1,
     name: '心情',
     type: 'public',
-    userId: 'u0',
+    userId: 1,
     article: 10,
     isSub: true,
     subCounts: 100,
