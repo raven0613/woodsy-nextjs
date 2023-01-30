@@ -19,10 +19,10 @@ export interface ILoginuser{
 }; 
 
 export interface Ihollow {
-    id: number,
+    id?: number,
     name: string,
     type: string,
-    userId: string,
+    userId: number,
     article: number,
     isSub: boolean,
     subCounts: number,
@@ -49,15 +49,15 @@ export interface Iarticle {
 };
 
 export interface Icomment {
-    id: number,
-    articleId: number,
-    userId: number,
-    content: string,
-    likedCounts: number,
-    reportedCounts: number,
-    isLiked: boolean,
-    reportedAt: string,
-    createdAt: string,
+    id: number
+    articleId: number
+    userId: number
+    content: string
+    likedCounts: number
+    reportedCounts: number
+    isLiked: boolean
+    reportedAt: string
+    createdAt: string
     description?: string
 };
 export type param = {

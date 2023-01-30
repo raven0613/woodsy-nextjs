@@ -30,6 +30,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     })
 
     function handleSelect (hollow: Ihollow) {
+        if (!hollow.id) return
         setSelectHollow(hollow)
         setArticle({...article, hollowId: hollow.id, hollowName: hollow.name})
     }

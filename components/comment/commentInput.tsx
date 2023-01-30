@@ -8,12 +8,11 @@ interface IcommentProps {
 }
 
 export default function CommentInput ({ handleAddComment, currentUser }: IcommentProps) {
-    const [idNum, setIdNum] = useState<number>(4)
     const [textVal, setTextVal] = useState<string>('')
     const [comment, setComment] = useState<Icomment>({
         id: 4,
-        articleId: 'a01',
-        userId: 'u01',
+        articleId: 1,
+        userId: 1,
         content: '',
         likedCounts: 0,
         reportedCounts: 0,
@@ -36,8 +35,7 @@ export default function CommentInput ({ handleAddComment, currentUser }: Icommen
         if (!comment.content) return console.log('沒有內容')
         handleAddComment(comment)
         setTextVal('')
-        setComment({...comment, id: `a${idNum + 1}`, content: '', description: ''})
-        setIdNum(pre => pre + 1)
+        setComment({...comment, content: '', description: ''})
     }
 
     return (
