@@ -13,7 +13,7 @@ export default function handleUser(req: NextApiRequest, res: NextApiResponse<Ius
           getUser(req, res)
           break
       case 'PUT':
-          editUser(req, res)
+          // editUser(req, res)
           break
       default:
           res.status(405).end() //Method Not Allowed
@@ -21,10 +21,10 @@ export default function handleUser(req: NextApiRequest, res: NextApiResponse<Ius
   }
 }
 
-async function editUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
+// async function editUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
     
-  res.status(200).json(currentUser)
-}
+//   res.status(200).json(currentUser)
+// }
 
 async function getUser (req: NextApiRequest, res: NextApiResponse<Iuser>) {
     const { id } = req.query

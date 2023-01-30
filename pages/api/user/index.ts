@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
 
-export default function handleUsers(req: NextApiRequest, res: NextApiResponse<Iuser>) {
+export default function handleUsers(req: NextApiRequest, res: NextApiResponse<Iuser[]>) {
     switch (req.method) {
         case 'GET':
             getUsers(res)
@@ -32,22 +32,14 @@ async function getUsers(res: NextApiResponse<Iuser[]> ) {
 }
 
 export const currentUser: Iuser = {
-    id: 1,
-    name: '白文鳥',
-    account: 'abc123',
-    articles: 5,
-    subHollows: 2,
-    createAt: '20230106',
-    role: 'user'
+  id: 1,
+  name: '白文鳥',
+  account: 'abc123',
+  articles: 5,
+  subHollows: 2,
+  createAt: '20230106',
+  role: 'user',
+  email: '',
+  password: ''
 }
 
-const hollow: Ihollow = {
-    id: 'h1',
-    name: '心情',
-    type: 'public',
-    userId: 'u0',
-    article: 10,
-    isSub: true,
-    subCounts: 100,
-    createdAt: '20230105'
-}

@@ -9,15 +9,3 @@ export default function addComment(req: NextApiRequest, res: NextApiResponse<Ico
     addCom(comment)
     res.status(200).json(comment)
 }
-
-const comment: Icomment = {
-    id: 'c1',
-    articleId: 'a1',
-    userId: 'u1',
-    content: '年後比較好找啦',
-    likedCounts: 10,
-    reportedCounts: 0,
-    isLiked: false,
-    reportedAt: '',
-    createdAt: '20230121'
-}
