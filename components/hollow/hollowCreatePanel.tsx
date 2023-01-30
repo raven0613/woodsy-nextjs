@@ -10,13 +10,12 @@ interface HollowCreateProps {
 }
 
 export default function HollowCreatePanel ({ hollows, currentUser, handleAddHollow }: HollowCreateProps) {
-    const [idNum, setIdNum] = useState<number>(8)
     const [inputVal, setInputVal] = useState<string>('')
     const [hollow, setHollow] = useState<Ihollow>({
-        id: `h${idNum}`,
+        id: 0,
         name: '',
         type: 'public',
-        userId: currentUser.id,
+        userId: 1,
         article: 0,
         isSub: false,
         subCounts: 0,
@@ -49,8 +48,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
         e.preventDefault()
         e.stopPropagation()
         setInputVal('')
-        setHollow({...hollow, id: `h${idNum + 1}`, name: ''})
-        setIdNum(pre => pre + 1)
+        setHollow({...hollow, name: ''})
         handleAddHollow(hollow)
     }
     return (
