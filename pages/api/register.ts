@@ -21,7 +21,7 @@ export default async function register(req: NextApiRequest, res: NextApiResponse
       nest: true
     })
     if (existUser) return res.status(403).end()
-    let user: Iuser = await Users.create({...userData, password })
+    let user: Iuser = await Users.create({...userData, password }) as unknown as Iuser
 
     if (user === null) return res.status(405).end()
     res.status(200).json(user)

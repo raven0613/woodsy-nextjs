@@ -2,7 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Iarticle, Icomment, Iuser } from '../../../type-config'
 import { currentUser } from '../user/index'
-import db from '../../../models/index';
+// import db from '../../../models/index';
+import db from '../../../models';
 const { Users, Articles, Comments } = db;
 
 function getOffset (page: number, limit: number) {
@@ -23,7 +24,12 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+// export interface IhomeServerProps{
+//     rows: Iarticle[]
+//     count: number
+// }; 
+
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle>) {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
 
@@ -35,7 +41,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       offset: getOffset(page, limit),
       nest: true, 
     })
-    if (articles === null) return res.status(405).end({ message: '找不到文章' })
+    if (articles === null) return res.status(405).end()
     res.status(200).json(articles)  //回傳的是 count 和 data
 }
 
@@ -43,7 +49,7 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) 
   try {
     const { title, hollowId: hollow_id, content } = req.body
     console.log(req.body)
-    const article = await Articles.create({
+    const article: Iarticle = await Articles.create({
       title, 
       content, 
       comment_counts: 0, 

@@ -33,7 +33,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) 
         { model: Users, as: 'User' }, 
         { model: Comments, as: 'Comments' }]
     })
-    if (article === null) return res.status(405).end({ message: '找不到文章' })
+    if (article === null) return res.status(405).end('找不到文章')
     res.status(200).json(article)
 }
 
@@ -46,7 +46,7 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>)
             id: idNum
         }
     })
-    if (article === null) return res.status(405).end({ message: '找不到文章' })
+    if (article === null) return res.status(405).end('找不到文章')
 
     res.status(200).json(article)
 }
@@ -59,13 +59,13 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle
             articleId: idNum
         }
     })
-    if (comment === null) return res.status(405).end({ message: '找不到評論' })
+    if (comment === null) return res.status(405).end('找不到評論')
     const article = await Articles.destroy({
         where: {
             id: idNum
         }
     })
-    if (article === null) return res.status(405).end({ message: '找不到文章' })
+    if (article === null) return res.status(405).end('找不到評論')
 
     res.status(200).json(article)
 }
