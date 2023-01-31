@@ -3,15 +3,15 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) { //table名稱
-        await queryInterface.addColumn("articles", "user_id", {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: "Users",
-                key: "id",
-            },
-        });
-        await queryInterface.addColumn("articles", "hollow_id", {
+        // await queryInterface.addColumn("Articles", "user_id", {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: false,
+        //     references: {
+        //         model: "Users",
+        //         key: "id",
+        //     },
+        // });
+        await queryInterface.addColumn("Articles", "hollow_id", {
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
@@ -22,7 +22,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.removeColumn("articles", "user_id");
-        await queryInterface.removeColumn("articles", "hollow_id");
+        // await queryInterface.removeColumn("Articles", "user_id");
+        await queryInterface.removeColumn("Articles", "hollow_id");
     },
 };

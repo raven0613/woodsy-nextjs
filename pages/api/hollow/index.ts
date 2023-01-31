@@ -19,9 +19,9 @@ export default async function getHollows(req: NextApiRequest, res: NextApiRespon
       limit,
       offset: getOffset(page, limit),
       nest: true, 
-    })
+    }) as unknown as Ihollow[]  //TODO: 待刪
 
-    if (hollows === null) return res.status(405).end({ message: '找不到樹洞' })
+    if (hollows === null) return res.status(405).end('找不到樹洞')
     res.status(200).json(hollows)  //回傳的是 count 和 data
   } catch (err) {
     console.log(err)

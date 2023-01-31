@@ -4,9 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
+
 // const basename = path.basename(__filename);
 const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
+
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
@@ -14,6 +16,7 @@ const db = {};
 // const Articles = require('./article');
 // const Users = require('./user');
 // const Comments = require('./comment');
+// const Hollows = require('./hollow');
 
 let sequelize;
 if (config.use_env_variable) {
@@ -51,5 +54,9 @@ db.Sequelize = Sequelize;
 // db.Articles = Articles(sequelize, Sequelize);
 // db.Users = Users(sequelize, Sequelize);
 // db.Comments = Comments(sequelize, Sequelize);
+// db.Hollows = Hollows(sequelize, Sequelize);
+
+// console.log('db '+ JSON.parse(JSON.stringify(db)))
+
 
 module.exports = db;

@@ -73,12 +73,13 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             currentUser={currentUser} 
             handleAddArt={handleAddArt}/>}
 
-            <HollowCreatePanel 
+            {/* <HollowCreatePanel 
             currentUser={currentUser} 
             hollows={hollows} 
-            handleAddHollow={handleAddHollow}/>
+            handleAddHollow={handleAddHollow}/> */}
+        </div>
 
-
+        <div className='pt-6 mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
             <div className='flex justify-between'>
                 <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
                 <Link href={`/hollows`}>
@@ -94,8 +95,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     )
                 })}
             </div>
-        </div>
-        <div className='mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
+        </div>  
+        
+        <div className='pt-6 mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
             <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
             <div className='flex-col justify-center w-full'>
                 {articles && articles.map(art => {

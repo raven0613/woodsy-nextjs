@@ -107,7 +107,7 @@ export default function Article () {
                 </div>
 
                 <CommentInput handleAddComment={handleAddComment} currentUser={currentUser} />
-                <ArticleEditWindow article={article}/>
+                {/* <ArticleEditWindow article={article}/> */}
             </div>}
 
         </>

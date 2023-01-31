@@ -2,9 +2,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Iarticle, Icomment, Iuser } from '../../../type-config'
 import { currentUser } from '../user/index'
-// import db from '../../../models/index';
-import db from '../../../models';
-const { Users, Articles, Comments } = db;
+
+import db from '../../../models/index';
+// const { Users, Articles, Comments, Hollows } = db;
+// db.sequelize.sync();
+const Users = db.Users;
+const Articles = db.Articles;
+const Comments = db.Comments;
+const Hollows = db.Hollows;
 
 function getOffset (page: number, limit: number) {
   return (page - 1) * limit
@@ -24,12 +29,9 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-// export interface IhomeServerProps{
-//     rows: Iarticle[]
-//     count: number
-// }; 
 
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+  try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
 
@@ -40,15 +42,19 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       limit,
       offset: getOffset(page, limit),
       nest: true, 
-    })
+    }) as unknown as Iarticle[]  //TODO: 待刪
     if (articles === null) return res.status(405).end()
     res.status(200).json(articles)  //回傳的是 count 和 data
+  } catch (err) {
+    res.status(405).end()
+  }
 }
 
 async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
   try {
-    const { title, hollowId: hollow_id, content } = req.body
-    console.log(req.body)
+    const { title, hollowId: hollow_id, content, userId } = req.body
+    console.log('req.body')
+    console.log(userId)
     const article: Iarticle = await Articles.create({
       title, 
       content, 
@@ -56,12 +62,14 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) 
       collected_counts: 0, 
       liked_counts: 0, 
       reported_counts: 0,
-      hollow_id, 
+      hollow_id: 1, 
       user_id: 1, 
     })
+
     console.log('加上去 ' + article)
     res.status(200).json(article)
   } catch (err) {
+    res.status(405).end()
     console.log(err)
   }
 }

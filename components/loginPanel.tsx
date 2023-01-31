@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FC, PropsWithChildren } from 'react';
 import { flushSync } from 'react-dom';
-import { Ihollow, Iarticle, Iuser, ILoginuser } from '../type-config'
+import { ILoginuser } from '../type-config'
 
 
 interface IuserProps {
@@ -38,24 +38,30 @@ export default function LoginPanel ({ handleLogin }: IuserProps) {
     }
     return (
         <>
-            <div className='fixed right-2/4 bottom-2/4 translate-x-1/2 translate-y-1/2 w-8/12 h-96 border'>
-                <h1 className=''>歡迎回到 Woodsy</h1>
-                <form action="" className='flex flex-col'>
+            <div className='fixed right-2/4 bottom-2/4 translate-x-1/2 translate-y-1/2 w-8/12 border max-w-2xl rounded-xl shadow-md'>
 
-                    <input className='border' 
+
+                <form action="" className='flex flex-col w-8/12 m-auto'>
+                    <h1 className='font-sans text-neutral-600 text-3xl font-bold leading-loose py-4'>歡迎回到 Woodsy</h1>
+
+                    <input className='h-12 border w-full outline-0 px-4 py-1 rounded-md mb-2' 
                     onChange={e => {handleSetValue(e, setAccount)}} 
-                    value={account} placeholder='請輸入帳號或E-mail' type="text" />
+                    value={account} placeholder='請輸入帳號' type="text" />
 
-                    <input className='border' 
+                    <input className='h-12 border w-full outline-0 px-4 py-1 rounded-md mb-2' 
                     value={password} 
                     onChange={e => {handleSetValue(e, setPassword)}} 
                     placeholder='請輸入密碼' type="password" />
 
-                    {isFetching && <button className='w-20 h-8 border' disabled onClick={handleSubmitLogin}>登入</button>}
 
-                    {!isFetching && <button className='w-20 h-8 border' onClick={handleSubmitLogin}>登入</button>}
-                    <span>還沒有加入 Woodsy？ </span>
-                    <button type='button' onClick={handleChangeToRegister}>立即加入</button>
+                    {isFetching && <button className='m-auto w-40 h-10 border rounded-lg' disabled onClick={handleSubmitLogin}>登入</button>}
+
+                    {!isFetching && <button className='m-auto w-40 h-10 border rounded-lg' onClick={handleSubmitLogin}>登入</button>}
+
+                    <div className='flex justify-end pt-20 pb-4'>
+                        <span className='pr-4'>還沒有加入 Woodsy？ </span>
+                        <button className='' type='button' onClick={handleChangeToRegister}>立即加入</button>
+                    </div>
                 </form>
                 
             </div>
