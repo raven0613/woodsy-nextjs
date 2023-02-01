@@ -10,7 +10,7 @@ import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { getArticles, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
+import { fetchHotHollows, fetchHotArticles, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg } from '../type-config';
 import { getCsrfToken } from 'next-auth/react';
@@ -142,53 +142,6 @@ export async function getServerSideProps(context: CtxOrReq | undefined) {
         return {
             props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }
         }
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-
-async function fetchHotHollows (url: string, { page, limit }: param) {
-    try {
-        const res = await getHollows(url, page, limit)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchHotArticles (url: string, { page, limit }: param) {
-    try {
-        const res = await getArticles(url, page, limit)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchAddArt (url: string, { arg }: articleArg) {
-    try {
-        const { data } = await addArticle(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchEditArticle (url: string, { arg }: articleArg) {
-    try {
-        const { data } = await editArticle(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
-    try {
-        
-        const { data } = await deleteArticle(url, arg)
-        return data
     } catch (err) {
         console.log(err)
     }

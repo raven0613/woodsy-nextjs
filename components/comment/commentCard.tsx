@@ -75,7 +75,7 @@ export default function CommentCard ({ comment, handleDeleteComment, handleEditC
     return (
         <div className='w-full border-b px-4 py-2'>
 
-            <div className='w-full flex relative items-center'>
+            <div className='w-full h-8 flex relative items-center'>
                 <span className='text-base text-gray-700 pr-2'>白文鳥</span>
                 <span className='text-sm text-slate-300 flex-1'>@Vg2X8</span>
                 {!isCardShowMore && <button className='w-8 h-8 border rounded-full' onClick={handleClickMoreBtn}>…</button>}

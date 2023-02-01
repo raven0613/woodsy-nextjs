@@ -7,7 +7,8 @@ import Link from 'next/link'
 import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
-import { getArticles, addArticle, deleteArticle } from '../../api_helpers/apis/article'
+import { fetchHollow, fetchHotArticles, fetchDeleteArticle } from '../../api_helpers/fetchers'
+
 import { articlesWithHollowName } from '../home'
 
 interface hollowProps {
@@ -116,7 +117,7 @@ export default function Hollow () {
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollow, setHollow] = useState<Ihollow>()
 
-    const { data: articlesData, error: articlesError } = useSWR(['article', params], ([url, params]) => fetchArticles(url, params));
+    const { data: articlesData, error: articlesError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
 
     // 刪除一篇文章
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
@@ -186,33 +187,4 @@ export default function Hollow () {
             </div>
         </>
     )
-}
-
-async function fetchHollow (id: string) {
-    try {
-        const res = await getHollow(id)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchArticles (url: string, { page, limit }: param) {
-    console.log('來')
-    try {
-        const res = await getArticles(url, page, limit)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
-    try {
-        
-        const { data } = await deleteArticle(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
 }

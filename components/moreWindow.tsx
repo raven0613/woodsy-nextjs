@@ -40,10 +40,10 @@ export default function MoreWindow ({ id, handleCloseMore }: props) {
     }
     return (
         <>
-            <div className='w-20 border absolute top-0 right-0 rounded-4 flex flex-col z-10'>
-                <button className='py-1.5' onClick={handleClickEdit}>編輯</button>
-                <button className='pb-1.5' onClick={handleClickDelete}>刪除</button>
-                <button className='pb-1.5' onClick={handleClickReport}>回報</button>
+            <div className='w-20 border absolute top-0 right-0 rounded-2xl flex flex-col z-10 bg-white'>
+                <button className='py-1.5 rounded-full' onClick={handleClickEdit}>編輯</button>
+                <button className='pb-1.5 rounded-full' onClick={handleClickDelete}>刪除</button>
+                <button className='pb-1.5 rounded-full' onClick={handleClickReport}>回報</button>
             </div>
             <div className='fixed inset-0 z-0' onClick={handleClickClose}></div>
         </>

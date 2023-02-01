@@ -8,8 +8,7 @@ import CommentCard from "../../components/comment/commentCard"
 import CommentInput from "../../components/comment/commentInput"
 import ArticleDetailCard from "../../components/article/articleDetailCard"
 import ArticleEditWindow from "../../components/article//articleEditWindow"
-import { getArticle, editArticle, deleteArticle } from '../../api_helpers/apis/article'
-import { getComments, addComment, editComment, deleteComment } from '../../api_helpers/apis/comments'
+import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
 import { AxiosResponse } from 'axios'
 import { articlesWithHollowName } from '../home'
 import Link from 'next/link'
@@ -134,70 +133,4 @@ export default function Article () {
 
         </main>
     )
-}
-
-async function fetchArticle (id: string) {
-    try {
-        const res = await getArticle(id)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchComments (url: string, { page, limit }: param) {
-    try {
-        const res = await getComments(url, page, limit)
-        return res
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-
-
-async function fetchAddComments (url: string, { arg }: commentArg) {
-    try {
-        const { data } = await addComment(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchEditComments (url: string, { arg }: commentArg) {
-    try {
-        const { data } = await editComment(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchDeleteComments (url: string, { arg }: deleteArg) {
-    try {
-        const { data } = await deleteComment(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchEditArticle (url: string, { arg }: articleArg) {
-    try {
-        const { data } = await editArticle(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
-    try {
-        
-        const { data } = await deleteArticle(url, arg)
-        return data
-    } catch (err) {
-        console.log(err)
-    }
 }

@@ -14,7 +14,7 @@ export default function Navbar () {
         signOut({ callbackUrl: 'http://localhost:3000/login' })
     }
     return (
-        <div className='fixed inset-x-0 top-0 bg-slate-100 h-16 pl-6 flex justify-between items-center'>
+        <div className='fixed inset-x-0 top-0 bg-slate-100 h-16 pl-6 flex justify-between items-center z-20'>
             <Link href={`/home`}>
                 <span className='font-sans text-neutral-600 text-3xl font-bold leading-loose'>Woodsy</span>
             </Link>
