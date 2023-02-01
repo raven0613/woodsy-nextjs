@@ -48,12 +48,18 @@ export interface Iarticle {
     description?: string
     comments?: ReactNode
     User?: user
+    Hollow?: hollow
 };
 
 type user = {
     id: number
     name: string
 }
+type hollow = {
+    id: number
+    name: string
+}
+
 
 export interface Icomment {
     id: number

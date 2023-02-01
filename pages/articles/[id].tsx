@@ -11,7 +11,8 @@ import ArticleEditWindow from "../../components/article//articleEditWindow"
 import { getArticle, editArticle, deleteArticle } from '../../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../../api_helpers/apis/comments'
 import { AxiosResponse } from 'axios'
-import articlesWithHollowName from '../home'
+import { articlesWithHollowName } from '../home'
+import Link from 'next/link'
 
 const currentUser: Iuser = {
     id: 1,
@@ -28,12 +29,12 @@ const currentUser: Iuser = {
 const params: param = { page: 1, limit: 15 }
 
 export default function Article () {
+    const [moreShowingId, setMoreShowingId] = useState<string>('')
+    
     const router = useRouter()
     const { id } = router.query
     const { data: articleData, error: articleError } = useSWR(id, fetchArticle);
     //fetch 回來的文章資料
-    
-
     const [comments, setComments] = useState<Icomment[]>([])
     const [article, setArticle] = useState<Iarticle | null>()
 
@@ -43,6 +44,7 @@ export default function Article () {
     
     useEffect(() => {
         const fetchedArt: Iarticle = articleData? articleData.data : {}
+        // const art = articlesWithHollowName()
         setArticle(fetchedArt)
     }, [articleData])
 
@@ -87,12 +89,28 @@ export default function Article () {
         deleteArtTrigger(articleId)
         router.push('/home')
     }
+    function handleClickMore (id: string) {
+        setMoreShowingId(id)
+    }
+    function handleCloseMore () {
+        setMoreShowingId('')
+    }
     return (
-        <>
-            {article && <div className='h-screen mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5 flex flex-col justify-between pb-8'>
+        <main className='md:mx-auto md:w-4/5 lg:w-6/12'>
+            {article && <div className='h-screen mx-2 w-full flex flex-col justify-between pb-8'>
 
                 <div className='pt-20 flex-1'>
-                    <ArticleDetailCard article={article} handleDeleteArt={handleDeleteArt} />
+
+                    <div className='flex items-center'>
+                        <h2 className='text-lg font-semibold px-4'>{article.User?.name}</h2>
+                        {article.Hollow && <Link className='' href={`/hollows/${article.Hollow.id}`}>{article.Hollow.name}</Link>}
+                    </div>
+
+                    <ArticleDetailCard article={article} 
+                    handleDeleteArt={handleDeleteArt} 
+                    handleClickMore={handleClickMore}
+                    moreShowingId={moreShowingId}
+                    handleCloseMore={handleCloseMore} />
                     
                     <div className='w-full'>
                         {comments && comments.map(comment => {
@@ -101,7 +119,10 @@ export default function Article () {
                                 comment={comment}
                                 key={comment.id}
                                 handleDeleteComment={handleDeleteComment}
-                                handleEditComment={handleEditComment}/>
+                                handleEditComment={handleEditComment}
+                                handleClickMore={handleClickMore}
+                                moreShowingId={moreShowingId}
+                                handleCloseMore={handleCloseMore}/>
                             )
                         })}
                     </div>
@@ -111,7 +132,7 @@ export default function Article () {
                 {/* <ArticleEditWindow article={article}/> */}
             </div>}
 
-        </>
+        </main>
     )
 }
 

@@ -41,7 +41,7 @@ export default function CommentInput ({ handleAddComment, currentUser }: Icommen
     return (
         <div className='mx-auto w-full h-24 border flex'>
             <textarea 
-                className='border h-full m-auto resize-none px-2 py-1 flex-1'
+                className='border h-full m-auto resize-none px-2 py-1 flex-1 outline-0'
                 placeholder='請輸入你的回音'
                 value={textVal} 
                 onChange={handleContentChange} 

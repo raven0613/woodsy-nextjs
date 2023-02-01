@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation'
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
-import { Iarticle, Ihollow, Iuser, param } from '../../type-config'
+import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
-import { getArticles, addArticle } from '../../api_helpers/apis/article'
+import { getArticles, addArticle, deleteArticle } from '../../api_helpers/apis/article'
 import { articlesWithHollowName } from '../home'
 
 interface hollowProps {
@@ -111,44 +112,59 @@ export default function Hollow () {
     const { data, error } = useSWR(id, fetchHollow);
     const hollowData = data?.data
 
-    const [moreShowingId, setMoreShowingId] = useState<number>(0)
+    const [moreShowingId, setMoreShowingId] = useState<string>('')
     const [articles, setArticles] = useState<Iarticle[]>([])
+    const [hollow, setHollow] = useState<Ihollow>()
 
     const { data: articlesData, error: articlesError } = useSWR(['article', params], ([url, params]) => fetchArticles(url, params));
 
+    // 刪除一篇文章
+    const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
+
     useEffect(() => {
+        if (!articlesData) return
         const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
         setArticles(fetchedArts)
     }, [articlesData])
 
     useEffect(() => {
-        console.log(hollowData)
+        if (!hollowData) return
+        setHollow(hollowData)
+    }, [hollowData])
+
+    useEffect(() => {
+        if (!hollow || !articlesData) return
         const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
-        const arts = articlesWithHollowName([hollowData], fetchedArts)
+        const arts = articlesWithHollowName([hollow], fetchedArts)
         setArticles(arts)
-    }, [hollowData, articlesData])
+    }, [hollow, articlesData])
 
 
-
+    function handleDeleteArt (articleId: number) {
+        deleteArtTrigger(articleId)
+    }
     
 
     function handleAddArt (article: Iarticle) {
         setArticles([...articles, article])
     }
-    function handleClickMore (artId: number) {
+    function handleClickMore (artId: string) {
         setMoreShowingId(artId)
+    }
+    function handleCloseMore () {
+        setMoreShowingId('')
     }
     function handleScroll () {
         // console.log(window.scrollY)
     }
     return (
         <>
-            <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+            <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-6/12'>
                 <div className='grid grid-cols-12 h-12'>
                     <button className=''>←</button>
 
-                    {hollowData? 
-                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollowData.name}</h1> :
+                    {hollow? 
+                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollow.name}</h1> :
                         <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
                     }
 
@@ -160,11 +176,11 @@ export default function Hollow () {
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {articles && articles.map(art => {
                     return (
-                        <Link href={`/articles/${art.id}`} key={art.id} >
-                            <ArticleCard art={art}
-                            handleClickMore={handleClickMore}
-                            moreShowingId={moreShowingId} />
-                        </Link>
+                        <ArticleCard article={art} key={art.id}
+                        handleClickMore={handleClickMore}
+                        handleCloseMore={handleCloseMore}
+                        handleDeleteArt={handleDeleteArt}
+                        moreShowingId={moreShowingId} />
                     )
                 })}
             </div>
@@ -186,6 +202,16 @@ async function fetchArticles (url: string, { page, limit }: param) {
     try {
         const res = await getArticles(url, page, limit)
         return res
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
+    try {
+        
+        const { data } = await deleteArticle(url, arg)
+        return data
     } catch (err) {
         console.log(err)
     }

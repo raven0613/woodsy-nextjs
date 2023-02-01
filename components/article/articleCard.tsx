@@ -4,21 +4,25 @@ import { Iarticle } from '../../type-config'
 import MoreWindow from '../moreWindow'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import Link from 'next/link'
 dayjs.extend(relativeTime)
 
-interface articleProps {
-  art: Iarticle
-  moreShowingId: number
-  handleClickMore: (artId: number) => void
+type props = {
+  article: Iarticle
+  moreShowingId: string
+  handleClickMore: (artId: string) => void
+  handleDeleteArt: (articleId: number) => void
+  handleCloseMore: () => void
 }
 
-export default function ArticleCard ({ art, moreShowingId, handleClickMore }: articleProps) {
-    console.log(art)
+export default function ArticleCard ({ article, moreShowingId, handleClickMore, handleDeleteArt, handleCloseMore }: props) {
+    // console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
-    const id = art.id
+    const id = article.id
+    const [isEditing, setIsEditing] = useState<boolean>(false)
 
     useEffect(() => {
-        if (moreShowingId !== id) {
+        if (moreShowingId !== `a${id}`) {
             setIsCardShowMore(false)
         } 
     }, [moreShowingId, id])
@@ -26,33 +30,44 @@ export default function ArticleCard ({ art, moreShowingId, handleClickMore }: ar
     function handleClickMoreBtn (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
-        if (!art.id) return
+        if (!article.id) return
         setIsCardShowMore(true)
-        handleClickMore(art.id)
+        handleClickMore(`a${article.id}`)
     }
     function handleCollect (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
     }
+    function handleEdit (article: Iarticle) {
+        setIsEditing(true)
+    }
+    function handleDelete () {
+        if (!article.id) return
+        handleDeleteArt(article.id)
+    }
     return (
         <div className='m-auto border bg-gray-0 py-3 px-5 mb-4 rounded-lg flex flex-col'>
             <div className='pb-2 border-b flex items-center relative'>
-                <span className='text-gray-600 text-lg font-bold leading-8 h-8'>{art.User?.name}</span>
-                <span className='text-gray-400 text-sm pl-4 leading-8 h-8 flex-1'>{dayjs(art.createdAt).fromNow()}</span>
+                <span className='text-gray-600 text-lg font-bold leading-8 h-8'>{article.User?.name}</span>
+                <span className='text-gray-400 text-sm pl-4 leading-8 h-8 flex-1'>{dayjs(article.createdAt).fromNow()}</span>
                 {!isCardShowMore && <button className='w-8 h-8 border justify-end rounded-full' onClick={handleClickMoreBtn}>…</button>}
-                {isCardShowMore && <MoreWindow id={id? id : 0}/>}
+                {isCardShowMore && <MoreWindow 
+                handleEdit={handleEdit} 
+                handleDelete={handleDelete}
+                handleCloseMore={handleCloseMore} 
+                id={id? id : 0}/>}
             </div>
 
-            <div className='pt-2'>
-                <p className='text-gray-600 text-lg font-bold'>{art.title}</p>
-                <p className='text-gray-400 text-base pt-2'>{art.description}</p>
-            </div>
+            <Link href={`/articles/${article.id}`} className='pt-2'>
+                <p className='text-gray-600 text-lg font-bold'>{article.title}</p>
+                <p className='text-gray-400 text-base pt-2 whitespace-pre-wrap' >{article.description}</p>
+            </Link>
 
             <div className='pt-4'>
-                <span className='border rounded-full border-lime-500 text-lime-500 px-1.5 py-0.5 flex-1'>{art.hollowName}</span>
-                <button className='px-2 ml-2'>回應數：{art.commentCounts}</button>
-                <button className='px-2 ml-2'>讚數：{art.likedCounts}</button>
-                <button className='h-8 justify-end px-2 ml-2' onClick={handleCollect}>收藏數：{art.collectedCounts}</button>
+                <span className='border rounded-full border-lime-500 text-lime-500 px-3 py-1.5 flex-1'>{article.hollowName}</span>
+                <button className='px-2 ml-2'>回應數：{article.commentCounts}</button>
+                <button className='px-2 ml-2'>讚數：{article.likedCounts}</button>
+                <button className='h-8 justify-end px-2 ml-2' onClick={handleCollect}>收藏數：{article.collectedCounts}</button>
 
             </div>
         </div>

@@ -4,6 +4,7 @@ import { Ihollow, Icomment, Iuser } from '../../../type-config'
 
 
 export default function handleHollows(req: NextApiRequest, res: NextApiResponse<Ihollow>) {
+    console.log(req)
     switch (req.method) {
         case 'GET':
             getHollow(res)

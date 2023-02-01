@@ -10,9 +10,9 @@ import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { getArticles, addArticle } from '../api_helpers/apis/article'
+import { getArticles, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { type } from 'os';
-import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg } from '../type-config';
+import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg } from '../type-config';
 import { getCsrfToken } from 'next-auth/react';
 import { CtxOrReq } from 'next-auth/client/_utils';
 
@@ -31,10 +31,8 @@ const currentUser: Iuser = {
 }
 
 export const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
-    console.log(hollows)
     return articles.map(article => {
         const targetHollow = hollows.find(h => article.hollow_id === h.id)
-        console.log(targetHollow)
         const des = article.content.length < 200? article.content : article.content.trim().slice(0, 200) + '...'
         return { ...article, hollowName: targetHollow?.name || '', description: des}
     })
@@ -42,10 +40,13 @@ export const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[])
 
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
-    const [moreShowingId, setMoreShowingId] = useState<number>(0)
+    const [moreShowingId, setMoreShowingId] = useState<string>('')
 
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
+    // 刪除一篇文章
+    const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
+
     // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
     // const { data: artData, error: artError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
 
@@ -65,16 +66,22 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         addArtTrigger(article)
         setArticles([...articles, article])
     }
+    function handleDeleteArt (articleId: number) {
+        deleteArtTrigger(articleId)
+    }
     function handleAddHollow (hollow: Ihollow) {
         setHollows([...hollows, hollow])
     }
-    function handleClickMore (artId: number) {
+    function handleClickMore (artId: string) {
         setMoreShowingId(artId)
+    }
+    function handleCloseMore () {
+        setMoreShowingId('')
     }
 
     return (
-    <>
-        <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
+    <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
+        <div className='hidden sm:block mt-20 mx-2 w-full'>
             {csrfToken && <ArticleInput 
             hollows={hollows} 
             currentUser={currentUser} 
@@ -86,7 +93,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             handleAddHollow={handleAddHollow}/> */}
         </div>
 
-        <div className='pt-6 mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
+        <div className='pt-6 mx-2 w-full'>
             <div className='flex justify-between'>
                 <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
                 <Link href={`/hollows`}>
@@ -104,21 +111,21 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             </div>
         </div>  
         
-        <div className='pt-6 mx-2 w-full md:m-auto md:w-4/5 lg:w-3/5'>
+        <div className='pt-6 mx-2 w-full'>
             <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
             <div className='flex-col justify-center w-full'>
                 {articles && articles.map(art => {
                 return (
-                <Link href={`/articles/${art.id}`} key={art.id} >
-                    <ArticleCard art={art} 
+                    <ArticleCard article={art} key={art.id} 
                     handleClickMore={handleClickMore}
+                    handleCloseMore={handleCloseMore}
+                    handleDeleteArt={handleDeleteArt}
                     moreShowingId={moreShowingId} />
-                </Link>
                 )
                 })}
             </div>
         </div>
-    </>
+    </main>
     )
 }
 
@@ -162,6 +169,25 @@ async function fetchHotArticles (url: string, { page, limit }: param) {
 async function fetchAddArt (url: string, { arg }: articleArg) {
     try {
         const { data } = await addArticle(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchEditArticle (url: string, { arg }: articleArg) {
+    try {
+        const { data } = await editArticle(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchDeleteArticle (url: string, { arg }: deleteArg) {
+    try {
+        
+        const { data } = await deleteArticle(url, arg)
         return data
     } catch (err) {
         console.log(err)

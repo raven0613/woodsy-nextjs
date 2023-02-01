@@ -18,8 +18,8 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
     const [article, setArticle] = useState<Iarticle>({
         title: '',
-        hollowId: 0,
-        userId: 10,
+        hollow_id: 0,
+        user_id: 10,
         content: '',
         commentCounts: 0,
         collectedCounts: 0,
@@ -32,7 +32,7 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     function handleSelect (hollow: Ihollow) {
         if (!hollow.id) return
         setSelectHollow(hollow)
-        setArticle({...article, hollowId: hollow.id, hollowName: hollow.name})
+        setArticle({...article, hollow_id: hollow.id, hollowName: hollow.name})
     }
     function handleInputChange (event: React.FormEvent<HTMLInputElement>) {
         setInputVal(event.currentTarget.value)
@@ -74,19 +74,23 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
                 <div>
                     {hollows && hollows.map(hollow => {
                         return (
-                            <button className='border rounded-full m-1 px-2 h-10 hover:bg-sky-100 ease-out duration-300' key={hollow.id} onClick={() => {handleSelect(hollow)}}>
+                            <button className='border rounded-full m-1 px-3 h-10 hover:bg-sky-100 ease-out duration-300' key={hollow.id} onClick={() => {handleSelect(hollow)}}>
                                 <div >{hollow.name}</div>
                             </button>
                         )
                     })}
                 </div>
 
-                <div className='flex'>
-                    <div className='flex-1 flex items-center'>
+                <div className='flex '>
+
+                    <div className='flex-1 flex items-center flex-col sm:flex-row'>
                         <input className='outline-0 w-48 h-8 px-2 border-b' placeholder='搜尋樹洞' type="text" />
-                        <span className='text-sm text-slate-300 px-2'>沒有適合的樹洞？</span>
-                        <button className='inline text-sm text-slate-500 px-2 py-1 rounded-full hover:bg-sky-100 ease-out duration-300'>挖掘樹洞</button>
+                        <div>
+                            <span className='text-sm text-slate-300 px-2'>沒有適合的樹洞？</span>
+                            <button className='inline text-sm text-slate-500 px-2 py-1 rounded-full hover:bg-sky-100 ease-out duration-300'>挖掘樹洞</button>
+                        </div>
                     </div>
+
                     <button className='border w-20 h-10 rounded-full hover:bg-sky-100 ease-out duration-300' type="button" onClick={handleSubmit}>送出</button>
                 </div>
 
