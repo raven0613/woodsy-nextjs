@@ -16,7 +16,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
         name: '',
         type: 'public',
         userId: 1,
-        article: 0,
+        articleCounts: 0,
         isSub: false,
         subCounts: 0,
         createdAt: '20230106',

@@ -13,7 +13,7 @@ export default function ArticleEditWindow ({ article }: articleProps) {
         <div className='fixed right-2/4 bottom-2/4 translate-x-1/2 translate-y-1/2 w-8/12 h-96 border'>
             <h1 className='text-2xl font-semibold '>{article.title}</h1>
             <article className='whitespace-pre-wrap'>{article.content}</article>
-            
+            <div className='fixed inset-0 bg-black'></div>
         </div>
     )
 }

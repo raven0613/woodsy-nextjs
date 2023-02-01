@@ -1,5 +1,7 @@
 import Navbar from './navbar'
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
+import ToTopButton from './toTopButton';
+
 
 
 export default function Layout({ children }: PropsWithChildren) {
@@ -7,6 +9,7 @@ export default function Layout({ children }: PropsWithChildren) {
     <>
       <Navbar />
       <main>{children}</main>
+      <ToTopButton />
     </>
   )
 }

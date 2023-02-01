@@ -33,7 +33,7 @@ export default NextAuth({
                     password: credentials?.password || '',
                 }
                 const res = await userLogin('/auth/signin', payload)
-                console.log(res)
+
                 const user = res.data
                 // 如果登入資訊正確   .statusText === 'ok'
                 if (res.status === 200 && user) {
@@ -50,7 +50,6 @@ export default NextAuth({
     callbacks: {
         async jwt({ token, user, account }) {
             if (account) {
-                console.log(account)
                 return {
                     accessToken: account.access_token,
                     refreshToken: account.refresh_token,
@@ -61,6 +60,7 @@ export default NextAuth({
         },
         async session({ session, token }) {
             const { id, name, account, email } = JSON.parse(JSON.stringify(token.user))
+
             session.user = { id, name, account, email }
             session.accessToken = token.accessToken
 

@@ -1,15 +1,18 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Iarticle, Icomment, Iuser } from '../../../type-config'
+import { Iarticle, Icomment, Iuser, errorMessage } from '../../../type-config'
 import { currentUser } from '../user/index'
+
 import db from '../../../models/index';
-const { Users, Articles, Comments } = db;
+const DB: any = db;
+const { Users, Articles, Comments, Hollows } = DB;
+
 
 function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | Iarticle>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | Iarticle | errorMessage>) {
     switch (req.method) {
         case 'GET':
             getArticles(req, res)
@@ -23,7 +26,9 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
+
 export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+  try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
 
@@ -34,16 +39,26 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       limit,
       offset: getOffset(page, limit),
       nest: true, 
-    })
-    if (articles === null) return res.status(405).end({ message: '找不到文章' })
+    }) as unknown as Iarticle[]  //TODO: 待刪
+    if (articles === null) return res.status(405).end()
     res.status(200).json(articles)  //回傳的是 count 和 data
+  } catch (err) {
+    res.status(405).end()
+  }
 }
 
-async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
   try {
-    const { title, hollowId: hollow_id, content } = req.body
-    console.log(req.body)
-    const article = await Articles.create({
+    const { title, hollowId: hollow_id, content, userId: user_id } = req.body
+    
+    if (!title || title.length < 2 || title.length >= 20) {
+      return res.status(500).json({ error: '標題字數不足' })
+    }
+    if (!content || content.length < 2 || content.length >= 800) {
+      return res.status(500).json({ error: '標題字數不足' })
+    }
+
+    const article: Iarticle = await Articles.create({
       title, 
       content, 
       comment_counts: 0, 
@@ -51,11 +66,12 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) 
       liked_counts: 0, 
       reported_counts: 0,
       hollow_id, 
-      user_id: 1, 
+      user_id: 6, 
     })
+
     console.log('加上去 ' + article)
     res.status(200).json(article)
   } catch (err) {
-    console.log(err)
+    res.status(405).end()
   }
 }

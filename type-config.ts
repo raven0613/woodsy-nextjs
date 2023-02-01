@@ -1,4 +1,5 @@
 import NextAuth, { DefaultSession } from "next-auth"
+import { type } from "os"
 import { ReactNode } from "react"
 
 
@@ -23,7 +24,7 @@ export interface Ihollow {
     name: string,
     type: string,
     userId: number,
-    article: number,
+    articleCounts: number,
     isSub: boolean,
     subCounts: number,
     createdAt: string,
@@ -32,8 +33,8 @@ export interface Ihollow {
 export interface Iarticle {
     id?: number
     title: string
-    hollowId: number
-    userId: number
+    hollow_id: number
+    user_id: number
     content: string
     commentCounts: number
     collectedCounts: number
@@ -46,7 +47,19 @@ export interface Iarticle {
     hollowName?: string
     description?: string
     comments?: ReactNode
+    User?: user
+    Hollow?: hollow
 };
+
+type user = {
+    id: number
+    name: string
+}
+type hollow = {
+    id: number
+    name: string
+}
+
 
 export interface Icomment {
     id: number
@@ -103,4 +116,8 @@ declare module "next-auth" {
       email: string
     } & DefaultSession["user"]
   }
+}
+
+export type errorMessage = {
+    error: string
 }

@@ -18,7 +18,7 @@ module.exports = {
     await queryInterface.bulkInsert('Comments',       
       Array.from({ length: 10 }).map((_, i) => (
         {
-          content: `content-${i + 1}`,
+          content: 'tailwind 的重複 css class 可以拉出去 module.css 引入寫法要注意 class 名稱不能用一槓，例如 form-input',
           liked_counts: 0,
           reported_counts: 0,
           User_id: user[0].id,
