@@ -2,7 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Ihollow, Icomment, Iuser } from '../../../type-config'
 import db from '../../../models/index';
-const { Users, Articles, Comments, Hollows } = db;
+const DB: any = db;
+const { Users, Articles, Comments, Hollows } = DB;
 
 function getOffset (page: number, limit: number) {
   return (page - 1) * limit

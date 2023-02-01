@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
 import { Iarticle, Icomment, Iuser } from '../../../../type-config'
 import db from '../../../../models/index';
-const { Users, Articles, Comments } = db;
-
+const DB: any = db;
+const { Users, Articles, Comments } = DB;
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle | Icomment>) {
     switch (req.method) {

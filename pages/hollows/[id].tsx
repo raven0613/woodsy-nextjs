@@ -1,80 +1,17 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr';
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
-import { Iarticle, Ihollow, Iuser } from '../../type-config'
+import { Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
-
+import { getArticles, addArticle } from '../../api_helpers/apis/article'
+import { articlesWithHollowName } from '../home'
 
 interface hollowProps {
     art: Iarticle
 }
-
-
-const dummyArticles: Iarticle[] = [
-    {
-        id: 'a1',
-        title: '找工作嗚嗚',
-        hollowId: 'h1',
-        userId: 'u1',
-        content: '好想趕快找到工作，過年後就想要找工作懂否',
-        comments: 2,
-        collectedCounts: 20,
-        likedCounts: 50,
-        reportedCounts: 1,
-        isCollected: false,
-        isLiked: false,
-        reportedAt: '20230105',
-        createdAt: '20230105'
-    },
-    {
-        id: 'a2',
-        title: '好好玩喔',
-        hollowId: 'h1',
-        userId: 'u1',
-        content: '寶可夢好好玩朱紫真香難道我是真香玩家嗎',
-        comments: 18,
-        collectedCounts: 2,
-        likedCounts: 100,
-        reportedCounts: 0,
-        isCollected: false,
-        isLiked: false,
-        reportedAt: '20230105',
-        createdAt: '20230105'
-    },
-    {
-        id: 'a3',
-        title: '本多終勝',
-        hollowId: 'h1',
-        userId: 'u1',
-        content: '現在買台積電還來得及嗎?',
-        comments: 8,
-        collectedCounts: 0,
-        likedCounts: 20,
-        reportedCounts: 5,
-        isCollected: false,
-        isLiked: false,
-        reportedAt: '20230105',
-        createdAt: '20230105'
-    },
-    {
-        id: 'a4',
-        title: '求牧師配點',
-        hollowId: 'h1',
-        userId: 'u1',
-        content: '我想玩牧師可以請各位大大幫我配點嗎?',
-        comments: 16,
-        collectedCounts: 1,
-        likedCounts: 3,
-        reportedCounts: 27,
-        isCollected: false,
-        isLiked: false,
-        reportedAt: '20230105',
-        createdAt: '20230105'
-    },
-]
 
 const dummyHollows: Ihollow[] = [
   {
@@ -150,45 +87,83 @@ const dummyHollows: Ihollow[] = [
 ]
 
 const currentUser: Iuser = {
-    id: 'u1',
+    id: 2,
     name: '白文鳥',
     account: 'abc123',
     articles: 5,
     subHollows: 2,
     createAt: '20230106',
-    role: 'user'
+    role: 'user',
+    email: '',
+    password: ''
 }
 
+const params: param = { page: 1, limit: 15 }
+
 export default function Hollow () {
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll)
+        return () => { window.removeEventListener('scroll', handleScroll) }
+    }, [])
+
     const router = useRouter()
     const { id } = router.query
     const { data, error } = useSWR(id, fetchHollow);
     const hollowData = data?.data
-    const [articles, setArticles] = useState<Iarticle[]>(dummyArticles)
+
+    const [moreShowingId, setMoreShowingId] = useState<number>(0)
+    const [articles, setArticles] = useState<Iarticle[]>([])
+
+    const { data: articlesData, error: articlesError } = useSWR(['article', params], ([url, params]) => fetchArticles(url, params));
+
+    useEffect(() => {
+        const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
+        setArticles(fetchedArts)
+    }, [articlesData])
+
+    useEffect(() => {
+        console.log(hollowData)
+        const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
+        const arts = articlesWithHollowName([hollowData], fetchedArts)
+        setArticles(arts)
+    }, [hollowData, articlesData])
+
+
+
+    
+
     function handleAddArt (article: Iarticle) {
         setArticles([...articles, article])
     }
-
+    function handleClickMore (artId: number) {
+        setMoreShowingId(artId)
+    }
+    function handleScroll () {
+        // console.log(window.scrollY)
+    }
     return (
         <>
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-3/5'>
-                <div className='grid grid-cols-12'>
-                    <button className=''>back</button>
+                <div className='grid grid-cols-12 h-12'>
+                    <button className=''>←</button>
 
                     {hollowData? 
-                    <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>{hollowData.name}</h1> :
-                     <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
+                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollowData.name}</h1> :
+                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
                     }
 
-                    <button>關注樹洞</button>
+                    <button>關注</button>
                 </div>
 
                 <ArticleInput handleAddArt={handleAddArt} currentUser={currentUser} hollows={dummyHollows} />
                 
-                {dummyArticles && dummyArticles.map(art => {
+                <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
+                {articles && articles.map(art => {
                     return (
                         <Link href={`/articles/${art.id}`} key={art.id} >
-                            <ArticleCard art={art}/>
+                            <ArticleCard art={art}
+                            handleClickMore={handleClickMore}
+                            moreShowingId={moreShowingId} />
                         </Link>
                     )
                 })}
@@ -200,6 +175,16 @@ export default function Hollow () {
 async function fetchHollow (id: string) {
     try {
         const res = await getHollow(id)
+        return res
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function fetchArticles (url: string, { page, limit }: param) {
+    console.log('來')
+    try {
+        const res = await getArticles(url, page, limit)
         return res
     } catch (err) {
         console.log(err)

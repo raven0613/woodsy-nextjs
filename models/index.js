@@ -3,6 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
+const Model = require('sequelize');
+
 const process = require('process');
 
 // const basename = path.basename(__filename);
@@ -17,6 +19,8 @@ const db = {};
 // const Users = require('./user');
 // const Comments = require('./comment');
 // const Hollows = require('./hollow');
+
+
 
 let sequelize;
 if (config.use_env_variable) {
@@ -39,6 +43,7 @@ fs
   .forEach(file => {
     // const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
     const model = require(__dirname + '/../models/' + file)(sequelize, Sequelize.DataTypes);
+
     db[model.name] = model;
   });
 
@@ -56,7 +61,7 @@ db.Sequelize = Sequelize;
 // db.Comments = Comments(sequelize, Sequelize);
 // db.Hollows = Hollows(sequelize, Sequelize);
 
-// console.log('db '+ JSON.parse(JSON.stringify(db)))
+// console.log('db '+ JSON.parse(JSON.stringify(db)))m
 
 
 module.exports = db;

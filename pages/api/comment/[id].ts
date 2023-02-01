@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Iarticle, Icomment, Iuser } from '../../../type-config'
 import { delCom, editCom } from '../article/[id]/comments'
 
-export default function handleComments(req: NextApiRequest, res: NextApiResponse<Icomment | string>) {
+export default function handleComments(req: NextApiRequest, res: NextApiResponse<Icomment | number>) {
     
     const comment = req.body
 
@@ -25,7 +25,7 @@ function editComment (comment: Icomment, res: NextApiResponse<Icomment>) {
     res.status(200).json(comment)
 }
 
-function deleteComment (commentId: string, res: NextApiResponse<string>) {
+function deleteComment (commentId: number, res: NextApiResponse<number>) {
     delCom(commentId)
     res.status(200).json(commentId)
 }

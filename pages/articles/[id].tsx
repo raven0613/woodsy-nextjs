@@ -11,6 +11,7 @@ import ArticleEditWindow from "../../components/article//articleEditWindow"
 import { getArticle, editArticle, deleteArticle } from '../../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../../api_helpers/apis/comments'
 import { AxiosResponse } from 'axios'
+import articlesWithHollowName from '../home'
 
 const currentUser: Iuser = {
     id: 1,

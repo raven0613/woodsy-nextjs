@@ -2,9 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Ihollow, Icomment, Iuser } from '../../../type-config'
 import db from '../../../models/index';
-const { Users, Articles } = db;
-import bcrypt from 'bcrypt';
-const saltRounds = 10;
+const DB: any = db;
+const { Users, Articles, Comments, Hollows } = DB;
 
 
 export default function handleUser(req: NextApiRequest, res: NextApiResponse<Iuser> ) {

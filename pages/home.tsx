@@ -30,16 +30,20 @@ const currentUser: Iuser = {
     password: ''
 }
 
-const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
+export const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
+    console.log(hollows)
     return articles.map(article => {
-        const targetHollow = hollows.find(h => article.hollowId === h.id)
-        const des = article.content.length < 10? article.content : article.content.trim().slice(0, 10) + '...'
+        const targetHollow = hollows.find(h => article.hollow_id === h.id)
+        console.log(targetHollow)
+        const des = article.content.length < 200? article.content : article.content.trim().slice(0, 200) + '...'
         return { ...article, hollowName: targetHollow?.name || '', description: des}
     })
 }
 
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
+    const [moreShowingId, setMoreShowingId] = useState<number>(0)
+
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
     // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
@@ -63,6 +67,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }
     function handleAddHollow (hollow: Ihollow) {
         setHollows([...hollows, hollow])
+    }
+    function handleClickMore (artId: number) {
+        setMoreShowingId(artId)
     }
 
     return (
@@ -103,13 +110,14 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                 {articles && articles.map(art => {
                 return (
                 <Link href={`/articles/${art.id}`} key={art.id} >
-                    <ArticleCard art={art}/>
+                    <ArticleCard art={art} 
+                    handleClickMore={handleClickMore}
+                    moreShowingId={moreShowingId} />
                 </Link>
                 )
                 })}
             </div>
         </div>
-        <ToTopButton />
     </>
     )
 }

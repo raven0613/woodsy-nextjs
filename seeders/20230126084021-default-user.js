@@ -38,8 +38,8 @@ module.exports = {
     return await queryInterface.bulkInsert('Articles',
       Array.from({ length: 10 }).map((_, i) => (
         {
-          title: `article-${i + 1}`,
-          content: `content-${i + 1}`,
+          title: 'httponly可以不讓 user 用 js 來操縱 cookie',
+          content: 'tailwind 的重複 css class 可以拉出去 module.css 引入寫法要注意 class 名稱不能用一槓，例如 form-input',
           comment_counts: 1,
           collected_counts: 0,
           liked_counts: 0,

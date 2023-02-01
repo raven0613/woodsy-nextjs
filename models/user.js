@@ -11,16 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // Users.hasMany(models.Articles, {
-      //     foreignKey: 'userId',
-      // });
-      Users.hasMany(models.Articles);
+      Users.hasMany(models.Articles, {
+          foreignKey: 'user_id',
+      });
+      // Users.hasMany(models.Articles);
       
       Users.hasMany(models.Comments, {
-          foreignKey: 'userId',
+          foreignKey: 'user_id',
       });
       Users.hasMany(models.Hollows, {
-          foreignKey: 'userId',
+          foreignKey: 'user_id',
       });
     }
   }

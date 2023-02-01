@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { FC, PropsWithChildren } from 'react';
 import { flushSync } from 'react-dom';
 import { ILoginuser } from '../type-config'
-
+import inputStyle from '../styles/LoginPanel.module.css';
 
 interface IuserProps {
   handleLogin: (user: ILoginuser) => void
@@ -24,6 +24,7 @@ export default function LoginPanel ({ handleLogin }: IuserProps) {
     function handleSubmitLogin (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        if (!account || !password) return console.log('請輸入帳號密碼')
         setIsFetching(true)
         handleLogin({
             account, password
@@ -44,11 +45,11 @@ export default function LoginPanel ({ handleLogin }: IuserProps) {
                 <form action="" className='flex flex-col w-8/12 m-auto'>
                     <h1 className='font-sans text-neutral-600 text-3xl font-bold leading-loose py-4'>歡迎回到 Woodsy</h1>
 
-                    <input className='h-12 border w-full outline-0 px-4 py-1 rounded-md mb-2' 
+                    <input className={inputStyle.form_input} 
                     onChange={e => {handleSetValue(e, setAccount)}} 
                     value={account} placeholder='請輸入帳號' type="text" />
 
-                    <input className='h-12 border w-full outline-0 px-4 py-1 rounded-md mb-2' 
+                    <input className={inputStyle.form_input} 
                     value={password} 
                     onChange={e => {handleSetValue(e, setPassword)}} 
                     placeholder='請輸入密碼' type="password" />

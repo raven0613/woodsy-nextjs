@@ -2,9 +2,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Ihollow, Icomment, Iuser } from '../../../type-config'
 import db from '../../../models/index';
-const { Users, Articles, Comments } = db;
 import bcrypt from 'bcrypt';
-const saltRounds = 10;
+
+const DB: any = db;
+const { Users } = DB;
+
 
 export default async function signin(req: NextApiRequest, res: NextApiResponse<Iuser> ) {
   const userData = req.body
