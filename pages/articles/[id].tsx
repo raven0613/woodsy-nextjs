@@ -38,7 +38,7 @@ export default function Article () {
     const [article, setArticle] = useState<Iarticle | null>()
 
 
-    // fetch 全部回覆
+    // 得到該樹洞的所有回覆
     const { data: commentsData, error: commentsError } = useSWR([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
     
     useEffect(() => {
@@ -58,8 +58,8 @@ export default function Article () {
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
     
     useEffect(() => {
-        const comments: Icomment[] = commentsData? commentsData.data : []
-        setComments(comments)
+        const fetchedComments: Icomment[] = commentsData? commentsData.data.rows : []
+        setComments(fetchedComments)
     }, [commentsData])
 
 

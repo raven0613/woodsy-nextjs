@@ -23,11 +23,12 @@ export interface Ihollow {
     id?: number,
     name: string,
     type: string,
-    userId: number,
-    articleCounts: number,
-    isSub: boolean,
-    subCounts: number,
-    createdAt: string,
+    articleCounts: number
+    isSub?: boolean
+    subCounts: number
+    createdAt?: string
+    userId?: number
+    user_id?: number
 };
 
 export interface Iarticle {
@@ -72,6 +73,7 @@ export interface Icomment {
     reportedAt: string
     createdAt: string
     description?: string
+    User?: user
 };
 export type param = {
     page: number

@@ -18,7 +18,6 @@ interface commentProps {
 }
 
 export default function CommentCard ({ comment, handleDeleteComment, handleEditComment, handleClickMore, moreShowingId, handleCloseMore }: commentProps) {
-    console.log(comment)
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [content, setContent] = useState<string>(comment.content)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
@@ -76,7 +75,7 @@ export default function CommentCard ({ comment, handleDeleteComment, handleEditC
         <div className='w-full border-b px-4 py-2'>
 
             <div className='w-full h-8 flex relative items-center'>
-                <span className='text-base text-gray-700 pr-2'>白文鳥</span>
+                <span className='text-base text-gray-700 pr-2'>{comment.User?.name || ''}</span>
                 <span className='text-sm text-slate-300 flex-1'>@Vg2X8</span>
                 {!isCardShowMore && <button className='w-8 h-8 border rounded-full' onClick={handleClickMoreBtn}>…</button>}
                 {isCardShowMore && <MoreWindow 

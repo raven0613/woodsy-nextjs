@@ -27,7 +27,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 }
 
 
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[]>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
   try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
@@ -40,7 +40,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       offset: getOffset(page, limit),
       nest: true, 
     }) as unknown as Iarticle[]  //TODO: 待刪
-    if (articles === null) return res.status(405).end()
+    if (articles === null) return res.status(500).json({ error: '找不到文章' })
     res.status(200).json(articles)  //回傳的是 count 和 data
   } catch (err) {
     res.status(405).end()

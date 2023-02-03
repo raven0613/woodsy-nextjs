@@ -16,7 +16,7 @@ type props = {
 }
 
 export default function ArticleCard ({ article, moreShowingId, handleClickMore, handleDeleteArt, handleCloseMore }: props) {
-    // console.log(article)
+    console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = article.id
     const [isEditing, setIsEditing] = useState<boolean>(false)

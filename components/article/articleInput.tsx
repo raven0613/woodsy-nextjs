@@ -5,21 +5,22 @@ import { Ihollow, Iarticle, Iuser } from '../../type-config'
 
 
 interface hollowProps {
-  hollows: Ihollow[],
-  handleAddArt: (article: Iarticle) => void,
-  currentUser: Iuser
+    currentHollow?: Ihollow
+    hollows: Ihollow[]
+    handleAddArt: (article: Iarticle) => void
+    currentUser: Iuser
 }
 
 
-export default function ArticleInput ({ hollows, handleAddArt, currentUser }: hollowProps) {
+export default function ArticleInput ({ currentHollow, hollows, handleAddArt, currentUser }: hollowProps) {
     const [inputVal, setInputVal] = useState<string>('')
     const [textVal, setTextVal] = useState<string>('')
     
-    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
+    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(currentHollow? currentHollow : null)
     const [article, setArticle] = useState<Iarticle>({
         title: '',
         hollow_id: 0,
-        user_id: 10,
+        user_id: 7,
         content: '',
         commentCounts: 0,
         collectedCounts: 0,
@@ -47,12 +48,13 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
     function handleSubmit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        if (!article.hollow_id) return console.log('請選擇樹洞')
         handleAddArt(article)
         setInputVal('')
         setTextVal('')
         setArticle({...article, title: '', content: '', description: ''})
     }
-
+    const hollowsWithoutCurrent: Ihollow[] = hollows.filter(hollow => hollow.id !== selectHollow?.id && hollow.id !== currentHollow?.id)
     return (
         <main className='w-full border rounded-lg'>
             <input 
@@ -70,9 +72,14 @@ export default function ArticleInput ({ hollows, handleAddArt, currentUser }: ho
 
             <div className='w-full border-t py-2 pl-8 pr-4 flex flex-col mt-1'>
                 
-                {/* {selectHollow && <div>{selectHollow.name}</div>} */}
                 <div>
-                    {hollows && hollows.map(hollow => {
+                    {selectHollow?.name && <button className='border-lime-500 text-lime-500 border rounded-full m-1 px-3 h-10' disabled>{selectHollow.name}</button>} 
+
+                    {currentHollow && <button 
+                    onClick={() => {handleSelect(currentHollow)}}
+                    className='border-blue-200 text-cyan-700 border rounded-full m-1 px-3 h-10 hover:bg-sky-100 ease-out duration-300'>{currentHollow.name}</button>}
+
+                    {hollowsWithoutCurrent && hollowsWithoutCurrent.map(hollow => {
                         return (
                             <button className='border rounded-full m-1 px-3 h-10 hover:bg-sky-100 ease-out duration-300' key={hollow.id} onClick={() => {handleSelect(hollow)}}>
                                 <div >{hollow.name}</div>
