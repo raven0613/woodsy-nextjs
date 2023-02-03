@@ -9,7 +9,7 @@ export interface Iuser {
     email: string
     password: string
     account: string
-    articles: number
+    articleCounts: number
     subHollows: number
     createAt?: string
     role: string
@@ -52,11 +52,11 @@ export interface Iarticle {
     Hollow?: hollow
 };
 
-type user = {
+interface user {
     id: number
     name: string
 }
-type hollow = {
+interface hollow {
     id: number
     name: string
 }
@@ -120,6 +120,6 @@ declare module "next-auth" {
   }
 }
 
-export type errorMessage = {
+export interface errorMessage {
     error: string
 }

@@ -48,14 +48,14 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
 }
 
 async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
+  const { title, hollow_id, content, user_id } = req.body
+  console.table(req.body)
   try {
-    const { title, hollowId: hollow_id, content, userId: user_id } = req.body
-    
     if (!title || title.length < 2 || title.length >= 20) {
       return res.status(500).json({ error: '標題字數不足' })
     }
     if (!content || content.length < 2 || content.length >= 800) {
-      return res.status(500).json({ error: '標題字數不足' })
+      return res.status(500).json({ error: '內容字數不足' })
     }
 
     const article: Iarticle = await Articles.create({
@@ -66,12 +66,21 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
       liked_counts: 0, 
       reported_counts: 0,
       hollow_id, 
-      user_id: 6, 
+      user_id, 
     })
+    //TODO: 把 user 的欄位也要加上 articleCounts
+    // const user = await Users.findByPk(user_id)
+    // user.set({ articleCounts: user.articleCounts? user.articleCounts + 1 : 1 })
+    // await user.save()
 
-    console.log('加上去 ' + article)
+    const hollow = await Hollows.findByPk(hollow_id)
+    console.log(hollow)
+    hollow.set({ articleCounts: hollow.articleCounts? hollow.articleCounts + 1 : 1 })
+    await hollow.save()
+
     res.status(200).json(article)
   } catch (err) {
-    res.status(405).end()
+    console.log(err)
+    return res.status(500).json({ error: '伺服器錯誤' })
   }
 }

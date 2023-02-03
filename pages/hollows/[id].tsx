@@ -50,7 +50,7 @@ export default function Hollow () {
 
     // 得到該樹洞的所有文章
     const { data: articlesData, error: articlesError } = useSWR([`hollow/${id}/articles`, params], ([url, params]) => fetchHotArticles(url, params));
-    
+
     // 得到熱門樹洞(給 input 用)
     const { data: hollowsData, error: hollowsError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
 
@@ -86,6 +86,8 @@ export default function Hollow () {
     }
     function handleAddArt (article: Iarticle) {
         addArtTrigger(article)
+        //TODO: 目前跳頁後文章沒有被增加上去
+        if (article.hollow_id !== Number(id)) return router.push(`/hollows/${article.hollow_id}`)
         setArticles([...articles, article])
     }
     function handleClickMore (artId: string) {

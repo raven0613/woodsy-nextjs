@@ -12,6 +12,7 @@ import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetc
 import { AxiosResponse } from 'axios'
 import { articlesWithHollowName } from '../home'
 import Link from 'next/link'
+import hollowStyle from '../../styles/hollow.module.css';
 
 const currentUser: Iuser = {
     id: 1,
@@ -102,7 +103,7 @@ export default function Article () {
 
                     <div className='flex items-center'>
                         <h2 className='text-lg font-semibold px-4'>{article.User?.name}</h2>
-                        {article.Hollow && <Link className='' href={`/hollows/${article.Hollow.id}`}>{article.Hollow.name}</Link>}
+                        {article.Hollow && <Link className={hollowStyle.hollow_button} href={`/hollows/${article.Hollow.id}`}><p>{article.Hollow.name}</p></Link>}
                     </div>
 
                     <ArticleDetailCard article={article} 

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { flushSync } from 'react-dom';
 import { Ihollow, Iarticle, Iuser } from '../../type-config'
-
+import hollowStyle from '../../styles/hollow.module.css';
 
 interface hollowProps {
     currentHollow?: Ihollow
@@ -81,7 +81,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
 
                     {hollowsWithoutCurrent && hollowsWithoutCurrent.map(hollow => {
                         return (
-                            <button className='border rounded-full m-1 px-3 h-10 hover:bg-sky-100 ease-out duration-300' key={hollow.id} onClick={() => {handleSelect(hollow)}}>
+                            <button className={hollowStyle.hollow_button} key={hollow.id} onClick={() => {handleSelect(hollow)}}>
                                 <div >{hollow.name}</div>
                             </button>
                         )

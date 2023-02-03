@@ -25,7 +25,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
   const { id } = req.query
   const { page: p, limit: l } = req.query;
   const page = Number(p), limit = Number(l)
-
+  
   try {
     const articles = await Articles.findAndCountAll({
       where: {

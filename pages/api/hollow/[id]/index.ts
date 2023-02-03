@@ -49,12 +49,12 @@ async function editHollow (req: NextApiRequest, res: NextApiResponse<Ihollow | e
                 { model: Users, attributes: ['id', 'name'] }],
             nest: true
         })
-        if (hollow === null) return res.status(500).json({ error: '找不到樹洞' } )
+        if (hollow === null) return res.status(500).json({ error: '找不到樹洞'})
 
         hollow.set({ name, type })
         await hollow.save()
         res.status(200).json(hollow)
     } catch (err) {
-        return res.status(500).json({ error: '伺服器錯誤' } )
+        return res.status(500).json({ error: '伺服器錯誤' })
     }
 }
