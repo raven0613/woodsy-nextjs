@@ -1,61 +1,48 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Icomment, Iuser } from '../../../../type-config'
+import { Icomment, Iuser, errorMessage } from '../../../../type-config'
+import db from '../../../../models/index';
+const DB: any = db;
+const { Users, Articles, Comments, Hollows } = DB;
 
-
-export default function getComments(req: NextApiRequest, res: NextApiResponse<Icomment[]>) {
-    // const { id, page, limit } = req.query;
-    // console.log('id: ' + id + ' page: '+ page + ' limit: ' + limit)
-    res.status(200).json(comments)
+function getOffset (page: number, limit: number) {
+  return (page - 1) * limit
 }
 
-let comments: Icomment[] = [
-    {
-        id: 1,
-        articleId: 1,
-        userId: 1,
-        content: '年後比較好找啦',
-        likedCounts: 10,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-    {
-        id: 2,
-        articleId: 1,
-        userId: 1,
-        content: '我也好想要工作',
-        likedCounts: 0,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-    {
-        id: 3,
-        articleId: 1,
-        userId: 1,
-        content: '一起加油啊',
-        likedCounts: 5,
-        reportedCounts: 0,
-        isLiked: false,
-        reportedAt: '',
-        createdAt: '20230121'
-    },
-]
+export default async function getComments(req: NextApiRequest, res: NextApiResponse<Icomment[] | errorMessage>) {
+    const { id } = req.query
+    const { page: p, limit: l } = req.query;
+    const page = Number(p), limit = Number(l)
 
-export function addCom (comment: Icomment) {
-    comments = [...comments, comment]
+    try {
+        const comments = await Comments.findAndCountAll({
+            where: {
+                article_id: id
+            },
+            include: { model: Users, attributes: ['id', 'name'] },
+            limit,
+            offset: getOffset(page, limit),
+            nest: true,
+        })
+        if (!comments.count) return res.status(500).json({ error: '找不到評論' })
+        res.status(200).json(comments)  //回傳的是 count 和 data
+    } catch (err) {
+        return res.status(500).json({ error: '伺服器錯誤' })
+    }
 }
-export function delCom (commentId: number) {
-    comments = comments.filter(com => com.id !== commentId)
-}
-export function editCom (comment: Icomment) {
-    comments = comments.map(com => {
-        if (com.id === comment.id) {
-            return { ...com, content: comment.content}
-        }
-        return { ...com }
-    })
-}
+
+
+// export function addCom(comment: Icomment) {
+//     comments = [...comments, comment]
+// }
+// export function delCom(commentId: number) {
+//     comments = comments.filter(com => com.id !== commentId)
+// }
+// export function editCom(comment: Icomment) {
+//     comments = comments.map(com => {
+//         if (com.id === comment.id) {
+//             return { ...com, content: comment.content }
+//         }
+//         return { ...com }
+//     })
+// }

@@ -44,35 +44,43 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
 
 }
 
-async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
     const { id } = req.query
     const idNum = Number(id)
+    const { title, content, hollow_id } = req.body
+    try {
+        const article = await Articles.findByPk(idNum)
+        if (article === null) res.status(500).json({ error: '找不到樹洞' })
 
-    const article = await Articles.destroy({
-        where: {
-            id: idNum
-        }
-    })
-    if (article === null) return res.status(405).end('找不到文章')
+        article.set({ title, content, hollow_id })
+        await article.save()
 
-    res.status(200).json(article)
+        return res.status(200).json(article)
+    } catch (err) {
+        return res.status(500).json({ error: '伺服器錯誤' } )
+    }
+
 }
 
-async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle>) {
+async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
     const { id } = req.query
     const idNum = Number(id)
-    const comment = await Comments.destroy({
-        where: {
-            articleId: idNum
-        }
-    })
-    if (comment === null) return res.status(405).end('找不到評論')
-    const article = await Articles.destroy({
-        where: {
-            id: idNum
-        }
-    })
-    if (article === null) return res.status(405).end('找不到評論')
+    const t = await new Sequelize().transaction();
+    try {
+        await Comments.destroy({
+            where: { article_id: idNum }
+        }, { transaction: t })
 
-    res.status(200).json(article)
+        const article = await Articles.findByPk(idNum, { transaction: t })
+        if (article === null) return res.status(500).json({ error: '找不到文章' })
+        await article.destroy({}, { transaction: t })
+
+        await t.commit();
+
+        return res.status(200).json(article)
+    } catch (err) {
+        console.log(err)
+        await t.rollback();
+        return res.status(500).json({ error: '伺服器錯誤' })
+    }
 }

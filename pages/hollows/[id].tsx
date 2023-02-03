@@ -7,86 +7,8 @@ import Link from 'next/link'
 import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
-import { fetchHollow, fetchHotArticles, fetchDeleteArticle } from '../../api_helpers/fetchers'
-
+import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt, fetchDeleteArticle } from '../../api_helpers/fetchers'
 import { articlesWithHollowName } from '../home'
-
-interface hollowProps {
-    art: Iarticle
-}
-
-const dummyHollows: Ihollow[] = [
-  {
-    id: 'h1',
-    name: '心情',
-    type: 'public',
-    userId: 'u0',
-    article: 10,
-    isSub: true,
-    subCounts: 100,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h2',
-    name: '八點檔',
-    type: 'public',
-    userId: 'u0',
-    article: 5,
-    isSub: false,
-    subCounts: 500,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h3',
-    name: '股票',
-    type: 'public',
-    userId: 'u0',
-    article: 5,
-    isSub: false,
-    subCounts: 35,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h4',
-    name: '寵物',
-    type: 'public',
-    userId: 'u0',
-    article: 16,
-    isSub: false,
-    subCounts: 600,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h5',
-    name: '遊戲',
-    type: 'public',
-    userId: 'u0',
-    article: 8,
-    isSub: true,
-    subCounts: 1000,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h6',
-    name: '仙境傳說',
-    type: 'public',
-    userId: 'u0',
-    article: 8,
-    isSub: true,
-    subCounts: 250,
-    createdAt: '20230105'
-  },
-  {
-    id: 'h7',
-    name: '寶可夢',
-    type: 'public',
-    userId: 'u0',
-    article: 30,
-    isSub: true,
-    subCounts: 800,
-    createdAt: '20230105'
-  },
-]
 
 const currentUser: Iuser = {
     id: 2,
@@ -112,31 +34,49 @@ export default function Hollow () {
     const { id } = router.query
     const { data, error } = useSWR(id, fetchHollow);
     const hollowData = data?.data
+    
 
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     const [articles, setArticles] = useState<Iarticle[]>([])
-    const [hollow, setHollow] = useState<Ihollow>()
+    const [hollow, setHollow] = useState<Ihollow>({
+        id: Number(id)? Number(id) : 0,
+        name: "",
+        type: "",
+        articleCounts: 0,
+        subCounts: 0,
+        user_id: 0,
+    })
+    const [hollows, setHollows] = useState<Ihollow[]>([])
 
-    const { data: articlesData, error: articlesError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
+    // 得到該樹洞的所有文章
+    const { data: articlesData, error: articlesError } = useSWR([`hollow/${id}/articles`, params], ([url, params]) => fetchHotArticles(url, params));
+
+    // 得到熱門樹洞(給 input 用)
+    const { data: hollowsData, error: hollowsError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
+
+    // 新增一則文章
+    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
 
     // 刪除一篇文章
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
-
+    
+    //熱門樹洞
     useEffect(() => {
-        if (!articlesData) return
-        const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
-        setArticles(fetchedArts)
-    }, [articlesData])
-
+        if (!hollowsData) return
+        const fetchedHollows: Ihollow[] = hollowsData? hollowsData.data.rows : []
+        setHollows(fetchedHollows)
+    }, [hollowsData])
+    //目前樹洞
     useEffect(() => {
         if (!hollowData) return
         setHollow(hollowData)
     }, [hollowData])
-
+    // 熱門文章
     useEffect(() => {
         if (!hollow || !articlesData) return
         const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
         const arts = articlesWithHollowName([hollow], fetchedArts)
+        console.log(arts)
         setArticles(arts)
     }, [hollow, articlesData])
 
@@ -144,9 +84,10 @@ export default function Hollow () {
     function handleDeleteArt (articleId: number) {
         deleteArtTrigger(articleId)
     }
-    
-
     function handleAddArt (article: Iarticle) {
+        addArtTrigger(article)
+        //TODO: 目前跳頁後文章沒有被增加上去
+        if (article.hollow_id !== Number(id)) return router.push(`/hollows/${article.hollow_id}`)
         setArticles([...articles, article])
     }
     function handleClickMore (artId: string) {
@@ -165,14 +106,19 @@ export default function Hollow () {
                     <button className=''>←</button>
 
                     {hollow? 
-                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollow.name}</h1> :
+                        <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollow.name}</h1> 
+                        :
                         <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
                     }
 
                     <button>關注</button>
                 </div>
 
-                <ArticleInput handleAddArt={handleAddArt} currentUser={currentUser} hollows={dummyHollows} />
+                <ArticleInput 
+                currentHollow={hollow}
+                handleAddArt={handleAddArt} 
+                currentUser={currentUser} 
+                hollows={hollows} />
                 
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {articles && articles.map(art => {
@@ -184,6 +130,7 @@ export default function Hollow () {
                         moreShowingId={moreShowingId} />
                     )
                 })}
+                {articles.length < 1 && <p className=''>這個樹洞目前是空的</p>}
             </div>
         </>
     )

@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       //}
       Articles.belongsTo(models.Users);
       Articles.belongsTo(models.Hollows);
-      Articles.hasMany(models.Comments);
+      Articles.hasMany(models.Comments, {
+          foreignKey: 'article_id',
+      });
       // Articles.hasMany(models.Comments, { foreignKey: 'articleId' });
     }
   }

@@ -9,7 +9,7 @@ export interface Iuser {
     email: string
     password: string
     account: string
-    articles: number
+    articleCounts: number
     subHollows: number
     createAt?: string
     role: string
@@ -23,11 +23,12 @@ export interface Ihollow {
     id?: number,
     name: string,
     type: string,
-    userId: number,
-    articleCounts: number,
-    isSub: boolean,
-    subCounts: number,
-    createdAt: string,
+    articleCounts: number
+    isSub?: boolean
+    subCounts: number
+    createdAt?: string
+    userId?: number
+    user_id?: number
 };
 
 export interface Iarticle {
@@ -51,11 +52,11 @@ export interface Iarticle {
     Hollow?: hollow
 };
 
-type user = {
+interface user {
     id: number
     name: string
 }
-type hollow = {
+interface hollow {
     id: number
     name: string
 }
@@ -72,6 +73,7 @@ export interface Icomment {
     reportedAt: string
     createdAt: string
     description?: string
+    User?: user
 };
 export type param = {
     page: number
@@ -118,6 +120,6 @@ declare module "next-auth" {
   }
 }
 
-export type errorMessage = {
+export interface errorMessage {
     error: string
 }

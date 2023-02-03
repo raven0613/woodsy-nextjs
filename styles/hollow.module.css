@@ -1,0 +1,3 @@
+.hollow_button {
+  @apply border rounded-full m-1 px-3 h-10 hover:bg-sky-100 ease-out duration-300;
+}
