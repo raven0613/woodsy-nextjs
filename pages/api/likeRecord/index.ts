@@ -33,7 +33,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<ILikeship 
                     user_id, article_id
                 }
             }, { transaction: t })
-            if (existLike) return res.status(500).json({ error: '已存在相同紀錄' })
+            if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
 
             const sub = await Likeships.create({
                 user_id, article_id
@@ -48,7 +48,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<ILikeship 
                     user_id, comment_id
                 }
             }, { transaction: t })
-            if (existLike) return res.status(500).json({ error: '已存在相同紀錄' })
+            if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
             const sub = await Likeships.create({
                 user_id, comment_id
             }, { transaction: t })

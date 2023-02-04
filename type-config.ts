@@ -156,5 +156,5 @@ export interface errorMessage {
 
 export interface successMessage {
     success: string
-    payload?: Iuser | Iarticle | Ihollow | Icomment | ICollection | ILikeship | IReport | ISubcription
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription
 }

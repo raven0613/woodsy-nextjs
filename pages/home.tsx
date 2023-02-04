@@ -136,8 +136,8 @@ export async function getServerSideProps(context: CtxOrReq | undefined) {
             fetchHotArticles('article', params),
             fetchHotHollows('hollow', params)
         ])
-        const { count: articleCounts, rows: articleRows } = articles?.data
-        const { count: hollowCounts, rows: hollowRows } = hollows?.data
+        const { count: articleCounts, rows: articleRows } = articles?.data.payload
+        const { count: hollowCounts, rows: hollowRows } = hollows?.data.payload
         const csrfToken = await getCsrfToken(context)
         return {
             props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }

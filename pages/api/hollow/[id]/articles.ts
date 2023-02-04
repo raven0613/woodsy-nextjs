@@ -1,8 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser, errorMessage } from '../../../../type-config'
+import { Ihollow, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
 import db from '../../../../models/index';
-import { Iarticle } from '../../../../type-config';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
@@ -10,7 +9,7 @@ function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     console.log(req)
     switch (req.method) {
         case 'GET':
@@ -21,7 +20,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
             break
     }
 }
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
   const { page: p, limit: l, id } = req.query;
   const page = Number(p), limit = Number(l), idNum = Number(id)
   
@@ -38,7 +37,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       nest: true, 
     })
     if (!articles.count) return res.status(500).json({ error: '找不到文章' })
-    res.status(200).json(articles)  //回傳的是 count 和 data
+    res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }

@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage } from '../../../../type-config'
+import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
 
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle | Icomment | errorMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
     switch (req.method) {
         case 'GET':
             getArticle(req, res)
@@ -25,7 +25,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
+async function getArticle (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     const { id } = req.query
     const idNum = Number(id)
     try {
@@ -38,14 +38,14 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
             ]
         })
         if (!article) return res.status(500).json({ error: '找不到文章' } )
-        res.status(200).json(article)
+        res.status(200).json({ success: '查詢成功', payload: article })
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' } )
     }
 
 }
 
-async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
+async function editArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
@@ -62,14 +62,14 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<Iarticle |
         await article.save({ transaction: t })
         await t.commit();
 
-        return res.status(200).json(article)
+        return res.status(200).json({ success: '編輯文章成功', payload: article })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' } )
     }
 }
 
-async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
+async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
     const { id } = req.query
     const idNum = Number(id)
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
@@ -77,18 +77,22 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle
         dialect: 'mysql'
     }).transaction();
     try {
-        
         await Comments.destroy({
             where: { article_id: idNum }
         }, { transaction: t })
 
         const article = await Articles.findByPk(idNum, { transaction: t })
         if (article === null) return res.status(500).json({ error: '此文章不存在' })
+
+        const hollow = await Articles.Hollows(article.hollow_id, { transaction: t })
+        if (hollow) {
+            await Hollows.increment({article_counts: -1}, { where: { id: article.hollow_id }, transaction: t })
+        }
+
         await article.destroy({}, { transaction: t })
-        //TODO: 還要把 hollow & user 的 count 都 -1
         await t.commit();
 
-        return res.status(200).json(article)
+        return res.status(200).json({ success: '刪除文章成功' })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

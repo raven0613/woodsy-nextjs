@@ -1,12 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser, errorMessage } from '../../../../type-config'
+import { Ihollow, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
-export default function handleHollows(req: NextApiRequest, res: NextApiResponse<Ihollow | errorMessage>) {
-    console.log(req)
+export default function handleHollows(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     switch (req.method) {
         case 'GET':
             getHollow(req, res)
@@ -20,8 +19,7 @@ export default function handleHollows(req: NextApiRequest, res: NextApiResponse<
     }
 }
 
-
-async function getHollow (req: NextApiRequest, res: NextApiResponse<Ihollow | errorMessage>) {
+async function getHollow (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     const { id } = req.query
     try {
         const hollow = await Hollows.findByPk(id, {
@@ -31,16 +29,14 @@ async function getHollow (req: NextApiRequest, res: NextApiResponse<Ihollow | er
         })
 
         if (hollow === null) return res.status(500).json({ error: '找不到樹洞' } )
-        res.status(200).json(hollow)
+        res.status(200).json({ success: '查詢成功', payload: hollow })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ error: '伺服器錯誤' } )
     }
 }
 
-
-
-async function editHollow (req: NextApiRequest, res: NextApiResponse<Ihollow | errorMessage>) {
+async function editHollow (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     const { id } = req.query
     const { name, type } = req.body
     try {
@@ -53,7 +49,7 @@ async function editHollow (req: NextApiRequest, res: NextApiResponse<Ihollow | e
 
         hollow.set({ name, type })
         await hollow.save()
-        res.status(200).json(hollow)
+        res.status(200).json({ success: '樹洞編輯成功', payload: hollow })
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' })
     }
