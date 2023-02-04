@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { Sequelize } from 'sequelize';
 import { Iarticle, Icomment, Iuser, errorMessage } from '../../../type-config'
 import { currentUser } from '../user/index'
 
@@ -49,7 +50,10 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
 
 async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
   const { title, hollow_id, content, user_id } = req.body
-  console.table(req.body)
+  const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+      host: 'localhost',
+      dialect: 'mysql'
+  }).transaction();
   try {
     if (!title || title.length < 2 || title.length >= 20) {
       return res.status(500).json({ error: '標題字數不足' })
@@ -57,6 +61,7 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
     if (!content || content.length < 2 || content.length >= 800) {
       return res.status(500).json({ error: '內容字數不足' })
     }
+
 
     const article: Iarticle = await Articles.create({
       title, 
@@ -67,20 +72,21 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
       reported_counts: 0,
       hollow_id, 
       user_id, 
-    })
+    }, { transaction: t })
     //TODO: 把 user 的欄位也要加上 articleCounts
     // const user = await Users.findByPk(user_id)
     // user.set({ articleCounts: user.articleCounts? user.articleCounts + 1 : 1 })
     // await user.save()
 
-    const hollow = await Hollows.findByPk(hollow_id)
-    console.log(hollow)
-    hollow.set({ articleCounts: hollow.articleCounts? hollow.articleCounts + 1 : 1 })
-    await hollow.save()
+    const hollow = await Hollows.findByPk(hollow_id, { transaction: t })
 
+    hollow.set({ articleCounts: hollow.articleCounts? hollow.articleCounts + 1 : 1 }, { transaction: t })
+    await hollow.save({ transaction: t })
+
+    await t.commit();
     res.status(200).json(article)
   } catch (err) {
-    console.log(err)
+    await t.rollback();
     return res.status(500).json({ error: '伺服器錯誤' })
   }
 }
