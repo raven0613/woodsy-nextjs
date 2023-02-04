@@ -22,14 +22,13 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
-  const { id } = req.query
-  const { page: p, limit: l } = req.query;
-  const page = Number(p), limit = Number(l)
+  const { page: p, limit: l, id } = req.query;
+  const page = Number(p), limit = Number(l), idNum = Number(id)
   
   try {
     const articles = await Articles.findAndCountAll({
       where: {
-        hollow_id: id
+        hollow_id: idNum
       },
       include: [
         { model: Users, attributes: ['id', 'name'] }, 

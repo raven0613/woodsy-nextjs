@@ -11,7 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Hollows.belongsTo(models.Users);
-      Hollows.hasMany(models.Articles, { foreignKey: 'hollow_id' });
+      Hollows.hasMany(models.Articles, {  
+        foreignKey: 'hollow_id' 
+      });
+      Hollows.hasMany(models.Subscriptions, {  
+        foreignKey: 'hollow_id' 
+      });
+      Hollows.hasMany(models.Reports, {  
+        foreignKey: 'hollow_id' 
+      });
     }
   }
   Hollows.init({

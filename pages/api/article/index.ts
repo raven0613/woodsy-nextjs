@@ -27,7 +27,6 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-
 export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
   try {
     const { page: p, limit: l } = req.query;

@@ -74,8 +74,38 @@ export interface Icomment {
     createdAt: string
     description?: string
     User?: user
+}
+
+export interface ISubcription {
+    id: number
+    userId: number
+    hollowId: number
+    createdAt: string
+}
+export interface ICollection {
+    id: number
+    userId: number
+    articleId: number
+    createdAt: string
 };
-export type param = {
+export interface ILikeship {
+    id: number
+    userId: number
+    articleId: number
+    commentId: number
+    createdAt: string
+};
+
+export interface IReport {
+    id: number
+    userId: number
+    hollowId: number
+    articleId: number
+    commentId: number
+    createdAt: string
+};
+
+export interface param {
     page: number
     limit: number
 }
@@ -122,4 +152,9 @@ declare module "next-auth" {
 
 export interface errorMessage {
     error: string
+}
+
+export interface successMessage {
+    success: string
+    payload?: Iuser | Iarticle | Ihollow | Icomment | ICollection | ILikeship | IReport | ISubcription
 }

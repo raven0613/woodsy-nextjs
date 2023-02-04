@@ -37,7 +37,6 @@ async function editComment (req: NextApiRequest, res: NextApiResponse<Icomment |
         await comment.save({ transaction: t })
         await t.commit();
 
-        
         res.status(200).json(comment)
     } catch (err) {
         await t.rollback();

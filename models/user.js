@@ -19,6 +19,18 @@ module.exports = (sequelize, DataTypes) => {
       Users.hasMany(models.Hollows, {
           foreignKey: 'user_id',
       });
+      Users.hasMany(models.Subscriptions, {  
+        foreignKey: 'user_id' 
+      });
+      Users.hasMany(models.Collections, {
+          foreignKey: 'user_id',
+      });
+      Users.hasMany(models.Likeships, {
+          foreignKey: 'user_id',
+      });
+      Users.hasMany(models.Reports, {
+          foreignKey: 'user_id',
+      });
     }
   }
   Users.init({

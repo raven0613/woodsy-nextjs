@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Comments.belongsTo(models.Users);
       Comments.belongsTo(models.Articles);
+      Comments.hasMany(models.Likeships, {
+          foreignKey: 'comment_id',
+      });
+      Comments.hasMany(models.Reports, {
+          foreignKey: 'comment_id',
+      });
     }
   }
   Comments.init({
