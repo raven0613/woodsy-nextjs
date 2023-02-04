@@ -36,7 +36,7 @@ export const currentUser: Iuser = {
   id: 1,
   name: '白文鳥',
   account: 'abc123',
-  articles: 5,
+  articleCounts: 5,
   subHollows: 2,
   createAt: '20230106',
   role: 'user',

@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       reported_counts: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       created_at: {
         allowNull: false,
