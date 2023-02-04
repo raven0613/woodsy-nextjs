@@ -9,13 +9,16 @@ const { Users, Articles, Comments, Hollows } = DB;
 export default async function addComment(req: NextApiRequest, res: NextApiResponse<Icomment | errorMessage>) {
     if (req.method !== 'POST') return res.status(405).end() //Method Not Allowed
     const { content, user_id, article_id} = req.body
+    if (!content || content.length > 500 || !user_id || !article_id) return res.status(500).json({ error: '請求的內容不正確' })
+
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
     try {
         const comment = await Comments.create({content, user_id, article_id }, { transaction: t })
-        if (!comment) return res.status(500).json({ error: '新增使用者失敗' })
+        if (!comment) return res.status(500).json({ error: '新增回覆失敗' })
+        // TODO: 要把 article 和 user 的數量加上去
         await t.commit();
         res.status(200).json(comment)
     } catch (err) {

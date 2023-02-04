@@ -83,7 +83,7 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<Iarticle
         }, { transaction: t })
 
         const article = await Articles.findByPk(idNum, { transaction: t })
-        if (article === null) return res.status(500).json({ error: '找不到文章' })
+        if (article === null) return res.status(500).json({ error: '此文章不存在' })
         await article.destroy({}, { transaction: t })
         //TODO: 還要把 hollow & user 的 count 都 -1
         await t.commit();

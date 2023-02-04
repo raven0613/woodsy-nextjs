@@ -36,12 +36,13 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<Iuser | error
         const editedPassword = await bcrypt.hash(password, saltRounds)
 
         const user = await Users.findByPk(idNum, { transaction: t })
-
+        if (!user) return res.status(500).json({ error: '找不到使用者' })
+        
         user.set({ name, account, email, editedPassword }, { transaction: t })
         await user.save({ transaction: t })
         await t.commit();
 
-        if (!user) return res.status(500).json({ error: '找不到使用者' })
+        
         res.status(200).json(user)
     } catch (err) {
         await t.rollback();
