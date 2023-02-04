@@ -13,10 +13,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       liked_counts: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       reported_counts: {
         type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       created_at: {
         allowNull: false,

@@ -7,7 +7,7 @@ interface hollowProps {
 }
 
 export default function HollowCard ({ hollow }: hollowProps) {
-    console.log(hollow)
+    // console.log(hollow)
     return (
         <div className='bg-gray-50 rounded-lg py-3 px-4 h-28'>
             <h1 className='text-gray-600 text-lg font-bold'>{hollow.name}</h1>

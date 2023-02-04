@@ -30,19 +30,3 @@ export default async function getComments(req: NextApiRequest, res: NextApiRespo
         return res.status(500).json({ error: '伺服器錯誤' })
     }
 }
-
-
-// export function addCom(comment: Icomment) {
-//     comments = [...comments, comment]
-// }
-// export function delCom(commentId: number) {
-//     comments = comments.filter(com => com.id !== commentId)
-// }
-// export function editCom(comment: Icomment) {
-//     comments = comments.map(com => {
-//         if (com.id === comment.id) {
-//             return { ...com, content: comment.content }
-//         }
-//         return { ...com }
-//     })
-// }
