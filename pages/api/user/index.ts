@@ -22,6 +22,8 @@ export default function handleUsers(req: NextApiRequest, res: NextApiResponse<su
 async function getUsers(res: NextApiResponse<successMessage | errorMessage> ) {
   try {
     const users: Iuser[] = await Users.findAll({
+      attributes: ['id', 'name', 'account', 'email', 'role', 'createdAt', 'updatedAt'],
+      include: { model: Articles, attributes: ['id'] },
       where: { role: 'user' },
       nest: true,
       raw: true
@@ -31,16 +33,3 @@ async function getUsers(res: NextApiResponse<successMessage | errorMessage> ) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }
 }
-
-// export const currentUser: Iuser = {
-//   id: 1,
-//   name: '白文鳥',
-//   account: 'abc123',
-//   articleCounts: 5,
-//   subHollows: 2,
-//   createAt: '20230106',
-//   role: 'user',
-//   email: '',
-//   password: ''
-// }
-

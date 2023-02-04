@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
 import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../type-config'
-import { currentUser } from '../user/index'
 
 import db from '../../../models/index';
 const DB: any = db;
@@ -40,8 +39,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
       offset: getOffset(page, limit),
       nest: true, 
     })
-    if (!articles.count) return res.status(500).json({ error: '找不到文章' })
-    res.status(200).json({ success: '新增文章成功', payload: articles })  //回傳的是 count 和 data
+    res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }

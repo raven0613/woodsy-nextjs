@@ -7,11 +7,12 @@ export interface Iuser {
     id?: number
     name: string
     email: string
-    password: string
+    password?: string
     account: string
-    articleCounts: number
-    subHollows: number
-    createAt?: string
+    articleCounts?: number
+    subHollows?: number
+    createdAt?: string
+    updatedAt?: string
     role: string
 }; 
 export interface ILoginuser{

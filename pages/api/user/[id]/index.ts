@@ -38,12 +38,14 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successMessag
         const user = await Users.findByPk(idNum, { transaction: t })
         if (!user) return res.status(500).json({ error: '找不到使用者' })
         
-        user.set({ name, account, email, editedPassword, role }, { transaction: t })
+        user.set({ name, account, email, password: editedPassword, role }, { transaction: t })
         await user.save({ transaction: t })
         await t.commit();
 
+
+        const userWithoutPassword: Iuser = { id: user.id, name: user.name, account: user.account, email: user.email, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt }
         
-        res.status(200).json({ success: '編輯使用者資料成功', payload: user })
+        res.status(200).json({ success: '編輯使用者資料成功', payload: userWithoutPassword })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })
@@ -54,14 +56,17 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<successMessage
     const { id } = req.query
     const idNum = Number(id)
     try {
-        // TODO: 之後要加上 articleCounts
         const user = await Users.findByPk(idNum, {
             attributes: ['id', 'name', 'account', 'email', 'role', 'createdAt', 'updatedAt'],
             raw: true,
             nest: true
         })
         if (!user) return res.status(500).json({ error: '找不到使用者' })
-        res.status(200).json({ success: '查詢成功', payload: user })
+        const articleCounts = await Articles.count({
+            where: { user_id: idNum }
+        })
+        const userResult = { ...user, articleCounts: articleCounts? articleCounts : 0 }
+        res.status(200).json({ success: '查詢成功', payload: userResult })
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' })
     }
