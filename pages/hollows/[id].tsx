@@ -8,7 +8,7 @@ import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
 import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt, fetchDeleteArticle } from '../../api_helpers/fetchers'
-import { formattedArticles } from '../home'
+import { formattedArticles } from '../../helpers/helpers'
 import { useSession } from 'next-auth/react';
 
 

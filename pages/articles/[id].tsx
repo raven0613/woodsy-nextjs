@@ -10,7 +10,7 @@ import ArticleDetailCard from "../../components/article/articleDetailCard"
 import ArticleEditWindow from "../../components/article//articleEditWindow"
 import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
 import { AxiosResponse } from 'axios'
-import { formattedArticles } from '../home'
+import { formattedArticles } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
 import { useSession } from 'next-auth/react'

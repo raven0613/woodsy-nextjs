@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
+import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
@@ -9,7 +9,7 @@ function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     console.log(req)
     switch (req.method) {
         case 'GET':
@@ -20,7 +20,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
             break
     }
 }
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   const { page: p, limit: l, id } = req.query;
   const page = Number(p), limit = Number(l), idNum = Number(id)
   

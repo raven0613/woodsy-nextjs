@@ -1,12 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../type-config'
+import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
-export default function handleComments(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+export default function handleComments(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     switch (req.method) {
         case 'PUT':
             editComment(req, res)
@@ -20,7 +20,7 @@ export default function handleComments(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function editComment (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function editComment (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const { content } = req.body
@@ -44,7 +44,7 @@ async function editComment (req: NextApiRequest, res: NextApiResponse<successMes
     }
 }
 
-async function deleteComment (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function deleteComment (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {

@@ -67,6 +67,7 @@ interface hollow {
 }
 
 
+
 export interface Icomment {
     id: number
     articleId: number
@@ -110,6 +111,15 @@ export interface IReport {
     createdAt: string
 };
 
+export interface collectionPayload {
+    user_id: number
+    article_id: number
+}
+export interface likePayload {
+    user_id: number
+    article_id: number
+}
+
 export interface param {
     page: number
     limit: number
@@ -137,6 +147,12 @@ export type articleArg = {
 export type deleteArg = {
     arg: string
 }
+export type payloadArg = {
+    arg: likePayload
+}
+export type paramArg = {
+    arg: param
+}
 
 
 declare module "next-auth" {
@@ -156,11 +172,18 @@ declare module "next-auth" {
   }
 }
 
-export interface errorMessage {
+
+export interface errorResult {
     error: string
 }
 
-export interface successMessage {
+export interface successResult {
     success: string
-    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription | rows
+}
+
+
+export interface rows {
+    count: number
+    rows: Iarticle[]
 }

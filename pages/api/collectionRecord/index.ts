@@ -1,12 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Ihollow, Icomment, Iuser, ICollection, errorMessage, successMessage } from '../../../type-config'
+import { Ihollow, Icomment, Iuser, ICollection, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Collections } = DB;
 
-export default function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+export default function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'POST':
             addCollection(req, res)
@@ -20,7 +20,7 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function addCollection (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function addCollection (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, article_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
@@ -54,7 +54,7 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorMes
     }
 }
 
-async function deleteCollection (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function deleteCollection (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, article_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',

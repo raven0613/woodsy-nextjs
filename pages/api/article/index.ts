@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../type-config'
+import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../type-config'
 
 import db from '../../../models/index';
 const DB: any = db;
@@ -12,7 +12,7 @@ function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     switch (req.method) {
         case 'GET':
             getArticles(req, res)
@@ -26,7 +26,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
@@ -50,7 +50,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
   }
 }
 
-async function addArticle (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function addArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   const { title, hollow_id, content, user_id } = req.body
   const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
       host: 'localhost',

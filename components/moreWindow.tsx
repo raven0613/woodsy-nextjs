@@ -45,7 +45,7 @@ export default function MoreWindow ({ id, handleCloseMore }: props) {
                 <button className='pb-1.5 rounded-full' onClick={handleClickDelete}>刪除</button>
                 <button className='pb-1.5 rounded-full' onClick={handleClickReport}>回報</button>
             </div>
-            <div className='fixed inset-0 z-0' onClick={handleClickClose}></div>
+            <div className='fixed inset-0 z-0' onMouseDown={handleClickClose}></div>
         </>
     )
 }

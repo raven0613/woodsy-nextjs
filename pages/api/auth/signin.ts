@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser, successMessage, errorMessage } from '../../../type-config'
+import { Ihollow, Icomment, Iuser, successResult, errorResult } from '../../../type-config'
 import db from '../../../models/index';
 import bcrypt from 'bcrypt';
 
@@ -8,7 +8,7 @@ const DB: any = db;
 const { Users } = DB;
 
 
-export default async function signin(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage> ) {
+export default async function signin(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   const userData = req.body
 
   try {

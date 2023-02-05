@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
+import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
 
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'GET':
             getArticle(req, res)
@@ -25,7 +25,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function getArticle (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function getArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     try {
@@ -45,7 +45,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successMess
 
 }
 
-async function editArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
@@ -69,7 +69,7 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorMessa
     }
 }
 
-async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {

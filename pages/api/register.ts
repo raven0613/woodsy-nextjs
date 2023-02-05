@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Ihollow, Icomment, Iuser, ILoginuser, errorMessage, successMessage } from '../../type-config'
+import { Ihollow, Icomment, Iuser, ILoginuser, errorResult, successResult } from '../../type-config'
 import db from '../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
@@ -9,7 +9,7 @@ import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
 
-export default async function register(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage> ) {
+export default async function register(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   const userData = req.body
   const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
       host: 'localhost',

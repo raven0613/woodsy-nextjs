@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Ihollow, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
+import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
-export default function handleUser(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage> ) {
+export default function handleUser(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   switch (req.method) {
       case 'GET':
           getUser(req, res)
@@ -22,7 +22,7 @@ export default function handleUser(req: NextApiRequest, res: NextApiResponse<suc
   }
 }
 
-async function editUser (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function editUser (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const { name, account, email, password, role } = req.body
@@ -52,7 +52,7 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successMessag
     }
 }
 
-async function getUser (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function getUser (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     try {
