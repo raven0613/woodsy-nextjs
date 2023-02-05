@@ -10,7 +10,6 @@ function getOffset (page: number, limit: number) {
 }
 
 export default function handleHollows(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
-    console.log(req)
     switch (req.method) {
         case 'GET':
             getHollows(req, res)

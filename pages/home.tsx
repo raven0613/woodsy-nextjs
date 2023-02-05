@@ -10,7 +10,7 @@ import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { fetchHotHollows, fetchHotArticles, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
+import { fetchUser, fetchHotHollows, fetchHotArticles, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg } from '../type-config';
 import { getCsrfToken } from 'next-auth/react';
@@ -139,6 +139,7 @@ export async function getServerSideProps(context: CtxOrReq | undefined) {
         const { count: articleCounts, rows: articleRows } = articles?.data.payload
         const { count: hollowCounts, rows: hollowRows } = hollows?.data.payload
         const csrfToken = await getCsrfToken(context)
+        const currentUser = await fetchUser('user', '')
         return {
             props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }
         }

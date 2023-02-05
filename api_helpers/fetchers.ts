@@ -2,7 +2,16 @@ import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg } f
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
 import { getHollows, getHollow } from '../api_helpers/apis/hollow'
+import { getUser } from '../api_helpers/apis/user'
 
+export async function fetchUser (url: string, id: string) {
+    try {
+        const res = await getUser(url, id)
+        return res
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 export async function fetchHollow (id: string) {
     try {
