@@ -33,7 +33,7 @@ export default function Hollow () {
     const router = useRouter()
     const { id } = router.query
     const { data, error } = useSWR(id, fetchHollow);
-    const hollowData = data?.data
+    const hollowData = data?.data.payload
     
 
     const [moreShowingId, setMoreShowingId] = useState<string>('')
@@ -62,8 +62,9 @@ export default function Hollow () {
     
     //熱門樹洞
     useEffect(() => {
+        console.log(hollowsData)
         if (!hollowsData) return
-        const fetchedHollows: Ihollow[] = hollowsData? hollowsData.data.rows : []
+        const fetchedHollows: Ihollow[] = hollowsData? hollowsData.data.payload.rows : []
         setHollows(fetchedHollows)
     }, [hollowsData])
     //目前樹洞
@@ -74,7 +75,7 @@ export default function Hollow () {
     // 熱門文章
     useEffect(() => {
         if (!hollow || !articlesData) return
-        const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
+        const fetchedArts: Iarticle[] = articlesData? articlesData.data.payload.rows : []
         const arts = articlesWithHollowName([hollow], fetchedArts)
         setArticles(arts)
     }, [hollow, articlesData])

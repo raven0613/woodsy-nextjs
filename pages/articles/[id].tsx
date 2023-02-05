@@ -43,7 +43,7 @@ export default function Article () {
     const { data: commentsData, error: commentsError } = useSWR([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
     
     useEffect(() => {
-        const fetchedArt: Iarticle = articleData? articleData.data : {}
+        const fetchedArt: Iarticle = articleData? articleData.data.payload : {}
         // const art = articlesWithHollowName()
         setArticle(fetchedArt)
     }, [articleData])
@@ -59,7 +59,7 @@ export default function Article () {
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
     
     useEffect(() => {
-        const fetchedComments: Icomment[] = commentsData? commentsData.data.rows : []
+        const fetchedComments: Icomment[] = commentsData? commentsData.data.payload.rows : []
         setComments(fetchedComments)
     }, [commentsData])
 
