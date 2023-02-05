@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Subscriptions.belongsTo(models.Users);Subscriptions.belongsTo(models.Hollows);
+      // Subscriptions.belongsTo(models.Users);
+      // Subscriptions.belongsTo(models.Hollows);
     }
   }
   Subscriptions.init({

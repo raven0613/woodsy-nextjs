@@ -41,7 +41,10 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorMes
         }, { transaction: t })
         if (!collection) return res.status(500).json({ error: '記錄新增失敗' })
 
-        await Articles.increment({collected_counts: 1}, {where: { id: article_id }, transaction: t})
+        const article = await Articles.findByPk(article_id, { transaction: t })
+        if (article) {
+            await Articles.increment({collected_counts: 1}, {where: { id: article_id }, transaction: t})
+        }
         
         await t.commit();
         return res.status(200).json({ success: '收藏成功', payload: collection })

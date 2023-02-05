@@ -53,15 +53,15 @@ export default NextAuth({
                 return {
                     accessToken: account.access_token,
                     refreshToken: account.refresh_token,
-                    user
+                    ...user
                 }
             }
             return token
         },
         async session({ session, token }) {
-            const { id, name, account, email } = JSON.parse(JSON.stringify(token.user))
-
-            session.user = { id, name, account, email }
+            const userJSON = JSON.parse(JSON.stringify(token.payload))
+            const { id, name, account, email, role } = userJSON
+            session.user = { id, name, account, email, role }
             session.accessToken = token.accessToken
 
             return session

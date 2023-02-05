@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { Iarticle } from '../../type-config'
+import { Iarticle, Iuser } from '../../type-config'
 import MoreWindow from '../moreWindow'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -13,10 +13,11 @@ type props = {
   handleClickMore: (artId: string) => void
   handleDeleteArt: (articleId: number) => void
   handleCloseMore: () => void
+  currentUser: Iuser
 }
 
-export default function ArticleCard ({ article, moreShowingId, handleClickMore, handleDeleteArt, handleCloseMore }: props) {
-    // console.log(article)
+export default function ArticleCard ({ currentUser, article, moreShowingId, handleClickMore, handleDeleteArt, handleCloseMore }: props) {
+    console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = article.id
     const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -37,6 +38,7 @@ export default function ArticleCard ({ article, moreShowingId, handleClickMore, 
     function handleCollect (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
+        
     }
     function handleEdit (article: Iarticle) {
         setIsEditing(true)
@@ -64,7 +66,10 @@ export default function ArticleCard ({ article, moreShowingId, handleClickMore, 
             </Link>
 
             <div className='pt-4'>
-                <span className='border rounded-full border-lime-500 text-lime-500 px-3 py-1.5 flex-1'>{article.hollowName}</span>
+                <Link href={`/hollows/${article.hollow_id}`}>
+                    <span className='border rounded-full border-lime-500 text-lime-500 px-3 py-1.5 flex-1'>{article.Hollow?.name}</span>
+                </Link>
+
                 <button className='px-2 ml-2'>回應數：{article.commentCounts}</button>
                 <button className='px-2 ml-2'>讚數：{article.likedCounts}</button>
                 <button className='h-8 justify-end px-2 ml-2' onClick={handleCollect}>收藏數：{article.collectedCounts}</button>

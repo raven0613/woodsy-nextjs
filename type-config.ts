@@ -51,6 +51,10 @@ export interface Iarticle {
     comments?: ReactNode
     User?: user
     Hollow?: hollow
+    CollectedUsers?: user[]
+    LikedUsers?: user[]
+    UserId?: number
+    HollowId?: number
 };
 
 interface user {
@@ -147,6 +151,7 @@ declare module "next-auth" {
       name: string
       account: string
       email: string
+      role: string
     } & DefaultSession["user"]
   }
 }

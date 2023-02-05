@@ -8,19 +8,9 @@ import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
 import ArticleCard from '../../components/article/articleCard'
 import ArticleInput from '../../components/article/articleInput'
 import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt, fetchDeleteArticle } from '../../api_helpers/fetchers'
-import { articlesWithHollowName } from '../home'
+import { formattedArticles } from '../home'
+import { useSession } from 'next-auth/react';
 
-const currentUser: Iuser = {
-    id: 2,
-    name: '白文鳥',
-    account: 'abc123',
-    articleCounts: 5,
-    subHollows: 2,
-    createdAt: '20230106',
-    role: 'user',
-    email: '',
-    password: ''
-}
 
 const params: param = { page: 1, limit: 15 }
 
@@ -29,6 +19,13 @@ export default function Hollow () {
         window.addEventListener('scroll', handleScroll)
         return () => { window.removeEventListener('scroll', handleScroll) }
     }, [])
+
+    const { data: session, status } = useSession()
+
+    const currentUser: Iuser = session? { ...session.user } : {
+        name: '', email: '', account: '', role: ''
+    }
+    const currentUserId = currentUser.id
 
     const router = useRouter()
     const { id } = router.query
@@ -74,11 +71,11 @@ export default function Hollow () {
     }, [hollowData])
     // 熱門文章
     useEffect(() => {
-        if (!hollow || !articlesData) return
+        if (!currentUserId || !articlesData) return
         const fetchedArts: Iarticle[] = articlesData? articlesData.data.payload.rows : []
-        const arts = articlesWithHollowName([hollow], fetchedArts)
+        const arts = formattedArticles(currentUserId, fetchedArts)
         setArticles(arts)
-    }, [hollow, articlesData])
+    }, [hollow, articlesData, currentUserId])
 
 
     function handleDeleteArt (articleId: number) {
@@ -127,7 +124,8 @@ export default function Hollow () {
                         handleClickMore={handleClickMore}
                         handleCloseMore={handleCloseMore}
                         handleDeleteArt={handleDeleteArt}
-                        moreShowingId={moreShowingId} />
+                        moreShowingId={moreShowingId} 
+                        currentUser={currentUser} />
                     )
                 })}
                 {articles.length < 1 && <p className=''>這個樹洞目前是空的</p>}

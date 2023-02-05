@@ -10,61 +10,62 @@ import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { fetchUser, fetchHotHollows, fetchHotArticles, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
+import { fetchUser, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
-import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg } from '../type-config';
-import { getCsrfToken } from 'next-auth/react';
+import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successMessage } from '../type-config';
+import { getCsrfToken, getSession, useSession } from 'next-auth/react';
 import { CtxOrReq } from 'next-auth/client/_utils';
 
 const inter = Inter({ subsets: ['latin'] })
 
-const currentUser: Iuser = {
-    id: 1,
-    name: '白文鳥',
-    account: 'abc123',
-    articleCounts: 5,
-    subHollows: 2,
-    createdAt: '20230106',
-    role: 'user',
-    email: '',
-    password: ''
-}
-
-export const articlesWithHollowName = (hollows: Ihollow[], articles: Iarticle[]): Iarticle[] => {
+export const formattedArticles = (currentUserId: number, articles: Iarticle[]): Iarticle[] => {
+    console.log(articles)
     return articles.map(article => {
-        const targetHollow = hollows.find(h => article.hollow_id === h.id)
+        const isCollected = article.CollectedUsers?.some((user: { id: number }) => user.id === currentUserId)
+        const isLiked = article.LikedUsers?.some((user: { id: number }) => user.id === currentUserId)
         const des = article.content.length < 200? article.content : article.content.trim().slice(0, 200) + '...'
-        return { ...article, hollowName: targetHollow?.name || '', description: des}
+
+        // result 為整理過格式的版本
+        const { CollectedUsers, LikedUsers, UserId, HollowId, ...result } = article
+        return { ...result, description: des, isCollected, isLiked}
     })
 }
 
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
+    const { data: session, status } = useSession()
+
+    const currentUser: Iuser = session? { ...session.user } : {
+        name: '', email: '', account: '', role: ''
+    }
+    const currentUserId = currentUser.id
+
     const [moreShowingId, setMoreShowingId] = useState<string>('')
 
     // 新增一則文章
-    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
+    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successMessage, Error>(`article`, fetchAddArt);
     // 刪除一篇文章
     const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
 
-    // const { data: hollowData, error: hollowError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
-    // const { data: artData, error: artError } = useSWR(['article', params], ([url, params]) => fetchHotArticles(url, params));
-
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    // const [newArticle, setNewArticle] = useState<Iarticle | null>(null)
+    const newArticle = addedArtData?.payload as Iarticle
+    console.log('newArticle', newArticle)
     
     useEffect(() => {
+        if (!currentUserId) return
         const hotHollows: Ihollow[] = hollowRows? hollowRows : []
         const hotArticles: Iarticle[] = articleRows? articleRows : []
-        const arts = articlesWithHollowName(hotHollows, hotArticles)
+        const arts = formattedArticles(currentUserId, hotArticles)
         setHollows(hotHollows)
         setArticles(arts)
-    }, [articleRows, hollowRows])
+    }, [articleRows, hollowRows, currentUserId])
 
-
+    
     function handleAddArt (article: Iarticle) {
         addArtTrigger(article)
-        setArticles([...articles, article])
+        // setArticles([article, ...articles])
     }
     function handleDeleteArt (articleId: number) {
         deleteArtTrigger(articleId)
@@ -114,13 +115,21 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         <div className='pt-6 mx-2 w-full'>
             <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
             <div className='flex-col justify-center w-full'>
+                {newArticle && <ArticleCard article={newArticle} key={newArticle.id} 
+                    handleClickMore={handleClickMore}
+                    handleCloseMore={handleCloseMore}
+                    handleDeleteArt={handleDeleteArt}
+                    moreShowingId={moreShowingId} 
+                    currentUser={currentUser}/>}
+
                 {articles && articles.map(art => {
                 return (
                     <ArticleCard article={art} key={art.id} 
                     handleClickMore={handleClickMore}
                     handleCloseMore={handleCloseMore}
                     handleDeleteArt={handleDeleteArt}
-                    moreShowingId={moreShowingId} />
+                    moreShowingId={moreShowingId} 
+                    currentUser={currentUser}/>
                 )
                 })}
             </div>
@@ -139,7 +148,6 @@ export async function getServerSideProps(context: CtxOrReq | undefined) {
         const { count: articleCounts, rows: articleRows } = articles?.data.payload
         const { count: hollowCounts, rows: hollowRows } = hollows?.data.payload
         const csrfToken = await getCsrfToken(context)
-        const currentUser = await fetchUser('user', '')
         return {
             props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }
         }

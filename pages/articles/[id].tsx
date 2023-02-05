@@ -10,25 +10,21 @@ import ArticleDetailCard from "../../components/article/articleDetailCard"
 import ArticleEditWindow from "../../components/article//articleEditWindow"
 import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
 import { AxiosResponse } from 'axios'
-import { articlesWithHollowName } from '../home'
+import { formattedArticles } from '../home'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
-
-const currentUser: Iuser = {
-    id: 1,
-    name: '白文鳥',
-    account: 'abc123',
-    articleCounts: 5,
-    subHollows: 2,
-    createdAt: '20230106',
-    role: 'user',
-    email: '',
-    password: ''
-}
+import { useSession } from 'next-auth/react'
 
 const params: param = { page: 1, limit: 15 }
 
 export default function Article () {
+    const { data: session, status } = useSession()
+
+    const currentUser: Iuser = session? { ...session.user } : {
+        name: '', email: '', account: '', role: ''
+    }
+    const currentUserId = currentUser.id
+    
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     
     const router = useRouter()
