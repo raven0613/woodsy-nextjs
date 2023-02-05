@@ -31,7 +31,7 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
         if (password !== passwordForCheck) return console.log('確認密碼與密碼不符')
         setIsFetching(true)
         handleAddUser && handleAddUser({
-            name, account, email, password, articles: 0, subHollows: 0, role: 'user'
+            name, account, email, password, role: 'user'
         })
         setName('')
         setEmail('')

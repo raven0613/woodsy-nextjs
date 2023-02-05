@@ -33,7 +33,7 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<ISubcr
                 user_id, hollow_id
             }
         }, { transaction: t })
-        if (existSub) return res.status(500).json({ error: '已存在相同紀錄' })
+        if (existSub) return res.status(403).json({ error: '已存在相同紀錄' })
         const sub = await Subscriptions.create({
             user_id, hollow_id
         }, { transaction: t })

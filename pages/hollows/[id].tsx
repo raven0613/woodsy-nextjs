@@ -16,7 +16,7 @@ const currentUser: Iuser = {
     account: 'abc123',
     articleCounts: 5,
     subHollows: 2,
-    createAt: '20230106',
+    createdAt: '20230106',
     role: 'user',
     email: '',
     password: ''
@@ -76,7 +76,6 @@ export default function Hollow () {
         if (!hollow || !articlesData) return
         const fetchedArts: Iarticle[] = articlesData? articlesData.data.rows : []
         const arts = articlesWithHollowName([hollow], fetchedArts)
-        console.log(arts)
         setArticles(arts)
     }, [hollow, articlesData])
 

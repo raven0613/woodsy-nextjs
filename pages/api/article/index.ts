@@ -1,8 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage } from '../../../type-config'
-import { currentUser } from '../user/index'
+import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../type-config'
 
 import db from '../../../models/index';
 const DB: any = db;
@@ -13,7 +12,7 @@ function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | Iarticle | errorMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
     switch (req.method) {
         case 'GET':
             getArticles(req, res)
@@ -27,7 +26,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iarticle[] | errorMessage>) {
+export async function getArticles(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
   try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
@@ -39,15 +38,14 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<Iart
       limit,
       offset: getOffset(page, limit),
       nest: true, 
-    }) as unknown as Iarticle[]  //TODO: 待刪
-    if (articles === null) return res.status(500).json({ error: '找不到文章' })
-    res.status(200).json(articles)  //回傳的是 count 和 data
+    })
+    res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
   } catch (err) {
-    res.status(405).end()
+    return res.status(500).json({ error: '伺服器錯誤' })
   }
 }
 
-async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | errorMessage>) {
+async function addArticle (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
   const { title, hollow_id, content, user_id } = req.body
   const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
       host: 'localhost',
@@ -55,12 +53,11 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
   }).transaction();
   try {
     if (!title || title.length < 2 || title.length >= 20) {
-      return res.status(500).json({ error: '標題字數不足' })
+      return res.status(500).json({ error: '請確認標題字數' })
     }
     if (!content || content.length < 2 || content.length >= 800) {
-      return res.status(500).json({ error: '內容字數不足' })
+      return res.status(500).json({ error: '請確認內容字數' })
     }
-
 
     const article: Iarticle = await Articles.create({
       title, 
@@ -72,18 +69,11 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<Iarticle | 
       hollow_id, 
       user_id, 
     }, { transaction: t })
-    //TODO: 把 user 的欄位也要加上 articleCounts
-    // const user = await Users.findByPk(user_id)
-    // user.set({ articleCounts: user.articleCounts? user.articleCounts + 1 : 1 })
-    // await user.save()
 
-    const hollow = await Hollows.findByPk(hollow_id, { transaction: t })
-
-    hollow.set({ articleCounts: hollow.articleCounts? hollow.articleCounts + 1 : 1 }, { transaction: t })
-    await hollow.save({ transaction: t })
+    await Hollows.increment({article_counts: 1}, { where: { id: hollow_id }, transaction: t })
 
     await t.commit();
-    res.status(200).json(article)
+    res.status(200).json({ success: '新增文章成功', payload: article })
   } catch (err) {
     await t.rollback();
     return res.status(500).json({ error: '伺服器錯誤' })

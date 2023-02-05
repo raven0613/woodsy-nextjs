@@ -10,10 +10,10 @@ function getOffset (page: number, limit: number) {
   return (page - 1) * limit
 }
 
-export default function handleUserCollections(req: NextApiRequest, res: NextApiResponse<Iuser | errorMessage | successMessage> ) {
+export default function handleUserArticles(req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage> ) {
   switch (req.method) {
       case 'GET':
-          getUserCollections(req, res)
+          getUserArticles(req, res)
           break
       default:
           res.status(405).end() //Method Not Allowed
@@ -21,21 +21,19 @@ export default function handleUserCollections(req: NextApiRequest, res: NextApiR
   }
 }
 
-
-async function getUserCollections (req: NextApiRequest, res: NextApiResponse<Iuser | errorMessage | successMessage>) {
+async function getUserArticles (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
     const { page: p, limit: l, id } = req.query;
     const page = Number(p), limit = Number(l), idNum = Number(id)
     if (!id || !p || !l) return res.status(500).json({ error: '請確認請求資料' })
+    
     try {
-        const collections = await Collections.findAll({
+        const articles = await Articles.findAll({
             where: { user_id: idNum },
-            include: [
-                { model: Articles }],
             limit,
             offset: getOffset(page, limit),
             nest: true
         })
-        return res.status(200).json({ success: '查詢成功', payload: collections }) 
+        return res.status(200).json({ success: '查詢成功', payload: articles }) 
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' })
     }

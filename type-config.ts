@@ -7,11 +7,12 @@ export interface Iuser {
     id?: number
     name: string
     email: string
-    password: string
+    password?: string
     account: string
-    articleCounts: number
-    subHollows: number
-    createAt?: string
+    articleCounts?: number
+    subHollows?: number
+    createdAt?: string
+    updatedAt?: string
     role: string
 }; 
 export interface ILoginuser{
@@ -156,5 +157,5 @@ export interface errorMessage {
 
 export interface successMessage {
     success: string
-    payload?: Iuser | Iarticle | Ihollow | Icomment | ICollection | ILikeship | IReport | ISubcription
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription
 }

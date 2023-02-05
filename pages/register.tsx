@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWRMutation from 'swr/mutation'
-import { Ihollow, Iarticle, Iuser, userArg, ILoginuser } from '../type-config'
+import { Ihollow, Iarticle, Iuser, userArg, ILoginuser, successMessage } from '../type-config'
 import { userRegister } from '../api_helpers/apis/user'
 import LoginPanel from '../components/loginPanel';
 import RegisterPanel from '../components/registerPanel';
@@ -22,19 +22,26 @@ export default function Register () {
         router.push('/home')
     } 
     // 新增一筆 user
-    const { trigger: addUserTrigger, isMutating: addUserIsMutating, data: addedUserData, error: addedUserError } = useSWRMutation<Iuser, Error>(`register`, fetchAddUser);
+    const { trigger: addUserTrigger, isMutating: addUserIsMutating, data: addedUserData, error: addedUserError } = useSWRMutation<successMessage, Error>(`register`, fetchAddUser);
 
     function handleAddUser (user: Iuser) {
+        if (!user.password) return
         addUserTrigger(user)
         setPassword(user.password)
     }
     
     useEffect(() => {
-        if (!addedUserData) return
+        if (addedUserError) return
+        if (!addedUserData?.success || !addedUserData?.payload) return
         if (isFetching) return
-        handleLogin({...addedUserData, password})
+        const IuserData = addedUserData.payload as Iuser;
+        const user: ILoginuser = {
+            account: IuserData.account,
+            password
+        }
+        handleLogin(user)
         setIsFetching(true)
-    }, [addedUserData, isFetching, password])
+    }, [addedUserError, addedUserData, isFetching, password])
 
     return (
         <>
