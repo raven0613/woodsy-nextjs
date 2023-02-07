@@ -6,16 +6,17 @@ import React from 'react'
 
 type props = {
     id: number
-    handleEdit: (article: Iarticle) => void
+    handleClickEdit: () => void
     handleClickDelete: () => void
     handleCloseMore: () => void
 }
 
-export default function MoreWindow ({ id, handleCloseMore, handleClickDelete }: props) {
+export default function MoreWindow ({ id, handleCloseMore, handleClickDelete, handleClickEdit }: props) {
 
     function onClickEdit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        handleClickEdit()
         console.log('編輯')
     }
     function onClickDelete (e: React.MouseEvent) {

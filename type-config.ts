@@ -25,8 +25,8 @@ export interface Ihollow {
     name: string,
     type: string,
     articleCounts: number
-    isSub?: boolean
     subCounts: number
+    isSub?: boolean
     createdAt?: string
     userId?: number
     user_id?: number
@@ -196,8 +196,10 @@ export interface IArticleContext {
 //   handleArticleReFetch?: (trigger: () => void) => void
     refetchTrigger?: boolean 
     handleRefetchTrigger?: () => void
+    
 }
 
 export interface IUIContext {
     handleConfirmWindow?: () => void
+    handleEditWindow?: (article: Iarticle) => void
 }

@@ -3,6 +3,7 @@ import { use, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom';
 import { Ihollow, Iarticle, Iuser } from '../../type-config'
 import hollowStyle from '../../styles/hollow.module.css';
+import articleStyle from '../../styles/article.module.css';
 
 interface hollowProps {
     currentHollow?: Ihollow
@@ -106,11 +107,9 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
                         </div>
                     </div>
 
-                    <button className='border w-20 h-10 rounded-full hover:bg-sky-100 ease-out duration-300' type="button" onClick={handleSubmit}>送出</button>
+                    <button className={articleStyle.confirm_button} type="button" onClick={handleSubmit}>送出</button>
                 </div>
-
             </div>
-
         </main>
     )
 }

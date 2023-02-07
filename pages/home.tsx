@@ -28,7 +28,7 @@ const arg = { page: 1, limit: 10 }
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
     const { currentArticleId, handleArticleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
-    const { handleConfirmWindow } = useContext(UIContext)
+    const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
     const { data: session, status } = useSession()
     const currentUser: Iuser = session? { ...session.user } : {
@@ -162,7 +162,10 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             artRecordTrigger('collect', payload)
         }
     }
-
+    function handleEdit (article: Iarticle) {
+        if (!article || !handleEditWindow) return
+        handleEditWindow(article)
+    }
     return (
     <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
         <div className='hidden sm:block mt-20 mx-2 w-full'>
@@ -206,7 +209,8 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     handleCloseMore={handleCloseMore}
                     handleClickDelete={handleClickDelete}
                     moreShowingId={moreShowingId} 
-                    currentUser={currentUser}/>}
+                    currentUser={currentUser}
+                    handleEdit={handleEdit}/>}
 
                 {articles && articles.map(art => {
                 return (
@@ -217,7 +221,8 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     handleCloseMore={handleCloseMore}
                     handleClickDelete={handleClickDelete}
                     moreShowingId={moreShowingId} 
-                    currentUser={currentUser}/>
+                    currentUser={currentUser}
+                    handleEdit={handleEdit}/>
                 )
                 })}
             </div>

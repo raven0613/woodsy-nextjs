@@ -2,11 +2,13 @@ import Navbar from './navbar'
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import ToTopButton from './toTopButton';
 import ConfirmWindow from './confirmWindow';
+import ArticleEditWindow from './article/articleEditWindow';
 import React, { useRef } from 'react';
 
 import useSWRMutation from 'swr/mutation'
-import { fetchDeleteArticle } from '../api_helpers/fetchers'
+import { fetchDeleteArticle, fetchEditArticle } from '../api_helpers/fetchers'
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, IUIContext } from '../type-config';
+
 
 export const articleContext = React.createContext<IArticleContext>({})
 export const UIContext = React.createContext<IUIContext>({})
@@ -14,22 +16,26 @@ export const UIContext = React.createContext<IUIContext>({})
 
 export default function ArticleProvider({ children }: PropsWithChildren) {
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false)
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [refetchTrigger, setRefetchTrigger] = useState<boolean>(false)
   const [currentArticleId, setCurrentArticleId] = useState<number>(0)
+  const [article, setArticle] = useState<Iarticle | null>()
 
   // fetcher 區
   //刪除文章
-  const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle);
+  const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle, {onSuccess: (data: successResult) => { 
+      setRefetchTrigger(true)
+  }});
 
   // 編輯文章
-  // const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successResult, Error>(`article`, fetchAddArt, { onSuccess: (data: successResult) => { 
-  //     const payload = data.payload as Iarticle
-  //     const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
-  //     setNewArticle(art)
-  // }});
+  const { trigger: editArtTrigger, isMutating: editArtIsMutating, data: editArtData, error: editArtError } = useSWRMutation<successResult, Error>(`article`, fetchEditArticle, {onSuccess: (data: successResult) => { 
+      setRefetchTrigger(true)
+  }});
 
 
   // function 區
+
+  //刪除相關
   function handleDeleteArt (articleId: number) {
     deleteArtTrigger(articleId)
     // 關掉確認視窗
@@ -45,25 +51,32 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
     }
     setIsConfirmOpen(!isConfirmOpen)
   }
+
+  // 編輯相關
+  function handleEditWindow (article: Iarticle) {
+    setArticle(article)
+    setIsEditOpen(!isEditOpen)
+  }
+  function handleConfirmEdit (article: Iarticle) {
+    console.log(article)
+    editArtTrigger(article)
+    setIsEditOpen(false)
+  }
+  
   function handleRefetchTrigger () {
     setRefetchTrigger(false)
   }
-  
-  useEffect(() => {
-    // 確定刪除文章成功才觸發重新 fetch 所有文章
-    if (!deletedArtData) return
-      setRefetchTrigger(true)
-  }, [deletedArtData])
 
   // context value 區
   const articlecontextValue: IArticleContext = {
     currentArticleId,
     handleArticleIdChange,
     refetchTrigger,
-    handleRefetchTrigger
+    handleRefetchTrigger,
   }
   const UIcontextValue: IUIContext = {
-    handleConfirmWindow
+    handleConfirmWindow,
+    handleEditWindow
   }
 
   return (
@@ -75,29 +88,13 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
           {isConfirmOpen && <ConfirmWindow id={currentArticleId} 
           handleDeleteArt={handleDeleteArt} 
           handleConfirmWindow={handleConfirmWindow}/>}
+          {article && isEditOpen && <ArticleEditWindow 
+          handleConfirmEdit={handleConfirmEdit}
+          handleEditWindow={handleEditWindow}
+          article={article} />}
 
         </articleContext.Provider>
       </UIContext.Provider>
     </>
   )
 }
-
-// function artReducer (arts, action) {
-//   switch (action.type) {
-//     case 'get': {
-//       return 'get'
-//     }
-//     case 'add': {
-//       return 'add'
-//     }
-//     case 'edit': {
-//       return 'add'
-//     }
-//     case 'delete': {
-//       return deleteArtTrigger
-//     }
-//     default: {
-//       throw Error('Unknown action: ' + action.type);
-//     }
-//   }
-// }
