@@ -80,7 +80,6 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<successResu
 
     // 直接取得完整一包 article 資料回傳
     const resultArticle = await Articles.findByPk(article.id, {
-      raw: true,
       nest: true,
       include: [
         { model: Users, as: 'User', attributes: ['id', 'name'] }, 

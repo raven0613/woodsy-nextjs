@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Ihollow, Icomment, Iuser, ICollection, errorResult, successResult } from '../../../type-config'
+import { Ihollow, Icomment, Iuser, ICollection, errorResult, successResult, ILikeship } from '../../../type-config'
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Collections } = DB;
@@ -75,7 +75,7 @@ async function deleteCollection (req: NextApiRequest, res: NextApiResponse<error
         }
         
         await t.commit();
-        return res.status(200).json({ success: '關注紀錄刪除成功' })
+        return res.status(200).json({ success: '關注紀錄刪除成功', payload: { article_id } as ILikeship })
         
     } catch (err) {
         await t.rollback();

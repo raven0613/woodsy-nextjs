@@ -78,10 +78,10 @@ export async function fetchHotArticles (url: string, { arg }: paramArg) {
     }
 }
 
-export async function fetchArticle (id: string) {
+export async function fetchArticle (url: string) {
     try {
-        const res = await getArticle(id)
-        return res
+        const { data } = await getArticle(url)
+        return data
     } catch (err) {
         console.log(err)
     }

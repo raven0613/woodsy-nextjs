@@ -7,33 +7,29 @@ import React from 'react'
 type props = {
     id: number
     handleEdit: (article: Iarticle) => void
-    handleDelete: (articleId: number) => void
+    handleClickDelete: () => void
     handleCloseMore: () => void
 }
 
-export default function MoreWindow ({ id, handleCloseMore }: props) {
-    const { data: session, status } = useSession({
-        required: true,
-        onUnauthenticated() {
-        },
-    })
-    function handleClickEdit (e: React.MouseEvent) {
+export default function MoreWindow ({ id, handleCloseMore, handleClickDelete }: props) {
+
+    function onClickEdit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         console.log('編輯')
     }
-    function handleClickDelete (e: React.MouseEvent) {
+    function onClickDelete (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
-        console.log('刪除')
+        handleClickDelete()
     }
 
-    function handleClickReport (e: React.MouseEvent) {
+    function onClickReport (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         console.log('回報')
     }
-    function handleClickClose (e: React.MouseEvent) {
+    function onClickClose (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         handleCloseMore()
@@ -41,11 +37,11 @@ export default function MoreWindow ({ id, handleCloseMore }: props) {
     return (
         <>
             <div className='w-20 border absolute top-0 right-0 rounded-2xl flex flex-col z-10 bg-white'>
-                <button className='py-1.5 rounded-full' onClick={handleClickEdit}>編輯</button>
-                <button className='pb-1.5 rounded-full' onClick={handleClickDelete}>刪除</button>
-                <button className='pb-1.5 rounded-full' onClick={handleClickReport}>回報</button>
+                <button className='py-1 rounded-t-2xl hover:bg-stone-100 ease-out duration-200' onClick={onClickEdit}>編輯</button>
+                <button className='py-1 hover:bg-stone-100 ease-out duration-200' onClick={onClickDelete}>刪除</button>
+                <button className='py-1 rounded-b-2xl hover:bg-stone-100 ease-out duration-200' onClick={onClickReport}>回報</button>
             </div>
-            <div className='fixed inset-0 z-0' onMouseDown={handleClickClose}></div>
+            <div className='fixed inset-0 z-0' onMouseDown={onClickClose}></div>
         </>
     )
 }

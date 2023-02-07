@@ -11,14 +11,15 @@ type props = {
   article: Iarticle
   moreShowingId: string
   handleClickMore: (artId: string) => void
-  handleDeleteArt: (articleId: number) => void
+  handleClickDelete: () => void
   handleCloseMore: () => void
   handleCollect: (articleId: number, isCollected: boolean) => void
   handleLike: (articleId: number, isLiked: boolean) => void
   currentUser: Iuser
 }
 
-export default function ArticleCard ({ currentUser, article, moreShowingId, handleClickMore, handleDeleteArt, handleCloseMore, handleCollect, handleLike }: props) {
+export default function ArticleCard ({ currentUser, article, moreShowingId, handleClickMore, handleClickDelete, handleCloseMore, handleCollect, handleLike }: props) {
+
     // console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = article.id
@@ -54,10 +55,6 @@ export default function ArticleCard ({ currentUser, article, moreShowingId, hand
     function handleEdit (article: Iarticle) {
         setIsEditing(true)
     }
-    function handleDelete () {
-        if (!article.id) return
-        handleDeleteArt(article.id)
-    }
     function handleClickCollect (e: React.MouseEvent) {
         if (!id) return
         e.stopPropagation()
@@ -82,7 +79,7 @@ export default function ArticleCard ({ currentUser, article, moreShowingId, hand
                 {!isCardShowMore && <button className='w-8 h-8 border justify-end rounded-full' onMouseUp={handleClickMoreBtn}>…</button>}
                 {isCardShowMore && <MoreWindow 
                 handleEdit={handleEdit} 
-                handleDelete={handleDelete}
+                handleClickDelete={handleClickDelete}
                 handleCloseMore={handleCloseMore} 
                 id={id? id : 0}/>}
             </div>

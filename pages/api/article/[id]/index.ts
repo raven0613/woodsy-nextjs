@@ -4,7 +4,7 @@ import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCr
 import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
-const { Users, Articles, Comments, Hollows } = DB;
+const { Users, Articles, Comments, Hollows, Collections, Likeships } = DB;
 
 
 
@@ -30,11 +30,12 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successResu
     const idNum = Number(id)
     try {
         const article: Iarticle = await Articles.findByPk(idNum, {
-            raw: true,
             nest: true,
             include: [
                 { model: Users, as: 'User', attributes: ['id', 'name'] }, 
-                { model: Hollows, as: 'Hollow', attributes: ['id', 'name'] }
+                { model: Hollows, as: 'Hollow', attributes: ['id', 'name'] },
+                { model: Users, as: 'CollectedUsers', attributes: ['id', 'name'] },
+                { model: Users, as: 'LikedUsers', attributes: ['id', 'name'] }
             ]
         })
         if (!article) return res.status(500).json({ error: '找不到文章' } )
@@ -80,19 +81,26 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorRes
         await Comments.destroy({
             where: { article_id: idNum }
         }, { transaction: t })
+        await Collections.destroy({
+            where: { article_id: idNum }
+        }, { transaction: t })
+        await Likeships.destroy({
+            where: { article_id: idNum }
+        }, { transaction: t })
 
         const article = await Articles.findByPk(idNum, { transaction: t })
-        if (article === null) return res.status(500).json({ error: '此文章不存在' })
+        if (!article) return res.status(500).json({ error: '此文章不存在' })
 
-        const hollow = await Articles.Hollows(article.hollow_id, { transaction: t })
+        const hollow = await Hollows.findByPk(article.hollow_id, { transaction: t })
         if (hollow) {
-            await Hollows.increment({article_counts: -1}, { where: { id: article.hollow_id }, transaction: t })
+            await hollow.increment({article_counts: -1}, { where: { id: article.hollow_id }, transaction: t })
         }
 
-        await article.destroy({}, { transaction: t })
+        await Articles.destroy({ where: { id: idNum } }, { transaction: t })
         await t.commit();
 
         return res.status(200).json({ success: '刪除文章成功' })
+
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

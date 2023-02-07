@@ -110,7 +110,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
             }
         }
         await t.commit();
-        return res.status(200).json({ success: '關注紀錄刪除成功' })
+        return res.status(200).json({ success: '喜歡紀錄刪除成功', payload: {article_id, comment_id} as ILikeship })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

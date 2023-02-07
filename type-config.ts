@@ -89,16 +89,17 @@ export interface ISubcription {
     createdAt: string
 }
 export interface ICollection {
+    article_id: number | undefined
     id: number
-    userId: number
-    articleId: number
+    user_id: number
+    comment_id: number
     createdAt: string
 };
 export interface ILikeship {
+    article_id: number | undefined
     id: number
-    userId: number
-    articleId: number
-    commentId: number
+    user_id: number
+    comment_id: number
     createdAt: string
 };
 
@@ -186,4 +187,17 @@ export interface successResult {
 export interface rows {
     count: number
     rows: Iarticle[]
+}
+
+
+export interface IArticleContext {
+    currentArticleId?: number
+    handleArticleIdChange?: (id: number) => void
+//   handleArticleReFetch?: (trigger: () => void) => void
+    refetchTrigger?: boolean 
+    handleRefetchTrigger?: () => void
+}
+
+export interface IUIContext {
+    handleConfirmWindow?: () => void
 }
