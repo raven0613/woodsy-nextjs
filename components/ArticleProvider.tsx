@@ -26,7 +26,6 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle, {onSuccess: (data: successResult) => { 
       setRefetchTrigger(true)
   }});
-
   // 編輯文章
   const { trigger: editArtTrigger, isMutating: editArtIsMutating, data: editArtData, error: editArtError } = useSWRMutation<successResult, Error>(`article`, fetchEditArticle, {onSuccess: (data: successResult) => { 
       setRefetchTrigger(true)

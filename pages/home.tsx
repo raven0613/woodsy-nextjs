@@ -5,7 +5,7 @@ import Link from 'next/link'
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation'
 import HollowCard from '../components/hollow/hollowCard'
-import ArticleCard from '../components/article/articleCard'
+import ArticleCardController from '../components/article/articleCardController'
 import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
@@ -86,14 +86,14 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         setArticles(arts)
     }, [currentUserId, hotArtData])
     // 抓回來一篇的文章資料
-    // useEffect(() => {
-    //     if (!currentUserId) return
-    //     if (!artData) return
-    //     const payload = artData.payload as Iarticle
-    //     if (currentArticleIdRef.current !== payload.id) return
-    //     const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
-    //     setNewArticle(art)
-    // }, [currentUserId, artData])
+    useEffect(() => {
+        if (!currentUserId) return
+        if (!artData) return
+        const payload = artData.payload as Iarticle
+        if (currentArticleIdRef.current !== payload.id) return
+        const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
+        setNewArticle(art)
+    }, [currentUserId, artData])
     
     // 刪除文章後重新 fetch API
     useEffect(() => {
@@ -201,7 +201,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         <div className='pt-6 mx-2 w-full'>
             <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
             <div className='flex-col justify-center w-full'>
-                {newArticle && <ArticleCard 
+                {newArticle && <ArticleCardController 
                     article={newArticle} key={newArticle.id} 
                     handleCollect={handleCollect}
                     handleLike={handleLike}
@@ -210,11 +210,12 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     handleClickDelete={handleClickDelete}
                     moreShowingId={moreShowingId} 
                     currentUser={currentUser}
-                    handleEdit={handleEdit}/>}
+                    handleEdit={handleEdit}
+                    isDetail={false} />}
 
                 {articles && articles.map(art => {
                 return (
-                    <ArticleCard article={art} key={art.id} 
+                    <ArticleCardController article={art} key={art.id} 
                     handleCollect={handleCollect}
                     handleLike={handleLike}
                     handleClickMore={handleClickMore}
@@ -222,7 +223,8 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     handleClickDelete={handleClickDelete}
                     moreShowingId={moreShowingId} 
                     currentUser={currentUser}
-                    handleEdit={handleEdit}/>
+                    handleEdit={handleEdit}
+                    isDetail={false} />
                 )
                 })}
             </div>

@@ -1,4 +1,4 @@
-import { Iarticle } from '../type-config'
+import { Iarticle, ICollection, successResult } from '../type-config'
 
 export const formattedArticles = (currentUserId: number, articles: Iarticle[]): Iarticle[] => {
     return articles.map(article => {

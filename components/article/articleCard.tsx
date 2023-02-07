@@ -9,22 +9,17 @@ dayjs.extend(relativeTime)
 
 type props = {
   article: Iarticle
-  moreShowingId: string
-  handleClickMore: (artId: string) => void
-  handleClickDelete: () => void
   handleCloseMore: () => void
-  handleCollect: (articleId: number, isCollected: boolean) => void
-  handleLike: (articleId: number, isLiked: boolean) => void
-  handleEdit: (article: Iarticle) => void
-  currentUser: Iuser
+  handleClickCollect: () => void
+  handleClickLike: () => void
+  handleClickMoreBtn: () => void
+  handleClickEdit: () => void
+  handleClickDelete: () => void
+  isCardShowMore: boolean
 }
 
-export default function ArticleCard ({ currentUser, article, moreShowingId, handleClickMore, handleClickDelete, handleCloseMore, handleCollect, handleLike, handleEdit }: props) {
-
-    // console.log(article)
-    const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
+export default function ArticleCard ({ article, handleClickDelete, handleCloseMore, isCardShowMore, handleClickEdit, handleClickMoreBtn, handleClickLike, handleClickCollect }: props) {
     const id = article.id
-    const [isEditing, setIsEditing] = useState<boolean>(false)
 
     const isLikedFromParent = article.isLiked
     const isCollectedFromParent = article.isCollected
@@ -40,46 +35,31 @@ export default function ArticleCard ({ currentUser, article, moreShowingId, hand
         setIsCollected(isCollectedFromParent)
     }, [isCollectedFromParent])
 
-    useEffect(() => {
-        if (moreShowingId !== `a${id}`) {
-            setIsCardShowMore(false)
-        } 
-    }, [moreShowingId, id])
-
-    function handleClickMoreBtn (e: React.MouseEvent) {
+    function onClickMoreBtn (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
-        if (!article.id) return
-        setIsCardShowMore(true)
-        handleClickMore(`a${article.id}`)
+        handleClickMoreBtn()
     }
-    function handleClickEdit () {
-        // setIsEditing(true)
-        handleEdit(article)
-        setIsCardShowMore(false)
-    }
-    function handleClickCollect (e: React.MouseEvent) {
+    function onClickCollect (e: React.MouseEvent) {
         if (!id) return
         e.stopPropagation()
         e.preventDefault()
-
-        handleCollect(id, isCollected)
-        setIsCollected(!isCollected)
+        handleClickCollect()
+        // setIsCollected(!isCollected)
     }
-    function handleClickLike (e: React.MouseEvent) {
+    function onClickLike (e: React.MouseEvent) {
         if (!id) return
         e.stopPropagation()
         e.preventDefault()
-
-        handleLike(id, isLiked)
-        setIsLiked(!isLiked)
+        handleClickLike()
+        // setIsLiked(!isLiked)
     }
     return (
         <div className='m-auto border bg-gray-0 py-3 px-5 mb-4 rounded-lg flex flex-col'>
             <div className='pb-2 border-b flex items-center relative'>
                 <span className='text-gray-600 text-lg font-bold leading-8 h-8'>{article.User?.name}</span>
                 <span className='text-gray-400 text-sm pl-4 leading-8 h-8 flex-1'>{dayjs(article.createdAt).fromNow()}</span>
-                {!isCardShowMore && <button className='w-8 h-8 border justify-end rounded-full' onMouseUp={handleClickMoreBtn}>…</button>}
+                {!isCardShowMore && <button className='w-8 h-8 border justify-end rounded-full' onMouseUp={onClickMoreBtn}>…</button>}
                 {isCardShowMore && <MoreWindow 
                 handleClickEdit={handleClickEdit} 
                 handleClickDelete={handleClickDelete}
@@ -99,11 +79,11 @@ export default function ArticleCard ({ currentUser, article, moreShowingId, hand
 
                 <button className='px-2 ml-2'>回應{article.commentCounts}</button>
 
-                {article.isLiked && <button className='px-2 ml-2 text-red-500' onClick={handleClickLike}>讚{article.likedCounts}</button>}
-                {!article.isLiked && <button className='px-2 ml-2' onClick={handleClickLike}>讚{article.likedCounts}</button>}
+                {article.isLiked && <button className='px-2 ml-2 text-red-500' onClick={onClickLike}>讚{article.likedCounts}</button>}
+                {!article.isLiked && <button className='px-2 ml-2' onClick={onClickLike}>讚{article.likedCounts}</button>}
                 
-                {article.isCollected &&<button className='text-red-500 h-8 justify-end px-2 ml-2' onClick={handleClickCollect}>收藏{article.collectedCounts}</button>}
-                {!article.isCollected &&<button className='h-8 justify-end px-2 ml-2' onClick={handleClickCollect}>收藏{article.collectedCounts}</button>}
+                {article.isCollected &&<button className='text-red-500 h-8 justify-end px-2 ml-2' onClick={onClickCollect}>收藏{article.collectedCounts}</button>}
+                {!article.isCollected &&<button className='h-8 justify-end px-2 ml-2' onClick={onClickCollect}>收藏{article.collectedCounts}</button>}
             </div>
         </div>
     )

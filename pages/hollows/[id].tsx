@@ -5,7 +5,7 @@ import useSWRMutation from 'swr/mutation'
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
 import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
-import ArticleCard from '../../components/article/articleCard'
+import ArticleCardController from '../../components/article/articleCardController'
 import ArticleInput from '../../components/article/articleInput'
 import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt, fetchDeleteArticle } from '../../api_helpers/fetchers'
 import { formattedArticles } from '../../helpers/helpers'
@@ -120,7 +120,7 @@ export default function Hollow () {
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {articles && articles.map(art => {
                     return (
-                        <ArticleCard article={art} key={art.id}
+                        <ArticleCardController article={art} key={art.id}
                         handleClickMore={handleClickMore}
                         handleCloseMore={handleCloseMore}
                         handleDeleteArt={handleDeleteArt}
