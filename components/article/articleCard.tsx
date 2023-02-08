@@ -21,20 +21,6 @@ type props = {
 export default function ArticleCard ({ article, handleClickDelete, handleCloseMore, isCardShowMore, handleClickEdit, handleClickMoreBtn, handleClickLike, handleClickCollect }: props) {
     const id = article.id
 
-    const isLikedFromParent = article.isLiked
-    const isCollectedFromParent = article.isCollected
-    const [isLiked, setIsLiked] = useState<boolean>(isLikedFromParent || false)
-    const [isCollected, setIsCollected] = useState<boolean>(isCollectedFromParent || false)
-
-    useEffect(() => {
-        if (!isLikedFromParent) return
-        setIsLiked(isLikedFromParent)
-    }, [isLikedFromParent])
-    useEffect(() => {
-        if (!isCollectedFromParent) return
-        setIsCollected(isCollectedFromParent)
-    }, [isCollectedFromParent])
-
     function onClickMoreBtn (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
@@ -45,14 +31,12 @@ export default function ArticleCard ({ article, handleClickDelete, handleCloseMo
         e.stopPropagation()
         e.preventDefault()
         handleClickCollect()
-        // setIsCollected(!isCollected)
     }
     function onClickLike (e: React.MouseEvent) {
         if (!id) return
         e.stopPropagation()
         e.preventDefault()
         handleClickLike()
-        // setIsLiked(!isLiked)
     }
     return (
         <div className='m-auto border bg-gray-0 py-3 px-5 mb-4 rounded-lg flex flex-col'>

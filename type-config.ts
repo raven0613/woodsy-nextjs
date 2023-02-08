@@ -69,17 +69,20 @@ interface hollow {
 
 
 export interface Icomment {
-    id: number
-    articleId: number
-    userId: number
+    id?: number
+    article_id: number
+    user_id: number
     content: string
     likedCounts: number
     reportedCounts: number
-    isLiked: boolean
-    reportedAt: string
-    createdAt: string
+    isLiked?: boolean
+    reportedAt?: string
+    createdAt?: string
     description?: string
     User?: user
+    LikedUsers?: user[]
+    UserId?: number
+    ArticleId?: number
 }
 
 export interface ISubcription {
@@ -118,7 +121,8 @@ export interface collectionPayload {
 }
 export interface likePayload {
     user_id: number
-    article_id: number
+    article_id?: number
+    comment_id?: number
 }
 
 export interface param {
@@ -149,7 +153,7 @@ export type deleteArg = {
     arg: string
 }
 export type payloadArg = {
-    arg: likePayload
+    arg: likePayload | collectionPayload
 }
 export type paramArg = {
     arg: param

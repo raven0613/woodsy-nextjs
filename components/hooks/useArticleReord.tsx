@@ -1,5 +1,5 @@
 import useSWRMutation from 'swr/mutation'
-import { successResult, likePayload } from '../../type-config';
+import { successResult, likePayload, collectionPayload } from '../../type-config';
 import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect } from '../../api_helpers/fetchers'
 
 interface props {
@@ -15,9 +15,9 @@ export default function useArticleReord({ onSuccessCallback }: props) {
     const { trigger: addCollectTrigger, isMutating: addCollectIsMutating, data: addCollectData, error: addCollectError } = useSWRMutation<successResult, Error>(`collectionRecord`, fetchUserCollect, { onSuccess: onSuccessCallback});
     // 移除收藏
     const { trigger: deleteCollectTrigger, isMutating: deleteCollectIsMutating, data: deleteCollectData, error: deleteCollectError } = useSWRMutation<successResult, Error>(`collectionRecord`, fetchDeleteUserCollect, { onSuccess: onSuccessCallback});
-    
+
     // 決定 fetch 哪一個 trigger
-    function artRecordTrigger (action: string, arg: likePayload) {
+    function artRecordTrigger (action: string, arg: likePayload | collectionPayload) {
         switch (action) {
             case 'like': {
                 return addLikeTrigger(arg)

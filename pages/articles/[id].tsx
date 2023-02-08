@@ -4,14 +4,14 @@ import useSWR, { Key, Fetcher } from 'swr'
 import useSWRMutation from 'swr/mutation'
 import Navbar from '../../components/navbar'
 import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg, successResult } from '../../type-config'
-import CommentCard from "../../components/comment/commentCard"
+import CommentCardController from "../../components/comment/commentCardController"
 import CommentInput from "../../components/comment/commentInput"
 import ArticleDetailCard from "../../components/article/articleDetailCard"
 import ArticleCardController from '../../components/article/articleCardController'
 
 import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
 import { AxiosResponse } from 'axios'
-import { formattedArticles } from '../../helpers/helpers'
+import { formattedArticles, formattedComments } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
 import { useSession } from 'next-auth/react'
@@ -36,53 +36,66 @@ export default function Article () {
     
     const router = useRouter()
     const { id } = router.query
-    // 抓取一篇文章
-    const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${id}`, fetchArticle);
 
     //fetch 回來的文章資料
     const [comments, setComments] = useState<Icomment[]>([])
     const [article, setArticle] = useState<Iarticle | null>()
 
-    useEffect(() => {
-        if (!id || !artTrigger) return
-        artTrigger()
-    }, [id, artTrigger])
+    // 抓取一篇文章
+    const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${id}`, fetchArticle);
+
+    // 得到該文章的所有回覆
+    const { trigger: commentsTrigger, data: commentsData, error: commentsError } = useSWRMutation([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
 
     // 喜歡和收藏的 fetch hook
     const { artRecordTrigger, getRecordIsMutating } = useArticleReord({onSuccessCallback})
+
+
+
     function onSuccessCallback (data: successResult) {
-        //重新 fetch
         artTrigger()
+        commentsTrigger()
     }
 
+    useEffect(() => {
+        if (!id || !artTrigger || !commentsTrigger) return
+        artTrigger()
+        commentsTrigger()
+    }, [id, artTrigger, commentsTrigger])
 
-    // 得到該樹洞的所有回覆
-    const { data: commentsData, error: commentsError } = useSWR([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
-    
+    // 刪除後要重新 fetch
+    useEffect(() => {
+        if (!refetchTrigger) return
+        artTrigger()
+        return () => {
+            handleRefetchTrigger && handleRefetchTrigger()
+        }
+    }, [refetchTrigger, handleRefetchTrigger, artTrigger])
+    // 存進 article
     useEffect(() => {
         if (!currentUserId || !artData) return
         const payload = artData.payload as Iarticle
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
         setArticle(art)
     }, [artData, currentUserId])
-
+    //存進 comments
+    useEffect(() => {
+        if (!currentUserId || !commentsData) return
+        const payload = commentsData? commentsData.data.payload.rows : []
+        const com = formattedComments(currentUserId as number, payload as Icomment[])
+        setComments(com)
+    }, [commentsData, currentUserId])
     
     // 新增一條回覆
-    const { trigger: addComTrigger, isMutating: addComIsMutating, data: addedComData, error: addedComError } = useSWRMutation<Icomment, Error>(`comment`, fetchAddComments);
+    const { trigger: addComTrigger, isMutating: addComIsMutating, data: addedComData, error: addedComError } = useSWRMutation<successResult, Error>(`comment`, fetchAddComments, {onSuccess: onSuccessCallback});
     // 刪除一條回覆
     const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<Icomment, Error>(`comment`, fetchDeleteComments);
     // 編輯一條回覆
     const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
-    // 刪除一篇文章
-    const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
     
-    useEffect(() => {
-        const fetchedComments: Icomment[] = commentsData? commentsData.data.payload.rows : []
-        setComments(fetchedComments)
-    }, [commentsData])
 
 
-
+    // 新增一條回覆
     function handleAddComment (comment: Icomment) {
         addComTrigger(comment)
         setComments([...comments, comment])
@@ -117,15 +130,18 @@ export default function Article () {
         setMoreShowingId('')
     }
 
-    function handleLike (articleId: number, isLiked: boolean) {
-        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
+    function handleLike (articleId: number, commentId: number, isLiked: boolean) {
+        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
         // currentArticleIdRef.current = articleId
 
         if (!handleArticleIdChange) return
         handleArticleIdChange(articleId)
 
-        const payload = { user_id: currentUserId, article_id: articleId }
+        const payload = articleId ? 
+        { user_id: currentUserId, article_id: articleId }
+        : { user_id: currentUserId, comment_id: commentId }
+
         if (isLiked) {
             artRecordTrigger('deleteLike', payload)
         } else {
@@ -133,7 +149,7 @@ export default function Article () {
         }
     }
     function handleCollect (articleId: number, isCollected: boolean) {
-        if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return console.log('別吵還在處理')
+        if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
         if (!currentUserId) return console.log('請先登入')
         // currentArticleIdRef.current = articleId
 
@@ -176,21 +192,21 @@ export default function Article () {
                     <div className='w-full'>
                         {comments && comments.map(comment => {
                             return (
-                                <CommentCard 
+                                <CommentCardController 
                                 comment={comment}
                                 key={comment.id}
                                 handleDeleteComment={handleDeleteComment}
                                 handleEditComment={handleEditComment}
                                 handleClickMore={handleClickMore}
                                 moreShowingId={moreShowingId}
-                                handleCloseMore={handleCloseMore}/>
+                                handleCloseMore={handleCloseMore}
+                                handleLike={handleLike} />
                             )
                         })}
                     </div>
                 </div>
 
-                <CommentInput handleAddComment={handleAddComment} currentUser={currentUser} />
-                {/* <ArticleEditWindow article={article}/> */}
+                <CommentInput handleAddComment={handleAddComment} currentUser={currentUser} article={article} />
             </div>}
 
         </main>

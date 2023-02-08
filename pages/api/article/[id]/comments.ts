@@ -19,7 +19,10 @@ export default async function getComments(req: NextApiRequest, res: NextApiRespo
             where: {
                 article_id: id
             },
-            include: { model: Users, attributes: ['id', 'name'] },
+            include: [
+                { model: Users, attributes: ['id', 'name'] },
+                { model: Users, as: 'LikedUsers', attributes: ['id', 'name'] }
+            ],
             limit,
             offset: getOffset(page, limit),
             nest: true,

@@ -16,7 +16,7 @@ type props = {
   handleClickDelete: () => void
   handleCloseMore: () => void
   handleCollect: (articleId: number, isCollected: boolean) => void
-  handleLike: (articleId: number, isLiked: boolean) => void
+  handleLike: (articleId: number, commentId: number, isLiked: boolean) => void
   handleEdit: (article: Iarticle) => void
   currentUser: Iuser
   isDetail: boolean
@@ -66,9 +66,7 @@ export default function ArticleCardController ({ currentUser, article, moreShowi
     }
     function handleClickLike () {
         if (!id) return
-
-
-        handleLike(id, isLiked)
+        handleLike(id, null, isLiked)
         setIsLiked(!isLiked)
     }
     return (

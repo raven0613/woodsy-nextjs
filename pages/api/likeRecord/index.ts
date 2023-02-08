@@ -27,7 +27,6 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
-
     try {
         let existLike, like
         if (article_id) {
@@ -63,11 +62,13 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
 
             const comment = await Comments.findByPk(comment_id, { transaction: t })
             if (comment) {
-                await Hollows.increment({liked_counts: 1}, { where: { id: comment_id }, transaction: t })
+                await Comments.increment({liked_counts: 1}, { where: { id: comment_id }, transaction: t })
             }
         }
         await t.commit();
         return res.status(200).json({ success: '喜歡成功', payload: like })
+    
+
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })
@@ -106,7 +107,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
 
             const comment = await Comments.findByPk(comment_id, { transaction: t })
             if (comment) {
-                await Hollows.increment({liked_counts: -1}, { where: { id: comment_id }, transaction: t })
+                await Comments.increment({liked_counts: -1}, { where: { id: comment_id }, transaction: t })
             }
         }
         await t.commit();

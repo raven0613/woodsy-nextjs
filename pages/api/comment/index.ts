@@ -6,7 +6,19 @@ import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
 
-export default async function addComment(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+export default function handleComments(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    switch (req.method) {
+        case 'POST':
+            addComment(req, res)
+            break
+        default:
+            res.status(405).end() //Method Not Allowed
+            break
+    }
+}
+
+
+async function addComment(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     if (req.method !== 'POST') return res.status(405).end() //Method Not Allowed
     const { content, user_id, article_id} = req.body
     if (!content || content.length > 500 || !user_id || !article_id) return res.status(500).json({ error: '請求的內容不正確' })

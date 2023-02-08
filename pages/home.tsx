@@ -132,7 +132,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         handleConfirmWindow()
         setMoreShowingId('')
     }
-    function handleLike (articleId: number, isLiked: boolean) {
+    function handleLike (articleId: number, _commentId: number, isLiked: boolean) {
         if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
         if (!currentUserId) return console.log('請先登入')
         currentArticleIdRef.current = articleId

@@ -34,7 +34,7 @@ export async function fetchDeleteUserLike (url: string, { arg }: payloadArg) {
 
 export async function fetchUserCollect (url: string, { arg }: payloadArg) {
     try {
-        const { data } = await addUserCollect(url, arg)
+        const { data } = await addUserCollect(url, arg as collectionPayload)
         return data
     } catch (err) {
         console.log(err)
@@ -43,7 +43,7 @@ export async function fetchUserCollect (url: string, { arg }: payloadArg) {
 
 export async function fetchDeleteUserCollect (url: string, { arg }: payloadArg) {
     try {
-        const { data } = await deleteUserCollect(url, arg)
+        const { data } = await deleteUserCollect(url, arg as collectionPayload)
         return data
     } catch (err) {
         console.log(err)

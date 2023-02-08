@@ -17,7 +17,6 @@ export default function MoreWindow ({ id, handleCloseMore, handleClickDelete, ha
         e.preventDefault()
         e.stopPropagation()
         handleClickEdit()
-        console.log('編輯')
     }
     function onClickDelete (e: React.MouseEvent) {
         e.preventDefault()
