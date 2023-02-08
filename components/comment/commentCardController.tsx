@@ -11,17 +11,16 @@ dayjs.extend(relativeTime)
 
 interface commentProps {
     comment: Icomment
-    handleDeleteComment: (commentId: number) => void,
-    handleEditComment: (comment: Icomment) => void
+    handleClickDelete: () => void
+    handleSubmitComment: (comment: Icomment) => void
     moreShowingId: string
-    handleClickMore: (artId: string) => void
+    handleClickMore: (id: string) => void
     handleCloseMore: () => void
     handleLike: (articleId: number, commentId: number, isLiked: boolean) => void
 }
 
-export default function CommentCardController ({ comment, handleDeleteComment, handleEditComment, handleClickMore, moreShowingId, handleCloseMore, handleLike }: commentProps) {
+export default function CommentCardController ({ comment, handleClickDelete, handleClickMore, moreShowingId, handleCloseMore, handleLike, handleSubmitComment }: commentProps) {
     const [isEditing, setIsEditing] = useState<boolean>(false)
-    const [content, setContent] = useState<string>(comment.content)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = comment.id
     const commentTime = dayjs(comment.createdAt).fromNow()
@@ -41,35 +40,28 @@ export default function CommentCardController ({ comment, handleDeleteComment, h
 
     function handleClickEdit () {
         setIsEditing(true)
-    }
-
-    function handleClickDelete () {
-        if (!id) return
-        handleDeleteComment(id)
+        handleCloseMore()
     }
     function handleClickLike () {
         if (!id) return
         handleLike(0, id, isLiked)
         setIsLiked(!isLiked)
     }
-    function handleSubmit () {
+    function handleSubmit (content: string) {
         if (!content) {
             setIsEditing(false)
-            setContent(comment.content)
             return
         }
         if (content === comment.content) {
             setIsEditing(false)
             return
         }
-        let editedComment = { ...comment, content }
-        handleEditComment(editedComment)
+        handleSubmitComment({...comment, content})
         setIsEditing(false)
     }
 
     function handleCancel () {
         setIsEditing(false)
-        setContent(comment.content)
     }
     function handleClickMoreBtn () {
         if (!id) return

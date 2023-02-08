@@ -27,7 +27,7 @@ const inter = Inter({ subsets: ['latin'] })
 const arg = { page: 1, limit: 10 }
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
-    const { currentArticleId, handleArticleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
+    const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
     const { data: session, status } = useSession()
@@ -117,18 +117,18 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         setHollows([...hollows, hollow])
     }
     function handleClickMore (artId: string) {
-        if (!artId || !handleArticleIdChange) return
+        if (!artId || !handleIdChange) return
         setMoreShowingId(artId)
-        handleArticleIdChange(Number(artId.slice(1)))
+        handleIdChange(artId)
     }
     function handleCloseMore () {
-        if (!handleArticleIdChange) return
+        if (!handleIdChange) return
         setMoreShowingId('')
-        handleArticleIdChange(0)
+        handleIdChange(0)
     }
     // 當 user 按下小視窗內的刪除按鈕
     function handleClickDelete () {
-        if (!handleArticleIdChange || !handleConfirmWindow) return
+        if (!handleIdChange || !handleConfirmWindow) return
         handleConfirmWindow()
         setMoreShowingId('')
     }
@@ -136,9 +136,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
         if (!currentUserId) return console.log('請先登入')
         currentArticleIdRef.current = articleId
-
-        if (!handleArticleIdChange) return
-        handleArticleIdChange(articleId)
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isLiked) {
@@ -151,9 +148,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return console.log('別吵還在處理')
         if (!currentUserId) return console.log('請先登入')
         currentArticleIdRef.current = articleId
-
-        if (!handleArticleIdChange) return
-        handleArticleIdChange(articleId)
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isCollected) {

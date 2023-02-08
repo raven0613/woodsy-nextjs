@@ -10,7 +10,7 @@ interface props {
     handleClickEdit: () => void
     handleClickMoreBtn: () => void
     handleCloseMore: () => void
-    handleSubmit: () => void
+    handleSubmit: (content: string) => void
     handleCancel: () => void
     handleClickLike: () => void
     commentTime: string
@@ -35,6 +35,7 @@ export default function CommentCard ({ comment, handleClickDelete, handleClickLi
     function onSubmit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        handleSubmit(content)
     }
 
     function onCancel (e: React.MouseEvent) {
@@ -74,7 +75,8 @@ export default function CommentCard ({ comment, handleClickDelete, handleClickLi
             </div>}
 
             <div className='pt-4 w-full flex'>
-                <button onClick={onLike} className=''>讚數：{comment.likedCounts}</button>
+                {comment.isLiked && <button className='px-2 ml-2 text-red-500' onClick={onLike}>讚{comment.likedCounts}</button>}
+                {!comment.isLiked && <button className='px-2 ml-2' onClick={onLike}>讚{comment.likedCounts}</button>}
                 <p className='text-gray-400 text-sm pr-4 leading-8 h-8 flex-1 text-right'>{commentTime}</p>
             </div>
         </div>

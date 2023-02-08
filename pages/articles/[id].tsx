@@ -6,11 +6,9 @@ import Navbar from '../../components/navbar'
 import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg, successResult } from '../../type-config'
 import CommentCardController from "../../components/comment/commentCardController"
 import CommentInput from "../../components/comment/commentInput"
-import ArticleDetailCard from "../../components/article/articleDetailCard"
 import ArticleCardController from '../../components/article/articleCardController'
 
 import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
-import { AxiosResponse } from 'axios'
 import { formattedArticles, formattedComments } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
@@ -22,7 +20,7 @@ import { useContext, useRef } from 'react'
 const params: param = { page: 1, limit: 15 }
 
 export default function Article () {
-    const { currentArticleId, handleArticleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
+    const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
     const { data: session, status } = useSession()
@@ -51,7 +49,6 @@ export default function Article () {
     const { artRecordTrigger, getRecordIsMutating } = useArticleReord({onSuccessCallback})
 
 
-
     function onSuccessCallback (data: successResult) {
         artTrigger()
         commentsTrigger()
@@ -67,10 +64,11 @@ export default function Article () {
     useEffect(() => {
         if (!refetchTrigger) return
         artTrigger()
+        commentsTrigger()
         return () => {
             handleRefetchTrigger && handleRefetchTrigger()
         }
-    }, [refetchTrigger, handleRefetchTrigger, artTrigger])
+    }, [refetchTrigger, handleRefetchTrigger, artTrigger, commentsTrigger])
     // 存進 article
     useEffect(() => {
         if (!currentUserId || !artData) return
@@ -89,7 +87,7 @@ export default function Article () {
     // 新增一條回覆
     const { trigger: addComTrigger, isMutating: addComIsMutating, data: addedComData, error: addedComError } = useSWRMutation<successResult, Error>(`comment`, fetchAddComments, {onSuccess: onSuccessCallback});
     // 刪除一條回覆
-    const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<Icomment, Error>(`comment`, fetchDeleteComments);
+    const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<successResult, Error>(`comment`, fetchDeleteComments, {onSuccess: onSuccessCallback});
     // 編輯一條回覆
     const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
     
@@ -100,7 +98,8 @@ export default function Article () {
         addComTrigger(comment)
         setComments([...comments, comment])
     }
-    function handleEditComment (comment: Icomment) {
+    // 確認編輯回覆
+    function handleSubmitComment (comment: Icomment) {
         const newComments = comments.map(com => {
             if (com.id === comment.id) {
                 return { ...com, content: comment.content}
@@ -110,21 +109,24 @@ export default function Article () {
         setComments(newComments)
         editComTrigger(comment)
     }
-    function handleDeleteComment (commentId: number) {
-        const updatedData = comments.filter(com => com.id !== commentId)
-        setComments(updatedData)
-        deleteComTrigger(commentId)
-    }
+    // function handleDeleteComment (commentId: number) {
+    //     // const updatedData = comments.filter(com => com.id !== commentId)
+    //     // setComments(updatedData)
+    //     deleteComTrigger(commentId)
+    // }
 
     // 當 user 按下小視窗內的刪除按鈕
     function handleClickDelete () {
-        if (!handleArticleIdChange || !handleConfirmWindow) return
+        if (!handleIdChange || !handleConfirmWindow) return
         handleConfirmWindow()
         setMoreShowingId('')
     }
 
     function handleClickMore (id: string) {
+        console.log(id)
+        if (!id || !handleIdChange) return
         setMoreShowingId(id)
+        handleIdChange(id)
     }
     function handleCloseMore () {
         setMoreShowingId('')
@@ -134,9 +136,6 @@ export default function Article () {
         if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
         // currentArticleIdRef.current = articleId
-
-        if (!handleArticleIdChange) return
-        handleArticleIdChange(articleId)
 
         const payload = articleId ? 
         { user_id: currentUserId, article_id: articleId }
@@ -152,9 +151,6 @@ export default function Article () {
         if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
         if (!currentUserId) return console.log('請先登入')
         // currentArticleIdRef.current = articleId
-
-        if (!handleArticleIdChange) return
-        handleArticleIdChange(articleId)
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isCollected) {
@@ -195,8 +191,8 @@ export default function Article () {
                                 <CommentCardController 
                                 comment={comment}
                                 key={comment.id}
-                                handleDeleteComment={handleDeleteComment}
-                                handleEditComment={handleEditComment}
+                                handleClickDelete={handleClickDelete}
+                                handleSubmitComment={handleSubmitComment}
                                 handleClickMore={handleClickMore}
                                 moreShowingId={moreShowingId}
                                 handleCloseMore={handleCloseMore}

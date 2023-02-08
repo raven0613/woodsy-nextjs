@@ -5,20 +5,23 @@ import { useSession, signOut } from "next-auth/react"
 import React from 'react'
 
 type props = {
-    id: number
+    artId: number
+    commentId: number
     // handleEdit: (article: Iarticle) => void
     // handleDelete: (articleId: number) => void
     // handleCloseMore: () => void
     handleDeleteArt: (articleId: number) => void
+    handleDeleteComment: (commentId: number) => void
     handleConfirmWindow: () => void
 }
 
-export default function ConfirmWindow ({ id, handleDeleteArt, handleConfirmWindow }: props) {
-    
+export default function ConfirmWindow ({ artId, commentId, handleDeleteArt, handleConfirmWindow, handleDeleteComment }: props) {
     function onClickOk (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
-        handleDeleteArt(id)
+        
+        if (artId) return handleDeleteArt(artId)
+        return handleDeleteComment(commentId)
     }
     function onClickCancel (e: React.MouseEvent) {
         e.preventDefault()

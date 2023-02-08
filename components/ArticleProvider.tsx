@@ -1,4 +1,4 @@
-import Navbar from './navbar'
+import { useRouter } from 'next/router'
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import ToTopButton from './toTopButton';
 import ConfirmWindow from './confirmWindow';
@@ -6,7 +6,7 @@ import ArticleEditWindow from './article/articleEditWindow';
 import React, { useRef } from 'react';
 
 import useSWRMutation from 'swr/mutation'
-import { fetchDeleteArticle, fetchEditArticle } from '../api_helpers/fetchers'
+import { fetchDeleteArticle, fetchEditArticle, fetchDeleteComments } from '../api_helpers/fetchers'
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, IUIContext } from '../type-config';
 
 
@@ -19,16 +19,23 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [refetchTrigger, setRefetchTrigger] = useState<boolean>(false)
   const [currentArticleId, setCurrentArticleId] = useState<number>(0)
+  const [currentCommentId, setCurrentCommentId] = useState<number>(0)
   const [article, setArticle] = useState<Iarticle | null>()
+  const router = useRouter()
 
   // fetcher 區
   //刪除文章
   const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle, {onSuccess: (data: successResult) => { 
-      setRefetchTrigger(true)
+    if (router.asPath !== 'home') return router.push('/home')
+    setRefetchTrigger(true)
   }});
   // 編輯文章
   const { trigger: editArtTrigger, isMutating: editArtIsMutating, data: editArtData, error: editArtError } = useSWRMutation<successResult, Error>(`article`, fetchEditArticle, {onSuccess: (data: successResult) => { 
-      setRefetchTrigger(true)
+    setRefetchTrigger(true)
+  }});
+  // 刪除一條回覆
+  const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<successResult, Error>(`comment`, fetchDeleteComments, {onSuccess: (data: successResult) => { 
+    setRefetchTrigger(true)
   }});
 
 
@@ -40,13 +47,22 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
     // 關掉確認視窗
     handleConfirmWindow()
   }
-  function handleArticleIdChange (articleId: number) {
-    setCurrentArticleId(articleId)
+  function handleDeleteComment (commentId: number) {
+    deleteComTrigger(commentId)
+    handleConfirmWindow()
+  }
+  // 每次都要先歸零 一次只能亮一個
+  function handleIdChange (id: string) {
+    setCurrentArticleId(0)
+    setCurrentCommentId(0)
+    if (!id) return
+    if (id[0] === 'a') return setCurrentArticleId(Number(id.slice(1)))
+    return setCurrentCommentId(Number(id.slice(1)))
   }
   function handleConfirmWindow () {
     // 關掉視窗前先把 articleId 歸零
     if (isConfirmOpen) {
-      handleArticleIdChange(0)
+      handleIdChange('')
     }
     setIsConfirmOpen(!isConfirmOpen)
   }
@@ -69,7 +85,8 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   // context value 區
   const articlecontextValue: IArticleContext = {
     currentArticleId,
-    handleArticleIdChange,
+    currentCommentId,
+    handleIdChange,
     refetchTrigger,
     handleRefetchTrigger,
   }
@@ -84,9 +101,13 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
         <articleContext.Provider value={articlecontextValue}>
 
           <main>{children}</main>
-          {isConfirmOpen && <ConfirmWindow id={currentArticleId} 
+          {isConfirmOpen && <ConfirmWindow 
+          artId={currentArticleId} 
+          commentId={currentCommentId}
           handleDeleteArt={handleDeleteArt} 
+          handleDeleteComment={handleDeleteComment}
           handleConfirmWindow={handleConfirmWindow}/>}
+
           {article && isEditOpen && <ArticleEditWindow 
           handleConfirmEdit={handleConfirmEdit}
           handleEditWindow={handleEditWindow}

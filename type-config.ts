@@ -190,13 +190,14 @@ export interface successResult {
 
 export interface rows {
     count: number
-    rows: Iarticle[]
+    rows: Iarticle[] | Icomment[] | Ihollow[]
 }
 
 
 export interface IArticleContext {
     currentArticleId?: number
-    handleArticleIdChange?: (id: number) => void
+    currentCommentId?: number
+    handleIdChange?: (id: string) => void
 //   handleArticleReFetch?: (trigger: () => void) => void
     refetchTrigger?: boolean 
     handleRefetchTrigger?: () => void
