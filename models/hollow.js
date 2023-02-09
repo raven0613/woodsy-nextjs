@@ -23,12 +23,12 @@ module.exports = (sequelize, DataTypes) => {
 
       Hollows.belongsToMany(models.Users, {
         through: models.Reports,
-        foreignKey: 'user_id',
+        foreignKey: 'hollow_id',
         as: 'ReportedUsers'
       })
       Hollows.belongsToMany(models.Users, {
         through: models.Subscriptions,
-        foreignKey: 'user_id',
+        foreignKey: 'hollow_id',
         as: 'SubUsers'
       })
     }

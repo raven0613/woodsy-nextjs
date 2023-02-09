@@ -23,7 +23,6 @@ type props = {
 }
 
 export default function ArticleCardController ({ currentUser, article, moreShowingId, handleClickMore, handleClickDelete, handleCloseMore, handleCollect, handleLike, handleEdit, isDetail }: props) {
-
     // console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = article.id
@@ -66,7 +65,7 @@ export default function ArticleCardController ({ currentUser, article, moreShowi
     }
     function handleClickLike () {
         if (!id) return
-        handleLike(id, null, isLiked)
+        handleLike(id, 0, isLiked)
         setIsLiked(!isLiked)
     }
     return (

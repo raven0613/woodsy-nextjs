@@ -6,7 +6,7 @@ interface props {
     onSuccessCallback: (data: successResult) => void
 }
 
-export default function useArticleReord({ onSuccessCallback }: props) {
+export default function useArticleRecord({ onSuccessCallback }: props) {
     // 新增喜歡
     const { trigger: addLikeTrigger, isMutating: addLikeIsMutating, data: addLikeData, error: addLikeError } = useSWRMutation<successResult, Error>(`likeRecord`, fetchUserLike, { onSuccess: onSuccessCallback});
     // 移除喜歡

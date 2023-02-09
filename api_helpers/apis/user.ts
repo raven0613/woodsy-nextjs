@@ -1,5 +1,5 @@
 import { apiHelper } from '../config'
-import { Iarticle, Icomment, Iuser, ILoginuser, param, collectionPayload, likePayload } from '../../type-config'
+import { Iarticle, Icomment, Iuser, ILoginuser, param, collectionPayload, likePayload, subPayload } from '../../type-config'
 import { AxiosResponse } from 'axios'
 
 export function getUsers (url: string, page: number, limit: number) {
@@ -40,5 +40,13 @@ export function deleteUserLike (url: string, payload: likePayload) {
 }
 
 export function deleteUserCollect (url: string, payload: collectionPayload) {
+    return apiHelper.delete(url, {data: payload})
+}
+
+export function addUserSub (url: string, payload: subPayload) {
+    return apiHelper.post(url, payload)
+}
+
+export function deleteUserSub (url: string, payload: subPayload) {
     return apiHelper.delete(url, {data: payload})
 }

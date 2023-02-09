@@ -30,7 +30,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
   try {
     const { page: p, limit: l } = req.query;
     const page = Number(p), limit = Number(l)
-
+    
     const articles = await Articles.findAndCountAll({
       include: [
         { model: Users, attributes: ['id', 'name'] }, 

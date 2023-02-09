@@ -1,20 +1,25 @@
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation'
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
-import { deleteArg, Iarticle, Ihollow, Iuser, param } from '../../type-config'
+import { deleteArg, Iarticle, ICollection, Ihollow, Iuser, param, rows, subPayload, successResult } from '../../type-config'
 import ArticleCardController from '../../components/article/articleCardController'
 import ArticleInput from '../../components/article/articleInput'
-import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt, fetchDeleteArticle } from '../../api_helpers/fetchers'
-import { formattedArticles } from '../../helpers/helpers'
+import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt } from '../../api_helpers/fetchers'
+import { formattedArticles, formattedHollows } from '../../helpers/helpers'
 import { useSession } from 'next-auth/react';
+import useArticleRecord from '../../components/hooks/useArticleRecord'
+import useHollowRecord from '../../components/hooks/useHollowRecord'
+import { articleContext, UIContext } from '../../components/ArticleProvider';
 
-
-const params: param = { page: 1, limit: 15 }
+const arg: param = { page: 1, limit: 15 }
 
 export default function Hollow () {
+    const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
+    const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
+
     useEffect(() => {
         window.addEventListener('scroll', handleScroll)
         return () => { window.removeEventListener('scroll', handleScroll) }
@@ -28,9 +33,9 @@ export default function Hollow () {
     const currentUserId = currentUser.id
 
     const router = useRouter()
-    const { id } = router.query
-    const { data, error } = useSWR(id, fetchHollow);
-    const hollowData = data?.data.payload
+    const { id } = router.query || ''
+    // const { data, error } = useSWR(id, fetchHollow);
+    // const hollowData = data?.data.payload
     
 
     const [moreShowingId, setMoreShowingId] = useState<string>('')
@@ -44,57 +49,142 @@ export default function Hollow () {
         user_id: 0,
     })
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    const isSub: boolean = hollow.isSub || false
+
+    // 抓取現在樹洞
+    const { trigger:  hollowTrigger, data: hollowData, error: hollowError } = useSWRMutation<successResult, Error>(id, fetchHollow);
 
     // 得到該樹洞的所有文章
-    const { data: articlesData, error: articlesError } = useSWR([`hollow/${id}/articles`, params], ([url, params]) => fetchHotArticles(url, params));
+    const { trigger: articlesTrigger, data: articlesData, error: articlesError } = useSWRMutation<successResult, Error>(`hollow/${id}/articles`, fetchHotArticles);
 
     // 得到熱門樹洞(給 input 用)
-    const { data: hollowsData, error: hollowsError } = useSWR(['hollow', params], ([url, params]) => fetchHotHollows(url, params));
+    const { data: hollowsData, error: hollowsError } = useSWR(['hollow', arg], ([url, params]) => fetchHotHollows(url, params));
 
     // 新增一則文章
-    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchAddArt);
+    const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successResult, Error>(`article`, fetchAddArt, { onSuccess: (data: successResult) => { 
+        // const payload = data.payload as Iarticle
+        // const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
+        // setNewArticle(art)
+    }});
+    // 喜歡和收藏的 fetch hook
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
+    // 關注的 fetch hook
+    const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
-    // 刪除一篇文章
-    const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<Iarticle, Error>(`article`, fetchDeleteArticle);
-    
+    function onSuccessCallback (data: successResult) {
+        // 按讚之後 newArt 會被蓋掉
+        // const { article_id } = data.payload as ICollection
+        // console.log('newArticle', newArticle)
+        // console.log('article_id', article_id)
+        // console.log('currentArticleIdRef.current', currentArticleIdRef.current)
+        // if (article_id === currentArticleIdRef.current) {
+        //     // return artTrigger()
+        // }  //TODO: 新增文章的邏輯還沒調整好
+        articlesTrigger(arg)
+        hollowTrigger()
+    }
+    useEffect(() => {
+        if (!id || !articlesTrigger || !hollowTrigger) return
+        hollowTrigger()
+        articlesTrigger(arg)
+    }, [id, articlesTrigger, hollowTrigger])
+
     //熱門樹洞
     useEffect(() => {
-        console.log(hollowsData)
-        if (!hollowsData) return
-        const fetchedHollows: Ihollow[] = hollowsData? hollowsData.data.payload.rows : []
-        setHollows(fetchedHollows)
-    }, [hollowsData])
+        if (!currentUserId || !hollowsData) return
+        const hollowDatas: Ihollow[] = hollowsData? hollowsData.data.payload.rows : []
+        const hollows = formattedHollows(currentUserId, hollowDatas)
+        setHollows(hollows)
+    }, [hollowsData, currentUserId])
     //目前樹洞
     useEffect(() => {
-        if (!hollowData) return
-        setHollow(hollowData)
-    }, [hollowData])
+        if (!currentUserId || !hollowData) return
+        const hollowPayload = hollowData.payload as Ihollow
+        const hollows = formattedHollows(currentUserId, [hollowPayload])[0]
+        setHollow(hollows)
+    }, [hollowData, currentUserId])
     // 熱門文章
     useEffect(() => {
         if (!currentUserId || !articlesData) return
-        const fetchedArts: Iarticle[] = articlesData? articlesData.data.payload.rows : []
-        const arts = formattedArticles(currentUserId, fetchedArts)
+        const artRows = articlesData?.payload as rows
+        const artDatas = artRows.rows as Iarticle[]
+        const arts = formattedArticles(currentUserId, artDatas)
         setArticles(arts)
-    }, [hollow, articlesData, currentUserId])
+    }, [articlesData, currentUserId])
 
+    // 刪除文章後重新 fetch API
+    useEffect(() => {
+        if (!refetchTrigger) return
+        articlesTrigger(arg)
+        return () => {
+            handleRefetchTrigger && handleRefetchTrigger()
+        }
+    }, [refetchTrigger, articlesTrigger, handleRefetchTrigger])
 
-    function handleDeleteArt (articleId: number) {
-        deleteArtTrigger(articleId)
-    }
     function handleAddArt (article: Iarticle) {
         addArtTrigger(article)
-        //TODO: 目前跳頁後文章沒有被增加上去
-        if (article.hollow_id !== Number(id)) return router.push(`/hollows/${article.hollow_id}`)
-        setArticles([...articles, article])
+    }
+    function handleAddHollow (hollow: Ihollow) {
+        setHollows([...hollows, hollow])
     }
     function handleClickMore (artId: string) {
+        if (!artId || !handleIdChange) return
         setMoreShowingId(artId)
+        handleIdChange(artId)
     }
     function handleCloseMore () {
+        if (!handleIdChange) return
+        setMoreShowingId('')
+        handleIdChange('')
+    }
+    // 當 user 按下小視窗內的刪除按鈕
+    function handleClickDelete () {
+        if (!handleIdChange || !handleConfirmWindow) return
+        handleConfirmWindow()
         setMoreShowingId('')
     }
+    function handleLike (articleId: number, _commentId: number, isLiked: boolean) {
+        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
+        if (!currentUserId) return console.log('請先登入')
+
+
+        const payload = { user_id: currentUserId, article_id: articleId }
+        if (isLiked) {
+            artRecordTrigger('deleteLike', payload)
+        } else {
+            artRecordTrigger('like', payload)
+        }
+    }
+    function handleCollect (articleId: number, isCollected: boolean) {
+        if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
+        if (!currentUserId) return console.log('請先登入')
+
+        const payload = { user_id: currentUserId, article_id: articleId }
+        if (isCollected) {
+            artRecordTrigger('deleteCollect', payload)
+        } else {
+            artRecordTrigger('collect', payload)
+        }
+    }
+    function handleSub (e: React.MouseEvent) {
+        if (!id || !currentUserId) return
+         if (getHollowRecordIsMutating('sub') || getHollowRecordIsMutating('deleteSub')) return
+        e.preventDefault()
+        e.stopPropagation()
+        const payload: subPayload = { user_id: currentUserId, hollow_id: Number(id) }
+        if (isSub) {
+            hollowRecordTrigger('deleteSub', payload)
+        }
+        else {
+            hollowRecordTrigger('sub', payload)
+        }
+    }
+    function handleEdit (article: Iarticle) {
+        if (!article || !handleEditWindow) return
+        handleEditWindow(article)
+    }
     function handleScroll () {
-        // console.log(window.scrollY)
+
     }
     return (
         <>
@@ -108,7 +198,8 @@ export default function Hollow () {
                         <h1 className='col-start-2 col-span-10 text-2xl font-semibold'>Loading!!!!!</h1>
                     }
 
-                    <button>關注</button>
+                    {!hollow.isSub && <button onClick={handleSub}>關注 {hollow.subCounts}</button>}
+                    {hollow.isSub && <button onClick={handleSub}>已關注 {hollow.subCounts}</button>}
                 </div>
 
                 <ArticleInput 
@@ -120,12 +211,16 @@ export default function Hollow () {
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {articles && articles.map(art => {
                     return (
-                        <ArticleCardController article={art} key={art.id}
+                        <ArticleCardController article={art} key={art.id} 
+                        handleCollect={handleCollect}
+                        handleLike={handleLike}
                         handleClickMore={handleClickMore}
                         handleCloseMore={handleCloseMore}
-                        handleDeleteArt={handleDeleteArt}
+                        handleClickDelete={handleClickDelete}
                         moreShowingId={moreShowingId} 
-                        currentUser={currentUser} />
+                        currentUser={currentUser}
+                        handleEdit={handleEdit}
+                        isDetail={false} />
                     )
                 })}
                 {articles.length < 1 && <p className=''>這個樹洞目前是空的</p>}

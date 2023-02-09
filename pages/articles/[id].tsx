@@ -13,7 +13,7 @@ import { formattedArticles, formattedComments } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
 import { useSession } from 'next-auth/react'
-import useArticleReord from '../../components/hooks/useArticleReord'
+import useArticleRecord from '../../components/hooks/useArticleRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider'
 import { useContext, useRef } from 'react'
 
@@ -46,7 +46,7 @@ export default function Article () {
     const { trigger: commentsTrigger, data: commentsData, error: commentsError } = useSWRMutation([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
 
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleReord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
 
 
     function onSuccessCallback (data: successResult) {

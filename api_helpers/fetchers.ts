@@ -1,8 +1,8 @@
-import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, likePayload, collectionPayload, payloadArg } from '../type-config'
-import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect } from '../api_helpers/apis/user'
+import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload } from '../type-config'
+import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, addUserSub, deleteUserSub } from '../api_helpers/apis/user'
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
-import { getHollows, getHollow } from '../api_helpers/apis/hollow'
+import { getHollows, getHollow, addHollow } from '../api_helpers/apis/hollow'
 import { getUser } from '../api_helpers/apis/user'
 
 export async function fetchUser (url: string, id: string) {
@@ -49,20 +49,47 @@ export async function fetchDeleteUserCollect (url: string, { arg }: payloadArg) 
         console.log(err)
     }
 }
-
-export async function fetchHollow (id: string) {
+export async function fetchUserSub (url: string, { arg }: payloadArg) {
     try {
-        const res = await getHollow(id)
-        return res
+        const { data } = await addUserSub(url, arg as subPayload)
+        return data
     } catch (err) {
         console.log(err)
     }
 }
 
-export async function fetchHotHollows (url: string, { page, limit }: param) {
+export async function fetchDeleteUserSub (url: string, { arg }: payloadArg) {
     try {
-        const res = await getHollows(url, page, limit)
-        return res
+        const { data } = await deleteUserSub(url, arg as subPayload)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchAddHollow (url: string, { arg }: hollowArg) {
+    try {
+        const { data } = await addHollow(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchHollow (id: string) {
+    try {
+        const { data } = await getHollow(id)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchHotHollows (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
+    try {
+        const { data } = await getHollows(url, page, limit)
+        return data
     } catch (err) {
         console.log(err)
     }

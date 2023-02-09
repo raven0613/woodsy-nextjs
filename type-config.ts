@@ -24,12 +24,14 @@ export interface Ihollow {
     id?: number,
     name: string,
     type: string,
-    articleCounts: number
-    subCounts: number
+    articleCounts?: number
+    subCounts?: number
     isSub?: boolean
     createdAt?: string
     userId?: number
     user_id?: number
+    UserId?: number
+    SubUsers?: user[]
 };
 
 export interface Iarticle {
@@ -115,6 +117,10 @@ export interface IReport {
     createdAt: string
 };
 
+export interface subPayload {
+    user_id: number
+    hollow_id: number
+}
 export interface collectionPayload {
     user_id: number
     article_id: number
@@ -149,11 +155,14 @@ export type commentArg = {
 export type articleArg = {
     arg: Iarticle
 }
+export type hollowArg = {
+    arg: Ihollow
+}
 export type deleteArg = {
     arg: string
 }
 export type payloadArg = {
-    arg: likePayload | collectionPayload
+    arg: likePayload | collectionPayload | subPayload
 }
 export type paramArg = {
     arg: param

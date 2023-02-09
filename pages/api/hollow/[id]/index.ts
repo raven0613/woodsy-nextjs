@@ -21,14 +21,17 @@ export default function handleHollows(req: NextApiRequest, res: NextApiResponse<
 
 async function getHollow (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
+    const idNum = Number(id)
     try {
-        const hollow = await Hollows.findByPk(id, {
+        const hollow = await Hollows.findByPk(idNum, {
             include: [
-                { model: Users, attributes: ['id', 'name'] }],
+                { model: Users, attributes: ['id', 'name'] },
+                { model: Users, as: 'SubUsers', attributes: ['id', 'name']},
+            ],
             nest: true
         })
 
-        if (hollow === null) return res.status(500).json({ error: '找不到樹洞' } )
+        if (!hollow) return res.status(500).json({ error: '找不到樹洞' } )
         res.status(200).json({ success: '查詢成功', payload: hollow })
     } catch (err) {
         console.log(err)

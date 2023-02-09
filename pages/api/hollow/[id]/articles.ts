@@ -10,7 +10,6 @@ function getOffset (page: number, limit: number) {
 }
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
-    console.log(req)
     switch (req.method) {
         case 'GET':
             getArticles(req, res)
@@ -23,7 +22,6 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 export async function getArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   const { page: p, limit: l, id } = req.query;
   const page = Number(p), limit = Number(l), idNum = Number(id)
-  
   try {
     const articles = await Articles.findAndCountAll({
       where: {
@@ -31,12 +29,16 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
       },
       include: [
         { model: Users, attributes: ['id', 'name'] }, 
-        { model: Comments, attributes: ['id', 'content'] }],
+        { model: Hollows, attributes: ['id', 'name'] }, 
+        { model: Comments, attributes: ['id', 'content']},
+        { model: Users, as: 'CollectedUsers', attributes: ['id', 'name'] },
+        { model: Users, as: 'LikedUsers', attributes: ['id', 'name'] }
+      ],
       limit,
       offset: getOffset(page, limit),
       nest: true, 
     })
-    if (!articles.count) return res.status(500).json({ error: '找不到文章' })
+    console.log(articles)
     res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })

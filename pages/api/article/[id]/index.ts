@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
+import {Op} from "sequelize";
 import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
@@ -78,13 +79,21 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorRes
         dialect: 'mysql'
     }).transaction();
     try {
-        await Comments.destroy({
-            where: { article_id: idNum }
-        }, { transaction: t })
+        const comments = await Comments.findAll({ where: { article_id: idNum } }, { transaction: t });
+        const commentIds = comments.map((c: { id: number }) => c.id);
+        
+        await Likeships.destroy({
+            where: {
+                [Op.or]: [
+                    { article_id: idNum },
+                    { comment_id: { [Op.in]: commentIds } },
+                ]
+            }
+        }, { transaction: t });
         await Collections.destroy({
             where: { article_id: idNum }
         }, { transaction: t })
-        await Likeships.destroy({
+        await Comments.destroy({
             where: { article_id: idNum }
         }, { transaction: t })
 
@@ -100,7 +109,7 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorRes
         await t.commit();
 
         return res.status(200).json({ success: '刪除文章成功' })
-
+    
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

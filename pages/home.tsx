@@ -10,17 +10,17 @@ import ArticleInput from '../components/article/articleInput'
 import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
-import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
+import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection } from '../type-config';
 import { getCsrfToken, getSession, useSession } from 'next-auth/react';
 import { CtxOrReq } from 'next-auth/client/_utils';
-import { formattedArticles } from '../helpers/helpers'
+import { formattedArticles, formattedHollows } from '../helpers/helpers'
 
 import { articleContext, UIContext } from '../components/ArticleProvider'
 import { useContext, useRef } from 'react'
 
-import useArticleReord from '../components/hooks/useArticleReord'
+import useArticleRecord from '../components/hooks/useArticleRecord'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -42,6 +42,8 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
 
     // 抓取一包文章
     const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError } = useSWRMutation<successResult, Error>(`article`, fetchHotArticles);
+    // 抓取一包樹洞
+    const { trigger: hotHollowTrigger, data: hotHollowData, error: hotHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
     // 抓取一篇文章
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleId}`, fetchArticle);
     // 新增一則文章
@@ -50,8 +52,13 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
         setNewArticle(art)
     }});
+    // 新增一個樹洞
+    const { trigger: addHollowTrigger, isMutating: addHollowIsMutating, data: addedHollowData, error: addedHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchAddHollow, { onSuccess: (data: successResult) => { 
+        // const payload = data.payload as Ihollow
+        hotHollowTrigger(arg)
+    }});
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleReord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
 
 
     const currentArticleIdRef = useRef<number>()
@@ -73,18 +80,28 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         const hotHollows: Ihollow[] = hollowRows? hollowRows : []
         const hotArticles: Iarticle[] = articleRows? articleRows : []
         const arts = formattedArticles(currentUserId, hotArticles)
-        setHollows(hotHollows)
+        const hollows = formattedHollows(currentUserId, hotHollows)
+        setHollows(hollows)
         setArticles(arts)
     }, [articleRows, hollowRows, currentUserId])
-    // 抓回來一整包的文章樹洞資料
+    // 抓回來一整包的文章資料
     useEffect(() => {
         if (!currentUserId) return
         if (!hotArtData) return
         const artRows = hotArtData?.payload as rows
-        const artDatas: Iarticle[] = artRows.rows
+        const artDatas = artRows.rows as Iarticle[]
         const arts = formattedArticles(currentUserId, artDatas)
         setArticles(arts)
     }, [currentUserId, hotArtData])
+    // 抓回來一整包的樹洞資料
+    useEffect(() => {
+        if (!currentUserId) return
+        if (!hotHollowData) return
+        const hollowRows = hotHollowData?.payload as rows
+        const hollowDatas = hollowRows.rows as Ihollow[]
+        const hollows = formattedHollows(currentUserId, hollowDatas)
+        setHollows(hollows)
+    }, [currentUserId, hotHollowData])
     // 抓回來一篇的文章資料
     useEffect(() => {
         if (!currentUserId) return
@@ -114,7 +131,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         addArtTrigger(article)
     }
     function handleAddHollow (hollow: Ihollow) {
-        setHollows([...hollows, hollow])
+        addHollowTrigger(hollow)
     }
     function handleClickMore (artId: string) {
         if (!artId || !handleIdChange) return
@@ -124,7 +141,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     function handleCloseMore () {
         if (!handleIdChange) return
         setMoreShowingId('')
-        handleIdChange(0)
+        handleIdChange('')
     }
     // 當 user 按下小視窗內的刪除按鈕
     function handleClickDelete () {
@@ -168,10 +185,10 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             currentUser={currentUser} 
             handleAddArt={handleAddArt}/>}
 
-            {/* <HollowCreatePanel 
+            <HollowCreatePanel 
             currentUser={currentUser} 
             hollows={hollows} 
-            handleAddHollow={handleAddHollow}/> */}
+            handleAddHollow={handleAddHollow}/>
         </div>
 
         <div className='pt-6 mx-2 w-full'>
@@ -227,16 +244,14 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     )
 }
 
-export async function getServerSideProps(context: CtxOrReq | undefined) {
-    const arg = { page: 1, limit: 10 }
-    const params = { page: 1, limit: 10 }
+export async function getServerSideProps(context: CtxOrReq) {
     try {
         const [articles, hollows] = await Promise.all([
             fetchHotArticles('article', { arg }),
-            fetchHotHollows('hollow', params)
+            fetchHotHollows('hollow', { arg })
         ])
         const { count: articleCounts, rows: articleRows } = articles?.payload
-        const { count: hollowCounts, rows: hollowRows } = hollows?.data.payload
+        const { count: hollowCounts, rows: hollowRows } = hollows?.payload
         const csrfToken = await getCsrfToken(context)
         return {
             props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }

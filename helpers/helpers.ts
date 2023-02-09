@@ -1,4 +1,4 @@
-import { Iarticle, ICollection, Icomment, successResult } from '../type-config'
+import { Iarticle, ICollection, Icomment, Ihollow, successResult } from '../type-config'
 
 export const formattedArticles = (currentUserId: number, articles: Iarticle[]): Iarticle[] => {
     return articles.map(article => {
@@ -23,5 +23,14 @@ export const formattedComments = (currentUserId: number, comments: Icomment[]): 
         // result 為整理過格式的版本
         const { LikedUsers, UserId, ArticleId, ...result } = comment
         return { ...result, description: des, isLiked}
+    })
+}
+
+export const formattedHollows = (currentUserId: number, hollows: Ihollow[]): Ihollow[] => {
+    return hollows.map(hollow => {
+        const isSub = hollow.SubUsers?.some((user: { id: number }) => user.id === currentUserId)
+        // result 為整理過格式的版本
+        const { SubUsers, UserId, ...result } = hollow
+        return { ...result, isSub}
     })
 }
