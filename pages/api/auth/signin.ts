@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Ihollow, Icomment, Iuser, successMessage, errorMessage } from '../../../type-config'
+import { Ihollow, Icomment, Iuser, successResult, errorResult } from '../../../type-config'
 import db from '../../../models/index';
 import bcrypt from 'bcrypt';
 
@@ -8,7 +8,7 @@ const DB: any = db;
 const { Users } = DB;
 
 
-export default async function signin(req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage> ) {
+export default async function signin(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   const userData = req.body
 
   try {
@@ -19,15 +19,15 @@ export default async function signin(req: NextApiRequest, res: NextApiResponse<s
       raw: true,
       nest: true
     })
-    if (!existUser) return res.status(405).end({ error: '請確認您的登入資訊' })
+    if (!existUser) return res.status(403).json({ error: '請確認您的登入資訊' })
 
     let isCorrect = await bcrypt.compare(userData.password, existUser.password)
-    if (!isCorrect) return res.status(405).end({ error: '請確認您的登入資訊' })
+    if (!isCorrect) return res.status(403).json({ error: '請確認您的登入資訊' })
 
-    const user = Users.findOne({
+    const user = await Users.findOne({
       where: { account: userData.account }
     })
-    if (!user) return res.status(405).end({ error: '登入失敗' })
+    if (!user) return res.status(403).json({ error: '登入失敗' })
 
     return res.status(200).json({ success: '登入成功', payload: user })
   } catch (err) {

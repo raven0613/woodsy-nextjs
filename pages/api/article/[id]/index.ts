@@ -1,14 +1,15 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
-import { Iarticle, Icomment, Iuser, errorMessage, successMessage } from '../../../../type-config'
+import {Op} from "sequelize";
+import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
-const { Users, Articles, Comments, Hollows } = DB;
+const { Users, Articles, Comments, Hollows, Collections, Likeships } = DB;
 
 
 
-export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'GET':
             getArticle(req, res)
@@ -25,16 +26,17 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function getArticle (req: NextApiRequest, res: NextApiResponse<successMessage | errorMessage>) {
+async function getArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
     try {
         const article: Iarticle = await Articles.findByPk(idNum, {
-            raw: true,
             nest: true,
             include: [
                 { model: Users, as: 'User', attributes: ['id', 'name'] }, 
-                { model: Hollows, as: 'Hollow', attributes: ['id', 'name'] }
+                { model: Hollows, as: 'Hollow', attributes: ['id', 'name'] },
+                { model: Users, as: 'CollectedUsers', attributes: ['id', 'name'] },
+                { model: Users, as: 'LikedUsers', attributes: ['id', 'name'] }
             ]
         })
         if (!article) return res.status(500).json({ error: '找不到文章' } )
@@ -45,7 +47,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successMess
 
 }
 
-async function editArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
@@ -69,7 +71,7 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorMessa
     }
 }
 
-async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorMessage | successMessage>) {
+async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
@@ -77,22 +79,37 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorMes
         dialect: 'mysql'
     }).transaction();
     try {
+        const comments = await Comments.findAll({ where: { article_id: idNum } }, { transaction: t });
+        const commentIds = comments.map((c: { id: number }) => c.id);
+        
+        await Likeships.destroy({
+            where: {
+                [Op.or]: [
+                    { article_id: idNum },
+                    { comment_id: { [Op.in]: commentIds } },
+                ]
+            }
+        }, { transaction: t });
+        await Collections.destroy({
+            where: { article_id: idNum }
+        }, { transaction: t })
         await Comments.destroy({
             where: { article_id: idNum }
         }, { transaction: t })
 
         const article = await Articles.findByPk(idNum, { transaction: t })
-        if (article === null) return res.status(500).json({ error: '此文章不存在' })
+        if (!article) return res.status(500).json({ error: '此文章不存在' })
 
-        const hollow = await Articles.Hollows(article.hollow_id, { transaction: t })
+        const hollow = await Hollows.findByPk(article.hollow_id, { transaction: t })
         if (hollow) {
-            await Hollows.increment({article_counts: -1}, { where: { id: article.hollow_id }, transaction: t })
+            await hollow.increment({article_counts: -1}, { where: { id: article.hollow_id }, transaction: t })
         }
 
-        await article.destroy({}, { transaction: t })
+        await Articles.destroy({ where: { id: idNum } }, { transaction: t })
         await t.commit();
 
         return res.status(200).json({ success: '刪除文章成功' })
+    
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

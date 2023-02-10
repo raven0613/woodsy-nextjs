@@ -22,16 +22,31 @@ module.exports = (sequelize, DataTypes) => {
       Articles.hasMany(models.Comments, {
           foreignKey: 'article_id',
       });
-      Articles.hasMany(models.Collections, {
-          foreignKey: 'article_id',
-      });
-      Articles.hasMany(models.Likeships, {
-          foreignKey: 'article_id',
-      });
-      Articles.hasMany(models.Reports, {
-          foreignKey: 'article_id',
-      });
-      // Articles.hasMany(models.Comments, { foreignKey: 'articleId' });
+      // Articles.hasMany(models.Collections, {
+      //     foreignKey: 'article_id',
+      // });
+      // Articles.hasMany(models.Likeships, {
+      //     foreignKey: 'article_id',
+      // });
+      // Articles.hasMany(models.Reports, {
+      //     foreignKey: 'article_id',
+      // });
+
+      Articles.belongsToMany(models.Users, {
+        through: models.Collections,
+        foreignKey: 'article_id',
+        as: 'CollectedUsers'
+      })
+      Articles.belongsToMany(models.Users, {
+        through: models.Likeships,
+        foreignKey: 'article_id',
+        as: 'LikedUsers'
+      })
+      Articles.belongsToMany(models.Users, {
+        through: models.Reports,
+        foreignKey: 'article_id',
+        as: 'ReportedUsers'
+      })
     }
   }
   Articles.init({

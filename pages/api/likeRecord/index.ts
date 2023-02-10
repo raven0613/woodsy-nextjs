@@ -1,12 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Sequelize } from 'sequelize';
-import { Ihollow, Icomment, Iuser, ILikeship, errorMessage, successMessage } from '../../../type-config'
+import { Ihollow, Icomment, Iuser, ILikeship, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Likeships } = DB;
 
-export default function handleLikeship(req: NextApiRequest, res: NextApiResponse<Ihollow | ILikeship | errorMessage | successMessage>) {
+export default function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'POST':
             addLikeship(req, res)
@@ -20,43 +20,53 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
     }
 }
 
-async function addLikeship (req: NextApiRequest, res: NextApiResponse<ILikeship | errorMessage | successMessage>) {
+async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, comment_id, article_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
-
+    try {
+        let existLike, like
         if (article_id) {
-            const existLike = await Likeships.findOne({
+            existLike = await Likeships.findOne({
                 where: {
                     user_id, article_id
                 }
             }, { transaction: t })
             if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
 
-            const sub = await Likeships.create({
+            like = await Likeships.create({
                 user_id, article_id
             }, { transaction: t })
-            if (!sub) return res.status(500).json({ error: '記錄新增失敗' })
-            await t.commit();
-            return res.status(200).json({ success: '關注成功', payload: sub })
+            if (!like) return res.status(500).json({ error: '記錄新增失敗' })
+
+            const article = await Articles.findByPk(article_id, { transaction: t })
+            if (article) {
+                await Articles.increment({liked_counts: 1}, { where: { id: article_id }, transaction: t })
+            }
         }
         if (comment_id) {
-            const existLike = await Likeships.findOne({
+            existLike = await Likeships.findOne({
                 where: {
                     user_id, comment_id
                 }
             }, { transaction: t })
             if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
-            const sub = await Likeships.create({
+
+            like = await Likeships.create({
                 user_id, comment_id
             }, { transaction: t })
-            if (!sub) return res.status(500).json({ error: '記錄新增失敗' })
-            await t.commit();
-            return res.status(200).json({ success: '關注成功', payload: sub })
+            if (!like) return res.status(500).json({ error: '記錄新增失敗' })
+
+            const comment = await Comments.findByPk(comment_id, { transaction: t })
+            if (comment) {
+                await Comments.increment({liked_counts: 1}, { where: { id: comment_id }, transaction: t })
+            }
         }
-    try {
+        await t.commit();
+        return res.status(200).json({ success: '喜歡成功', payload: like })
+    
 
     } catch (err) {
         await t.rollback();
@@ -64,7 +74,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<ILikeship 
     }
 }
 
-async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<ILikeship | errorMessage | successMessage>) {
+async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, comment_id, article_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
@@ -72,28 +82,35 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<ILikesh
     }).transaction();
 
     try {
+        let existLike
         if (article_id) {
-            const existLike = await Likeships.destroy({
+            existLike = await Likeships.destroy({
                 where: {
                     user_id, article_id
                 }
             }, { transaction: t })
             if (!existLike) return res.status(500).json({ error: '此紀錄不存在' })
-            
-            await t.commit();
-            return res.status(200).json({ success: '關注紀錄刪除成功' })
+
+            const article = await Articles.findByPk(article_id, { transaction: t })
+            if (article) {
+                await Articles.increment({liked_counts: -1}, { where: { id: article_id }, transaction: t })
+            }
         }
         if (comment_id) {
-            const existLike = await Likeships.destroy({
+            existLike = await Likeships.destroy({
                 where: {
                     user_id, comment_id
                 }
             }, { transaction: t })
             if (!existLike) return res.status(500).json({ error: '此紀錄不存在' })
-            
-            await t.commit();
-            return res.status(200).json({ success: '關注紀錄刪除成功' })
+
+            const comment = await Comments.findByPk(comment_id, { transaction: t })
+            if (comment) {
+                await Comments.increment({liked_counts: -1}, { where: { id: comment_id }, transaction: t })
+            }
         }
+        await t.commit();
+        return res.status(200).json({ success: '喜歡紀錄刪除成功', payload: {article_id, comment_id} as ILikeship })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })

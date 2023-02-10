@@ -1,7 +1,8 @@
-import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg } from '../type-config'
+import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload } from '../type-config'
+import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, addUserSub, deleteUserSub, getUserSubs } from '../api_helpers/apis/user'
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
-import { getHollows, getHollow } from '../api_helpers/apis/hollow'
+import { getHollows, getHollow, addHollow } from '../api_helpers/apis/hollow'
 import { getUser } from '../api_helpers/apis/user'
 
 export async function fetchUser (url: string, id: string) {
@@ -13,37 +14,114 @@ export async function fetchUser (url: string, id: string) {
     }
 }
 
+export async function fetchUserLike (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await addUserLike(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchDeleteUserLike (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await deleteUserLike(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchUserCollect (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await addUserCollect(url, arg as collectionPayload)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchDeleteUserCollect (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await deleteUserCollect(url, arg as collectionPayload)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchGetUserSubs (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
+    try {
+        const { data } = await getUserSubs(url, page, limit)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+export async function fetchAddUserSub (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await addUserSub(url, arg as subPayload)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+export async function fetchDeleteUserSub (url: string, { arg }: payloadArg) {
+    try {
+        const { data } = await deleteUserSub(url, arg as subPayload)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchAddHollow (url: string, { arg }: hollowArg) {
+    try {
+        const { data } = await addHollow(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 export async function fetchHollow (id: string) {
     try {
-        const res = await getHollow(id)
-        return res
+        const { data } = await getHollow(id)
+        return data
     } catch (err) {
         console.log(err)
     }
 }
 
-export async function fetchHotHollows (url: string, { page, limit }: param) {
+export async function fetchHotHollows (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
     try {
-        const res = await getHollows(url, page, limit)
-        return res
+        const { data } = await getHollows(url, page, limit)
+        return data
     } catch (err) {
         console.log(err)
     }
 }
 
-export async function fetchHotArticles (url: string, { page, limit }: param) {
+export async function fetchHotArticles (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
     try {
-        const res = await getArticles(url, page, limit)
-        return res
+        const { data } = await getArticles(url, page, limit)
+        return data
     } catch (err) {
         console.log(err)
     }
 }
 
-export async function fetchArticle (id: string) {
+export async function fetchArticle (url: string) {
     try {
-        const res = await getArticle(id)
-        return res
+        const { data } = await getArticle(url)
+        return data
     } catch (err) {
         console.log(err)
     }

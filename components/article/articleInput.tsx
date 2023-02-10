@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom';
 import { Ihollow, Iarticle, Iuser } from '../../type-config'
 import hollowStyle from '../../styles/hollow.module.css';
+import articleStyle from '../../styles/article.module.css';
 
 interface hollowProps {
     currentHollow?: Ihollow
@@ -16,11 +17,11 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
     const [inputVal, setInputVal] = useState<string>('')
     const [textVal, setTextVal] = useState<string>('')
     
-    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(currentHollow? currentHollow : null)
+    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
     const [article, setArticle] = useState<Iarticle>({
         title: '',
         hollow_id: 0,
-        user_id: 7,
+        user_id: 0,
         content: '',
         commentCounts: 0,
         collectedCounts: 0,
@@ -29,6 +30,14 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
         hollowName: '',
         description: ''
     })
+    useEffect(() => {
+        if (!currentHollow) return
+        setSelectHollow(currentHollow)
+    }, [currentHollow])
+    useEffect(() => {
+        if (!hollows) return
+        setSelectHollow(hollows[0])
+    }, [hollows])
 
     function handleSelect (hollow: Ihollow) {
         if (!hollow.id) return
@@ -49,14 +58,22 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
         e.preventDefault()
         e.stopPropagation()
         if (!article.hollow_id) return console.log('請選擇樹洞')
-        handleAddArt(article)
+        if (!currentUser.id) return
+        handleAddArt({ ...article, user_id: currentUser.id})
         setInputVal('')
         setTextVal('')
         setArticle({...article, title: '', content: '', description: ''})
     }
+
     const hollowsWithoutCurrent: Ihollow[] = hollows.filter(hollow => hollow.id !== selectHollow?.id && hollow.id !== currentHollow?.id)
     return (
-        <main className='w-full border rounded-lg'>
+        <main className='w-full border rounded-lg relative'>
+            
+            {!currentUser.id && <div className='z-0 absolute inset-0'>
+                <div className='z-0 absolute inset-5 bg-black opacity-50 flex items-center rounded-md'>
+                    <p className='w-full text-center text-lg text-slate-300'>請先登入</p>
+                </div>
+            </div>}
             <input 
                 className='block w-11/12 h-12 m-auto outline-0 mt-2'
                 value={inputVal}
@@ -98,11 +115,9 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
                         </div>
                     </div>
 
-                    <button className='border w-20 h-10 rounded-full hover:bg-sky-100 ease-out duration-300' type="button" onClick={handleSubmit}>送出</button>
+                    <button className={articleStyle.confirm_button} type="button" onClick={handleSubmit}>送出</button>
                 </div>
-
             </div>
-
         </main>
     )
 }

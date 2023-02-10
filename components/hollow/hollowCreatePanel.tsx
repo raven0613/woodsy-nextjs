@@ -2,6 +2,8 @@ import { useRouter } from 'next/router'
 import { useState, useRef } from 'react'
 import { Ihollow, Iuser } from '../../type-config'
 import Link from 'next/link'
+import hollowStyle from '../../styles/hollow.module.css';
+import articleStyle from '../../styles/article.module.css';
 
 interface HollowCreateProps {
   hollows: Ihollow[],
@@ -12,23 +14,18 @@ interface HollowCreateProps {
 export default function HollowCreatePanel ({ hollows, currentUser, handleAddHollow }: HollowCreateProps) {
     const [inputVal, setInputVal] = useState<string>('')
     const [hollow, setHollow] = useState<Ihollow>({
-        id: 0,
         name: '',
         type: 'public',
-        userId: 1,
-        articleCounts: 0,
-        isSub: false,
-        subCounts: 0,
-        createdAt: '20230106',
+        user_id: currentUser.id,
     })
     const [sameHollows, setSameHollows] = useState<Ihollow[]>([])
     const [existHollow, setExistHollow] = useState<Ihollow | null>(null)
 
     //得到 input 值存進 hollow
     function handleInputHollow (event: React.FormEvent<HTMLInputElement>) {
-        const value = event.currentTarget.value
-        setInputVal(value.trim())
-        setHollow({...hollow, name: value.trim()})
+        const value = event.currentTarget.value.trim()
+        setInputVal(value)
+        setHollow({...hollow, name: value})
     }
     function handleCheckExist (event: React.FormEvent<HTMLInputElement>) {
         if (!event.currentTarget.value.trim()) {
@@ -47,9 +44,10 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
     function handleSubmit (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
+        if (!currentUser) return
         setInputVal('')
         setHollow({...hollow, name: ''})
-        handleAddHollow(hollow)
+        handleAddHollow({...hollow, user_id: currentUser.id})
     }
     return (
         <div>
@@ -60,7 +58,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
                 <div>
                     <p>這個樹洞已經存在，您可以點選前往該樹洞</p> 
                     <Link href={`/hollows/${existHollow.id}`} key={existHollow.id}>
-                        <button>{existHollow.name}</button>
+                        <button className={hollowStyle.hollow_button}>{existHollow.name}</button>
                     </Link>
                 </div>
             }
@@ -72,7 +70,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
                     {sameHollows.map(hollow => {
                         return (
                             <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-                                <button>{hollow.name}</button>
+                                <button className={hollowStyle.hollow_button}>{hollow.name}</button>
                             </Link>
                         )
                     })}
@@ -80,6 +78,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
             </div>}
 
             <input
+                className='outline-0 border w-64 h-12 px-2.5'
                 value={inputVal}
                 onChange={e => {
                     handleInputHollow(e)
@@ -87,7 +86,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
                 }}
                 placeholder='請輸入樹洞名稱' type="text" />
 
-            <button onClick={handleSubmit}>送出</button>
+            <button className={articleStyle.confirm_button} onClick={handleSubmit}>送出</button>
         </div>
     )
 }

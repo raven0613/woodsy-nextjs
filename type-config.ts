@@ -24,12 +24,14 @@ export interface Ihollow {
     id?: number,
     name: string,
     type: string,
-    articleCounts: number
+    articleCounts?: number
+    subCounts?: number
     isSub?: boolean
-    subCounts: number
     createdAt?: string
     userId?: number
     user_id?: number
+    UserId?: number
+    SubUsers?: user[]
 };
 
 export interface Iarticle {
@@ -51,6 +53,10 @@ export interface Iarticle {
     comments?: ReactNode
     User?: user
     Hollow?: hollow
+    CollectedUsers?: user[]
+    LikedUsers?: user[]
+    UserId?: number
+    HollowId?: number
 };
 
 interface user {
@@ -63,18 +69,22 @@ interface hollow {
 }
 
 
+
 export interface Icomment {
-    id: number
-    articleId: number
-    userId: number
+    id?: number
+    article_id: number
+    user_id: number
     content: string
     likedCounts: number
     reportedCounts: number
-    isLiked: boolean
-    reportedAt: string
-    createdAt: string
+    isLiked?: boolean
+    reportedAt?: string
+    createdAt?: string
     description?: string
     User?: user
+    LikedUsers?: user[]
+    UserId?: number
+    ArticleId?: number
 }
 
 export interface ISubcription {
@@ -84,16 +94,17 @@ export interface ISubcription {
     createdAt: string
 }
 export interface ICollection {
+    article_id: number | undefined
     id: number
-    userId: number
-    articleId: number
+    user_id: number
+    comment_id: number
     createdAt: string
 };
 export interface ILikeship {
+    article_id: number | undefined
     id: number
-    userId: number
-    articleId: number
-    commentId: number
+    user_id: number
+    comment_id: number
     createdAt: string
 };
 
@@ -105,6 +116,26 @@ export interface IReport {
     commentId: number
     createdAt: string
 };
+
+export interface userSubPayload {
+    id: number
+    name: number
+    SubHollows: Ihollow[]
+}
+
+export interface subPayload {
+    user_id: number
+    hollow_id: number
+}
+export interface collectionPayload {
+    user_id: number
+    article_id: number
+}
+export interface likePayload {
+    user_id: number
+    article_id?: number
+    comment_id?: number
+}
 
 export interface param {
     page: number
@@ -130,8 +161,17 @@ export type commentArg = {
 export type articleArg = {
     arg: Iarticle
 }
+export type hollowArg = {
+    arg: Ihollow
+}
 export type deleteArg = {
     arg: string
+}
+export type payloadArg = {
+    arg: likePayload | collectionPayload | subPayload
+}
+export type paramArg = {
+    arg: param
 }
 
 
@@ -147,15 +187,39 @@ declare module "next-auth" {
       name: string
       account: string
       email: string
+      role: string
     } & DefaultSession["user"]
   }
 }
 
-export interface errorMessage {
+
+export interface errorResult {
     error: string
 }
 
-export interface successMessage {
+export interface successResult {
     success: string
-    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | userSubPayload | rows
+}
+
+
+export interface rows {
+    count: number
+    rows: Iarticle[] | Icomment[] | Ihollow[]
+}
+
+
+export interface IArticleContext {
+    currentArticleId?: number
+    currentCommentId?: number
+    handleIdChange?: (id: string) => void
+//   handleArticleReFetch?: (trigger: () => void) => void
+    refetchTrigger?: boolean 
+    handleRefetchTrigger?: () => void
+    
+}
+
+export interface IUIContext {
+    handleConfirmWindow?: () => void
+    handleEditWindow?: (article: Iarticle) => void
 }

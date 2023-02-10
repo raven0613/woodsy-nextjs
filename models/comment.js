@@ -14,12 +14,23 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Comments.belongsTo(models.Users);
       Comments.belongsTo(models.Articles);
-      Comments.hasMany(models.Likeships, {
-          foreignKey: 'comment_id',
-      });
-      Comments.hasMany(models.Reports, {
-          foreignKey: 'comment_id',
-      });
+      // Comments.hasMany(models.Likeships, {
+      //     foreignKey: 'comment_id',
+      // });
+      // Comments.hasMany(models.Reports, {
+      //     foreignKey: 'comment_id',
+      // });
+
+      Comments.belongsToMany(models.Users, {
+        through: models.Likeships,
+        foreignKey: 'comment_id',
+        as: 'LikedUsers'
+      })
+      Comments.belongsToMany(models.Users, {
+        through: models.Reports,
+        foreignKey: 'comment_id',
+        as: 'ReportedUsers'
+      })
     }
   }
   Comments.init({

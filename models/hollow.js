@@ -14,12 +14,23 @@ module.exports = (sequelize, DataTypes) => {
       Hollows.hasMany(models.Articles, {  
         foreignKey: 'hollow_id' 
       });
-      Hollows.hasMany(models.Subscriptions, {  
-        foreignKey: 'hollow_id' 
-      });
-      Hollows.hasMany(models.Reports, {  
-        foreignKey: 'hollow_id' 
-      });
+      // Hollows.hasMany(models.Subscriptions, {  
+      //   foreignKey: 'hollow_id' 
+      // });
+      // Hollows.hasMany(models.Reports, {  
+      //   foreignKey: 'hollow_id' 
+      // });
+
+      Hollows.belongsToMany(models.Users, {
+        through: models.Reports,
+        foreignKey: 'hollow_id',
+        as: 'ReportUsers'
+      })
+      Hollows.belongsToMany(models.Users, {
+        through: models.Subscriptions,
+        foreignKey: 'hollow_id',
+        as: 'SubUsers'
+      })
     }
   }
   Hollows.init({

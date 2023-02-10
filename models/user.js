@@ -19,18 +19,54 @@ module.exports = (sequelize, DataTypes) => {
       Users.hasMany(models.Hollows, {
           foreignKey: 'user_id',
       });
-      Users.hasMany(models.Subscriptions, {  
-        foreignKey: 'user_id' 
-      });
-      Users.hasMany(models.Collections, {
-          foreignKey: 'user_id',
-      });
-      Users.hasMany(models.Likeships, {
-          foreignKey: 'user_id',
-      });
-      Users.hasMany(models.Reports, {
-          foreignKey: 'user_id',
-      });
+      // Users.hasMany(models.Subscriptions, {  
+      //   foreignKey: 'user_id' 
+      // });
+      // Users.hasMany(models.Collections, {
+      //     foreignKey: 'user_id',
+      // });
+      // Users.hasMany(models.Likeships, {
+      //     foreignKey: 'user_id',
+      // });
+      // Users.hasMany(models.Reports, {
+      //     foreignKey: 'user_id',
+      // });
+
+      Users.belongsToMany(models.Hollows, {
+        through: models.Subscriptions,
+        foreignKey: 'user_id',
+        as: 'SubHollows'
+      })
+      Users.belongsToMany(models.Articles, {
+        through: models.Collections,
+        foreignKey: 'user_id',
+        as: 'CollectedArticles'
+      })
+      Users.belongsToMany(models.Articles, {
+        through: models.Likeships,
+        foreignKey: 'user_id',
+        as: 'LikedArticles'
+      })
+      Users.belongsToMany(models.Comments, {
+        through: models.Likeships,
+        foreignKey: 'user_id',
+        as: 'LikedComments'
+      })
+      Users.belongsToMany(models.Hollows, {
+        through: models.Reports,
+        foreignKey: 'user_id',
+        as: 'ReportedHollows'
+      })
+      Users.belongsToMany(models.Articles, {
+        through: models.Reports,
+        foreignKey: 'user_id',
+        as: 'ReportedArticles'
+      })
+      Users.belongsToMany(models.Comments, {
+        through: models.Reports,
+        foreignKey: 'user_id',
+        as: 'ReportedComments'
+      })
     }
   }
   Users.init({
