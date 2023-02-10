@@ -22,7 +22,6 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
 
 async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, comment_id, article_id } = req.body
-    console.log(req.body)
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'

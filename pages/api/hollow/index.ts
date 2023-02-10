@@ -38,7 +38,6 @@ async function getHollows(req: NextApiRequest, res: NextApiResponse<successResul
       offset: getOffset(page, limit),
       nest: true, 
     })
-    console.log(hollows)
     res.status(200).json({ success: '查詢成功', payload: hollows })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' } )

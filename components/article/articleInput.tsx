@@ -17,7 +17,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
     const [inputVal, setInputVal] = useState<string>('')
     const [textVal, setTextVal] = useState<string>('')
     
-    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(currentHollow? currentHollow : null)
+    const [selectHollow, setSelectHollow] = useState<Ihollow | null>(null)
     const [article, setArticle] = useState<Iarticle>({
         title: '',
         hollow_id: 0,
@@ -30,6 +30,14 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
         hollowName: '',
         description: ''
     })
+    useEffect(() => {
+        if (!currentHollow) return
+        setSelectHollow(currentHollow)
+    }, [currentHollow])
+    useEffect(() => {
+        if (!hollows) return
+        setSelectHollow(hollows[0])
+    }, [hollows])
 
     function handleSelect (hollow: Ihollow) {
         if (!hollow.id) return

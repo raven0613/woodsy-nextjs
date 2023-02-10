@@ -38,7 +38,6 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
       offset: getOffset(page, limit),
       nest: true, 
     })
-    console.log(articles)
     res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })

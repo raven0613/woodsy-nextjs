@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { deleteArg, Iarticle, ICollection, Ihollow, Iuser, param, rows, subPayload, successResult } from '../../type-config'
 import ArticleCardController from '../../components/article/articleCardController'
 import ArticleInput from '../../components/article/articleInput'
-import { fetchHotHollows, fetchHollow, fetchHotArticles, fetchAddArt } from '../../api_helpers/fetchers'
+import { fetchHotHollows, fetchAddHollow, fetchHollow, fetchHotArticles, fetchAddArt } from '../../api_helpers/fetchers'
 import { formattedArticles, formattedHollows } from '../../helpers/helpers'
 import { useSession } from 'next-auth/react';
 import useArticleRecord from '../../components/hooks/useArticleRecord'
@@ -24,6 +24,7 @@ export default function Hollow () {
         window.addEventListener('scroll', handleScroll)
         return () => { window.removeEventListener('scroll', handleScroll) }
     }, [])
+
 
     const { data: session, status } = useSession()
 
@@ -57,8 +58,13 @@ export default function Hollow () {
     // 得到該樹洞的所有文章
     const { trigger: articlesTrigger, data: articlesData, error: articlesError } = useSWRMutation<successResult, Error>(`hollow/${id}/articles`, fetchHotArticles);
 
-    // 得到熱門樹洞(給 input 用)
-    const { data: hollowsData, error: hollowsError } = useSWR(['hollow', arg], ([url, params]) => fetchHotHollows(url, params));
+    // 抓取一包樹洞(給 input 用)
+    const { trigger: hollowsTrigger, data: hollowsData, error: hollowsError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
+    // 新增一個樹洞
+    const { trigger: addHollowTrigger, isMutating: addHollowIsMutating, data: addedHollowData, error: addedHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchAddHollow, { onSuccess: (data: successResult) => { 
+        // const payload = data.payload as Ihollow
+        hollowsTrigger(arg)
+    }});
 
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successResult, Error>(`article`, fetchAddArt, { onSuccess: (data: successResult) => { 
@@ -84,6 +90,9 @@ export default function Hollow () {
         hollowTrigger()
     }
     useEffect(() => {
+        hollowsTrigger(arg)
+    }, [hollowsTrigger])
+    useEffect(() => {
         if (!id || !articlesTrigger || !hollowTrigger) return
         hollowTrigger()
         articlesTrigger(arg)
@@ -92,7 +101,8 @@ export default function Hollow () {
     //熱門樹洞
     useEffect(() => {
         if (!currentUserId || !hollowsData) return
-        const hollowDatas: Ihollow[] = hollowsData? hollowsData.data.payload.rows : []
+        const hollowRows = hollowsData?.payload as rows
+        const hollowDatas = hollowRows.rows as Ihollow[]
         const hollows = formattedHollows(currentUserId, hollowDatas)
         setHollows(hollows)
     }, [hollowsData, currentUserId])
@@ -125,7 +135,7 @@ export default function Hollow () {
         addArtTrigger(article)
     }
     function handleAddHollow (hollow: Ihollow) {
-        setHollows([...hollows, hollow])
+        addHollowTrigger(hollow)
     }
     function handleClickMore (artId: string) {
         if (!artId || !handleIdChange) return
@@ -144,7 +154,7 @@ export default function Hollow () {
         setMoreShowingId('')
     }
     function handleLike (articleId: number, _commentId: number, isLiked: boolean) {
-        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
+        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
 
 

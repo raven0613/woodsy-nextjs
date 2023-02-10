@@ -27,6 +27,7 @@ export const formattedComments = (currentUserId: number, comments: Icomment[]): 
 }
 
 export const formattedHollows = (currentUserId: number, hollows: Ihollow[]): Ihollow[] => {
+
     return hollows.map(hollow => {
         const isSub = hollow.SubUsers?.some((user: { id: number }) => user.id === currentUserId)
         // result 為整理過格式的版本

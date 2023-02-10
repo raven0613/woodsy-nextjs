@@ -1,5 +1,5 @@
 import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload } from '../type-config'
-import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, addUserSub, deleteUserSub } from '../api_helpers/apis/user'
+import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, addUserSub, deleteUserSub, getUserSubs } from '../api_helpers/apis/user'
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
 import { getHollows, getHollow, addHollow } from '../api_helpers/apis/hollow'
@@ -49,7 +49,19 @@ export async function fetchDeleteUserCollect (url: string, { arg }: payloadArg) 
         console.log(err)
     }
 }
-export async function fetchUserSub (url: string, { arg }: payloadArg) {
+
+export async function fetchGetUserSubs (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
+    try {
+        const { data } = await getUserSubs(url, page, limit)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+export async function fetchAddUserSub (url: string, { arg }: payloadArg) {
     try {
         const { data } = await addUserSub(url, arg as subPayload)
         return data
@@ -57,6 +69,7 @@ export async function fetchUserSub (url: string, { arg }: payloadArg) {
         console.log(err)
     }
 }
+
 
 export async function fetchDeleteUserSub (url: string, { arg }: payloadArg) {
     try {

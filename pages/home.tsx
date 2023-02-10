@@ -12,7 +12,7 @@ import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
 import { getHollows } from '../api_helpers/apis/hollow'
 import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
-import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection } from '../type-config';
+import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection, subPayload } from '../type-config';
 import { getCsrfToken, getSession, useSession } from 'next-auth/react';
 import { CtxOrReq } from 'next-auth/client/_utils';
 import { formattedArticles, formattedHollows } from '../helpers/helpers'
@@ -21,6 +21,7 @@ import { articleContext, UIContext } from '../components/ArticleProvider'
 import { useContext, useRef } from 'react'
 
 import useArticleRecord from '../components/hooks/useArticleRecord'
+import useHollowRecord from '../components/hooks/useHollowRecord';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -59,20 +60,22 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }});
     // 喜歡和收藏的 fetch hook
     const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
-
+    // 關注的 fetch hook
+    const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
     const currentArticleIdRef = useRef<number>()
 
     function onSuccessCallback (data: successResult) {
         // 按讚之後 newArt 會被蓋掉
-        const { article_id } = data.payload as ICollection
-        // console.log('newArticle', newArticle)
-        // console.log('article_id', article_id)
-        // console.log('currentArticleIdRef.current', currentArticleIdRef.current)
-        if (article_id === currentArticleIdRef.current) {
-            // return artTrigger()
-        }  //TODO: 新增文章的邏輯還沒調整好
+        // const { article_id } = data.payload as ICollection
+        // // console.log('newArticle', newArticle)
+        // // console.log('article_id', article_id)
+        // // console.log('currentArticleIdRef.current', currentArticleIdRef.current)
+        // if (article_id === currentArticleIdRef.current) {
+        //     // return artTrigger()
+        // }  //TODO: 新增文章的邏輯還沒調整好
         hotArtTrigger(arg)
+        hotHollowTrigger(arg)
     }
     // server props 的文章樹洞資料
     useEffect(() => {
@@ -150,7 +153,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         setMoreShowingId('')
     }
     function handleLike (articleId: number, _commentId: number, isLiked: boolean) {
-        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return console.log('別吵還在處理')
+        if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
         currentArticleIdRef.current = articleId
 
@@ -162,7 +165,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         }
     }
     function handleCollect (articleId: number, isCollected: boolean) {
-        if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return console.log('別吵還在處理')
+        if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
         if (!currentUserId) return console.log('請先登入')
         currentArticleIdRef.current = articleId
 
@@ -171,6 +174,18 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             artRecordTrigger('deleteCollect', payload)
         } else {
             artRecordTrigger('collect', payload)
+        }
+    }
+    function handleSub (hollowId: number, isSub: boolean) {
+        if (!currentUserId) return
+        if (getHollowRecordIsMutating('sub') || getHollowRecordIsMutating('deleteSub')) return
+
+        const payload: subPayload = { user_id: currentUserId, hollow_id: hollowId }
+        if (isSub) {
+            hollowRecordTrigger('deleteSub', payload)
+        }
+        else {
+            hollowRecordTrigger('sub', payload)
         }
     }
     function handleEdit (article: Iarticle) {
@@ -202,7 +217,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                 {hollows && hollows.map(hollow => {
                     return (
                         <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-                            <HollowCard hollow={hollow}/>
+                            <HollowCard hollow={hollow} handleSub={handleSub} />
                         </Link>
                     )
                 })}

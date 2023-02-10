@@ -6,7 +6,7 @@ import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Subscriptions } = DB;
 
-export default function handleSubscriptions(req: NextApiRequest, res: NextApiResponse<Ihollow | ISubcription | errorResult | successResult>) {
+export default function handleSubscriptions(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'POST':
             addSubscription(req, res)
@@ -20,7 +20,7 @@ export default function handleSubscriptions(req: NextApiRequest, res: NextApiRes
     }
 }
 
-async function addSubscription (req: NextApiRequest, res: NextApiResponse<ISubcription | errorResult | successResult>) {
+async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, hollow_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',
@@ -54,7 +54,7 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<ISubcr
     }
 }
 
-async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<ISubcription | errorResult | successResult>) {
+async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, hollow_id } = req.body
     const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
         host: 'localhost',

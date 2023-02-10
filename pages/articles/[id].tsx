@@ -109,11 +109,6 @@ export default function Article () {
         setComments(newComments)
         editComTrigger(comment)
     }
-    // function handleDeleteComment (commentId: number) {
-    //     // const updatedData = comments.filter(com => com.id !== commentId)
-    //     // setComments(updatedData)
-    //     deleteComTrigger(commentId)
-    // }
 
     // 當 user 按下小視窗內的刪除按鈕
     function handleClickDelete () {

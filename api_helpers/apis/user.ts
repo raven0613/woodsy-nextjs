@@ -50,3 +50,7 @@ export function addUserSub (url: string, payload: subPayload) {
 export function deleteUserSub (url: string, payload: subPayload) {
     return apiHelper.delete(url, {data: payload})
 }
+
+export function getUserSubs (url: string, page: number, limit: number) {
+    return apiHelper.get(url, { params: { page, limit } })
+}

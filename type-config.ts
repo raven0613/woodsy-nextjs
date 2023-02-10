@@ -117,6 +117,12 @@ export interface IReport {
     createdAt: string
 };
 
+export interface userSubPayload {
+    id: number
+    name: number
+    SubHollows: Ihollow[]
+}
+
 export interface subPayload {
     user_id: number
     hollow_id: number
@@ -193,7 +199,7 @@ export interface errorResult {
 
 export interface successResult {
     success: string
-    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | ISubcription | rows
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | userSubPayload | rows
 }
 
 

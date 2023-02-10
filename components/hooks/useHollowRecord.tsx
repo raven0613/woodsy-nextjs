@@ -1,15 +1,15 @@
 import useSWRMutation from 'swr/mutation'
 import { successResult, likePayload, collectionPayload } from '../../type-config';
-import { fetchUserSub, fetchDeleteUserSub } from '../../api_helpers/fetchers'
+import { fetchAddUserSub, fetchDeleteUserSub } from '../../api_helpers/fetchers'
 
 interface props {
     onSuccessCallback: (data: successResult) => void
 }
 
 export default function useHollowRecord({ onSuccessCallback }: props) {
-    // 新增喜歡
-    const { trigger: addSubTrigger, isMutating: addSubIsMutating, data: addSubData, error: addSubError } = useSWRMutation<successResult, Error>(`subRecord`, fetchUserSub, { onSuccess: onSuccessCallback});
-    // 移除喜歡
+    // 新增關注
+    const { trigger: addSubTrigger, isMutating: addSubIsMutating, data: addSubData, error: addSubError } = useSWRMutation<successResult, Error>(`subRecord`, fetchAddUserSub, { onSuccess: onSuccessCallback});
+    // 移除關注
     const { trigger: deleteSubTrigger, isMutating: deleteSubIsMutating, data: deleteSubData, error: deleteSubError } = useSWRMutation<successResult, Error>(`subRecord`, fetchDeleteUserSub, { onSuccess: onSuccessCallback});
 
     // 決定 fetch 哪一個 trigger
