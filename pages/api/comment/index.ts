@@ -23,8 +23,8 @@ async function addComment(req: NextApiRequest, res: NextApiResponse<successResul
     const { content, user_id, article_id} = req.body
     if (!content || content.length > 500 || !user_id || !article_id) return res.status(500).json({ error: '請求的內容不正確' })
 
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
     try {

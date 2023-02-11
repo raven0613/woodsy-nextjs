@@ -22,8 +22,8 @@ export default function handleSubscriptions(req: NextApiRequest, res: NextApiRes
 
 async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, hollow_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
 
@@ -56,8 +56,8 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorR
 
 async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, hollow_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
 

@@ -22,8 +22,8 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
 
 async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, comment_id, article_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
     try {
@@ -76,8 +76,8 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
 
 async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, comment_id, article_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
 

@@ -20,8 +20,6 @@ const db = {};
 // const Comments = require('./comment');
 // const Hollows = require('./hollow');
 
-
-
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
