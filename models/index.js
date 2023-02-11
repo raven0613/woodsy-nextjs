@@ -3,18 +3,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const getConfig = require('next/config')
-const { serverRuntimeConfig } = getConfig()
-fs.readFile(path.join(serverRuntimeConfig.PROJECT_ROOT, './path/to/file.json'))
-
 const Sequelize = require('sequelize');
 const Model = require('sequelize');
 
 const process = require('process');
 
 // const basename = path.basename(__filename);
-const modelPath = __dirname + '/models/';
-// const modelPath = process.cwd() + '/models/';
+
+const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
 
 const env = process.env.NODE_ENV || 'development';

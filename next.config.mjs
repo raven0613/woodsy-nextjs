@@ -20,12 +20,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASEURL: process.env['http://localhost:3000/'],
   },
-  experimental: { 
-    nftTracing: true 
-  },
-  serverRuntimeConfig: {
-      PROJECT_ROOT: __dirname
-  }
+  output: 'standalone'
 }
 
 export const bundleAnalyzer = withBundleAnalyzer({
