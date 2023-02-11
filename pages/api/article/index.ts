@@ -53,7 +53,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
 async function addArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   const { title, hollow_id, content, user_id } = req.body
   const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
-      host: 'localhost',
+      host: process.env.MYSQL_HOST,
       dialect: 'mysql'
   }).transaction();
 
