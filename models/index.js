@@ -2,14 +2,15 @@
 
 const fs = require('fs');
 const path = require('path');
+
 const Sequelize = require('sequelize');
 const Model = require('sequelize');
 
 const process = require('process');
 
 // const basename = path.basename(__filename);
-const modelPath = __dirname + '/models/';
-// const modelPath = process.cwd() + '/models/';
+
+const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
 
 const env = process.env.NODE_ENV || 'development';
