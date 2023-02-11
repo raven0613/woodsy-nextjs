@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "admin_raven",
-    "password": "knee0613",
+    "username": "root",
+    "password": "password",
     "database": "woodsy_nextjs",
-    "host": "database-1.ciuz9ttg6j18.ap-northeast-1.rds.amazonaws.com",
+    "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {

@@ -29,7 +29,10 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 async function getArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
-    
+    console.log('變數')
+    console.log(process.env.NEXTAUTH_URL)
+    console.log(process.env.MYSQL_DATABASE)
+    console.log(process.env.MYSQL_HOST)
         const article: Iarticle = await Articles.findByPk(idNum, {
             nest: true,
             include: [
