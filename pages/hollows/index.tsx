@@ -11,78 +11,6 @@ import { useSession } from 'next-auth/react';
 import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 
-const dummyHollows: Ihollow[] = [
-  {
-    id: 1,
-    name: '心情',
-    type: 'public',
-    userId: 1,
-    articleCounts: 10,
-    isSub: true,
-    subCounts: 100,
-    createdAt: '20230105'
-  },
-  {
-    id: 2,
-    name: '八點檔',
-    type: 'public',
-    userId: 1,
-    articleCounts: 5,
-    isSub: false,
-    subCounts: 500,
-    createdAt: '20230105'
-  },
-  {
-    id: 3,
-    name: '股票',
-    type: 'public',
-    userId: 1,
-    articleCounts: 5,
-    isSub: false,
-    subCounts: 35,
-    createdAt: '20230105'
-  },
-  {
-    id: 4,
-    name: '寵物',
-    type: 'public',
-    userId: 1,
-    articleCounts: 16,
-    isSub: false,
-    subCounts: 600,
-    createdAt: '20230105'
-  },
-  {
-    id: 5,
-    name: '遊戲',
-    type: 'public',
-    userId: 1,
-    articleCounts: 8,
-    isSub: true,
-    subCounts: 1000,
-    createdAt: '20230105'
-  },
-  {
-    id: 6,
-    name: '仙境傳說',
-    type: 'public',
-    userId: 1,
-    articleCounts: 8,
-    isSub: true,
-    subCounts: 250,
-    createdAt: '20230105'
-  },
-  {
-    id: 7,
-    name: '寶可夢',
-    type: 'public',
-    userId: 1,
-    articleCounts: 30,
-    isSub: true,
-    subCounts: 800,
-    createdAt: '20230105'
-  },
-]
 //樹洞可以選擇顯示簡單版或複雜版
 //複雜版有顯示熱門文章
 
@@ -147,7 +75,7 @@ export default function HollowList () {
          if (getHollowRecordIsMutating('sub') || getHollowRecordIsMutating('deleteSub')) return
 
         const payload: subPayload = { user_id: currentUserId, hollow_id: hollowId }
-        if (isSub) {
+       if (isSub) {
             hollowRecordTrigger('deleteSub', payload)
         }
         else {

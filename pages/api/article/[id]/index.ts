@@ -51,7 +51,7 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResul
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
@@ -74,7 +74,7 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResul
 async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
