@@ -29,7 +29,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 async function getArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
-    try {
+    
         const article: Iarticle = await Articles.findByPk(idNum, {
             nest: true,
             include: [
@@ -41,6 +41,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successResu
         })
         if (!article) return res.status(500).json({ error: '找不到文章' } )
         res.status(200).json({ success: '查詢成功', payload: article })
+    try {
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' } )
     }
