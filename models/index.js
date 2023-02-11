@@ -2,6 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
+
+const getConfig = require('next/config')
+const { serverRuntimeConfig } = getConfig()
+fs.readFile(path.join(serverRuntimeConfig.PROJECT_ROOT, './path/to/file.json'))
+
 const Sequelize = require('sequelize');
 const Model = require('sequelize');
 
