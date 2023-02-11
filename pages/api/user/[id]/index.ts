@@ -27,8 +27,8 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successResult
     const idNum = Number(id)
     const { name, account, email, password, role } = req.body
 
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
 

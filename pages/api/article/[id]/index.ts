@@ -10,11 +10,6 @@ const { Users, Articles, Comments, Hollows, Collections, Likeships } = DB;
 
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
-    console.log('變數')
-    console.log(process.env.NEXTAUTH_URL)
-    console.log(process.env.NEXT_PUBLIC_BASEURL)
-    console.log(process.env.MYSQL_DATABASE)
-    console.log(process.env.MYSQL_HOST)
     switch (req.method) {
         case 'GET':
             getArticle(req, res)
@@ -34,11 +29,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 async function getArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     const { id } = req.query
     const idNum = Number(id)
-    console.log('變數')
-    console.log(process.env.NEXTAUTH_URL)
-    console.log(process.env.NEXT_PUBLIC_BASEURL)
-    console.log(process.env.MYSQL_DATABASE)
-    console.log(process.env.MYSQL_HOST)
+    try {
         const article: Iarticle = await Articles.findByPk(idNum, {
             nest: true,
             include: [
@@ -50,7 +41,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successResu
         })
         if (!article) return res.status(500).json({ error: '找不到文章' } )
         res.status(200).json({ success: '查詢成功', payload: article })
-    try {
+    
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' } )
     }
@@ -61,8 +52,8 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResul
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
 
@@ -84,8 +75,8 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResul
 async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { id } = req.query
     const idNum = Number(id)
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
-        host: 'localhost',
+    const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
+        host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
     try {
