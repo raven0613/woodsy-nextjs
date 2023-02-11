@@ -10,6 +10,11 @@ const { Users, Articles, Comments, Hollows, Collections, Likeships } = DB;
 
 
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+    console.log('變數')
+    console.log(process.env.NEXTAUTH_URL)
+    console.log(process.env.NEXT_PUBLIC_BASEURL)
+    console.log(process.env.MYSQL_DATABASE)
+    console.log(process.env.MYSQL_HOST)
     switch (req.method) {
         case 'GET':
             getArticle(req, res)
@@ -31,6 +36,7 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successResu
     const idNum = Number(id)
     console.log('變數')
     console.log(process.env.NEXTAUTH_URL)
+    console.log(process.env.NEXT_PUBLIC_BASEURL)
     console.log(process.env.MYSQL_DATABASE)
     console.log(process.env.MYSQL_HOST)
         const article: Iarticle = await Articles.findByPk(idNum, {

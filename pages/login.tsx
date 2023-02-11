@@ -11,6 +11,11 @@ import { getCsrfToken } from "next-auth/react"
 import { useSession, signIn } from "next-auth/react"
 
 export default function Login () {
+    console.log('變數')
+    console.log(process.env.NEXTAUTH_URL)
+    console.log(process.env.NEXT_PUBLIC_BASEURL)
+    console.log(process.env.MYSQL_DATABASE)
+    console.log(process.env.MYSQL_HOST)
     const router = useRouter()
     // status: "loading" | "authenticated" | "unauthenticated"
     const { data: session, status } = useSession({
