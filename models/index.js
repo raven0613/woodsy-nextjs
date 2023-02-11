@@ -12,7 +12,7 @@ const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
 
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
 // const Articles = require('./article');

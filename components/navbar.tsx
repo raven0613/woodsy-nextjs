@@ -11,7 +11,7 @@ export default function Navbar () {
         },
     })
     function handleLogout () {
-        signOut({ callbackUrl: 'http://localhost:3000/login' })
+        signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_BASEURL}/login` })
     }
     return (
         <div className='fixed inset-x-0 top-0 bg-slate-100 h-16 pl-6 flex justify-between items-center z-20'>
