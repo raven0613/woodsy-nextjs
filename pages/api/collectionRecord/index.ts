@@ -22,7 +22,7 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
 
 async function addCollection (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, article_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();
@@ -56,7 +56,7 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorRes
 
 async function deleteCollection (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     const { user_id, article_id } = req.body
-    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+    const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
         host: 'localhost',
         dialect: 'mysql'
     }).transaction();

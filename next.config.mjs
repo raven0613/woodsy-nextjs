@@ -16,7 +16,10 @@ const nextConfig = {
       },
     ]
   },
-  reactStrictMode: true
+  reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_BASEURL: process.env['http://localhost:3000/'],
+  }
 }
 
 export const bundleAnalyzer = withBundleAnalyzer({

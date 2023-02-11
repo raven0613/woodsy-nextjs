@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWRMutation from 'swr/mutation'
-import { Ihollow, Iarticle, Iuser, userArg, ILoginuser, successMessage } from '../type-config'
+import { Ihollow, Iarticle, Iuser, userArg, ILoginuser, successResult } from '../type-config'
 import { userRegister } from '../api_helpers/apis/user'
 import LoginPanel from '../components/loginPanel';
 import RegisterPanel from '../components/registerPanel';
@@ -22,7 +22,7 @@ export default function Register () {
         router.push('/home')
     } 
     // 新增一筆 user
-    const { trigger: addUserTrigger, isMutating: addUserIsMutating, data: addedUserData, error: addedUserError } = useSWRMutation<successMessage, Error>(`register`, fetchAddUser);
+    const { trigger: addUserTrigger, isMutating: addUserIsMutating, data: addedUserData, error: addedUserError } = useSWRMutation<successResult, Error>(`register`, fetchAddUser);
 
     function handleAddUser (user: Iuser) {
         if (!user.password) return

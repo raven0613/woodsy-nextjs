@@ -11,7 +11,7 @@ const saltRounds = 10;
 
 export default async function register(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   const userData = req.body
-  const t = await new Sequelize('woodsy_nextjs', 'root', process.env.SEQUELIZE_PASSWORD, {
+  const t = await new Sequelize('woodsy_nextjs', 'root', process.env.MYSQL_PASSWORD, {
       host: 'localhost',
       dialect: 'mysql'
   }).transaction();

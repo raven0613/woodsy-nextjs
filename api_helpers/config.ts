@@ -12,7 +12,7 @@ declare module 'axios' {
     }
 }
 
-const baseURL: string = 'http://localhost:3000/api/'
+const baseURL: string = `${process.env.NEXT_PUBLIC_BASEURL}/api/` || 'http://localhost:3000/api/'
 
 export const apiHelper = axios.create({
     baseURL,
