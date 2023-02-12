@@ -9,19 +9,16 @@ const Model = require('sequelize');
 const process = require('process');
 
 // const basename = path.basename(__filename);
-const modelPath = path.resolve(__dirname, '../chunks')
+
+const modelPath = process.cwd() + '/models/';
 console.log('modelPath', modelPath);
-// const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
-// const Articles = require('./article');
-// const Users = require('./user');
-// const Comments = require('./comment');
-// const Hollows = require('./hollow');
+
 
 let sequelize;
 if (config.use_env_variable) {
@@ -30,23 +27,41 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-fs
-  // .readdirSync(__dirname)
-  .readdirSync(modelPath)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 &&
-      file !== basename &&
-      file.slice(-3) === '.js' &&
-      file.indexOf('.test.js') === -1
-    );
-  })
-  .forEach(file => {
-    // const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    const model = require(__dirname + '/../chunks/' + file)(sequelize, Sequelize.DataTypes);
+const Articles = require('./article')(sequelize, Sequelize.DataTypes)
+const Users = require('./user')(sequelize, Sequelize.DataTypes)
+const Hollows = require('./hollow')(sequelize, Sequelize.DataTypes)
+const Comments = require('./comment')(sequelize, Sequelize.DataTypes)
+const Collections = require('./collection')(sequelize, Sequelize.DataTypes)
+const Likeships = require('./likeship')(sequelize, Sequelize.DataTypes)
+const Reports = require('./report')(sequelize, Sequelize.DataTypes)
+const Subscriptions = require('./subscription')(sequelize, Sequelize.DataTypes)
 
-    db[model.name] = model;
-  });
+db.Articles = Articles
+db.Users = Users
+db.Comments = Comments
+db.Hollows = Hollows
+db.Collections = Collections
+db.Likeships = Likeships
+db.Reports = Reports
+db.Subscriptions = Subscriptions
+
+// fs
+//   // .readdirSync(__dirname)
+//   .readdirSync(modelPath)
+//   .filter(file => {
+//     return (
+//       file.indexOf('.') !== 0 &&
+//       file !== basename &&
+//       file.slice(-3) === '.js' &&
+//       file.indexOf('.test.js') === -1
+//     );
+//   })
+//   .forEach(file => {
+//     // const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+//     const model = require(__dirname + '/../models/' + file)(sequelize, Sequelize.DataTypes);
+
+//     db[model.name] = model;
+//   });
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
@@ -57,12 +72,7 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-// db.Articles = Articles(sequelize, Sequelize);
-// db.Users = Users(sequelize, Sequelize);
-// db.Comments = Comments(sequelize, Sequelize);
-// db.Hollows = Hollows(sequelize, Sequelize);
-
-// console.log('db '+ JSON.parse(JSON.stringify(db)))m
+// console.log('db '+ JSON.parse(JSON.stringify(db)))
 
 
 module.exports = db;
