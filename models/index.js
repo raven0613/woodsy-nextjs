@@ -9,7 +9,8 @@ const Model = require('sequelize');
 const process = require('process');
 
 // const basename = path.basename(__filename);
-const modelPath = process.cwd() + './models/';
+const modelPath = path.resolve(__dirname, '../chunks')
+console.log('modelPath', modelPath);
 // const modelPath = process.cwd() + '/models/';
 const basename = path.basename(__dirname + '/../models/index.js');
 
