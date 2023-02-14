@@ -102,27 +102,27 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
                     value={name} 
                     onChange={handleSetName} 
                     placeholder='請輸入名稱' type="text" />
-                    {!nameWarning && <p className='px-2 py-1 text-gray-400'></p>}
+                    {!nameWarning && <p className='px-2 py-0.5 h-8 text-gray-400'></p>}
                     {nameWarning && <p className={inputStyle.form_input_warningMsg}>{nameWarning}</p>}
 
                     <input className={emailWarning? inputStyle.form_input_warning : inputStyle.form_input} 
                     onChange={handleSetEmail} 
                     value={email} placeholder='請輸入 e-mail' type="text" />
-                    {!emailWarning && <p className='px-2 py-1 text-gray-400'>請填寫格式為 user@example.com</p>}
+                    {!emailWarning && <p className='px-2 py-0.5 h-8 text-gray-400'>請填寫格式為 user@example.com</p>}
                     {emailWarning && <p className={inputStyle.form_input_warningMsg}>{emailWarning}</p>}
 
                     <input className={passwordWarning? inputStyle.form_input_warning : inputStyle.form_input} 
                     value={password} 
                     onChange={handleSetPassword} 
                     placeholder='請輸入密碼' type="password" />
-                    {!passwordWarning && <p className='px-2 py-1 text-gray-400'>需為8位以上的英文 + 數字組合</p>}
+                    {!passwordWarning && <p className='px-2 py-0.5 h-8 text-gray-400'>需為8位以上的英文 + 數字組合</p>}
                     {passwordWarning && <p className={inputStyle.form_input_warningMsg}>{passwordWarning}</p>}
 
                     <input className={checkPasswordWarning? inputStyle.form_input_warning : inputStyle.form_input} 
                     value={passwordForCheck} 
                     onChange={handleSetPasswordForCheck} 
                     placeholder='請再次輸入密碼' type="password" />
-                    {!checkPasswordWarning && <p className='px-2 py-1 text-gray-400'></p>}
+                    {!checkPasswordWarning && <p className='px-2 py-0.5 h-8 text-gray-400'></p>}
                     {checkPasswordWarning && <p className={inputStyle.form_input_warningMsg}>{checkPasswordWarning}</p>}
                     
                     {isFetching && <button className='m-auto w-40 h-10 border rounded-lg' disabled onClick={handleSubmitRegister}>送出</button>}

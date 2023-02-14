@@ -5,5 +5,5 @@
   @apply h-12 border border-red-300 w-full outline-0 px-4 py-1 rounded-md;
 }
 .form_input_warningMsg {
-  @apply px-2 py-1 text-red-400;
+  @apply h-8 px-2 py-0.5 text-red-400;
 }
