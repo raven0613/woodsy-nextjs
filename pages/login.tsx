@@ -32,7 +32,7 @@ export default function Login () {
 export async function handleLogin (user: ILoginuser) {
     await signIn('credentials', {
         redirect: false,
-        account: user.account,
+        email: user.email,
         password: user.password,
     })
 }

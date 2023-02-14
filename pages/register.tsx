@@ -36,7 +36,7 @@ export default function Register () {
         if (isFetching) return
         const IuserData = addedUserData.payload as Iuser;
         const user: ILoginuser = {
-            account: IuserData.account,
+            email: IuserData.email,
             password
         }
         handleLogin(user)

@@ -29,7 +29,7 @@ export default function handleArticles(req: NextApiRequest, res: NextApiResponse
 export async function getArticles(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   const { page: p, limit: l } = req.query;
   const page = Number(p), limit = Number(l)
-  console.log('req.query',req.query)
+
   try {
     const articles = await Articles.findAndCountAll({
       include: [
