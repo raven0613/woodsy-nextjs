@@ -26,7 +26,7 @@ export default function Article () {
     const { data: session, status } = useSession()
 
     const currentUser: Iuser = session? { ...session.user } : {
-        name: '', email: '', account: '', role: ''
+        name: '', email: '', role: ''
     }
     const currentUserId = currentUser.id
     

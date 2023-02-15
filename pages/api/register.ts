@@ -32,6 +32,7 @@ export default async function register(req: NextApiRequest, res: NextApiResponse
     await t.commit();
     if (!user) return res.status(500).json({ error: '新增使用者失敗' })
     res.status(200).json({ success: '註冊成功', payload: user })
+    
   } catch (err) {
       await t.rollback();
       return res.status(500).json({ error: '伺服器錯誤' })

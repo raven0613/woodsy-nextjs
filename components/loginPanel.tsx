@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { FC, PropsWithChildren } from 'react';
-import { flushSync } from 'react-dom';
 import { ILoginuser } from '../type-config'
 import inputStyle from '../styles/LoginPanel.module.css';
+import { emailCheck, passWordCheck } from '../helpers/helpers'
 
 interface IuserProps {
   handleLogin: (user: ILoginuser) => void
@@ -11,49 +11,80 @@ interface IuserProps {
 
 export default function LoginPanel ({ handleLogin }: IuserProps) {
     const router = useRouter()
-    const [account, setAccount] = useState<string>('')
+    const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [isFetching, setIsFetching] = useState<boolean>(false)
+    
+    const [emailWarning, setEmailWarning] = useState<string>('')
+    const [passwordWarning, setPasswordWarning] = useState<string>('')
 
-
-    function handleSetValue (e: React.FormEvent<HTMLInputElement>, setter: (value: string) => void) {
+    function handleSetEmail (e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value
-        setter(value)
+        setEmail(value)
+        setEmailWarning('')
+        canSubmit = true
+    }
+
+    function handleSetPassword (e: React.FormEvent<HTMLInputElement>) {
+        const value = e.currentTarget.value
+        setPassword(value)
+        setPasswordWarning('')
+        canSubmit = true
     }
 
     function handleSubmitLogin (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
-        if (!account || !password) return console.log('請輸入帳號密碼')
+
+        emailCheck(email, setEmailWarning, setCantSubmit)
+        passWordCheck(password, setPasswordWarning, setCantSubmit)
+
+        if (!email) {
+            setEmailWarning('請輸入 e-mail')
+            canSubmit = false
+        }
+        if (!password) {
+            setPasswordWarning('請輸入密碼')
+            canSubmit = false
+        }
+        if (!canSubmit) return
+
         setIsFetching(true)
         handleLogin({
-            account, password
+            email, password
         })
-        setAccount('')
+        setEmail('')
         setPassword('')
+        setEmailWarning('')
+        setPasswordWarning('')
     }
+
     function handleChangeToRegister (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
         router.push('/register')
     }
+
     return (
         <>
             <div className='fixed right-2/4 bottom-2/4 translate-x-1/2 translate-y-1/2 w-8/12 border max-w-2xl rounded-xl shadow-md'>
 
 
-                <form action="" className='flex flex-col w-8/12 m-auto'>
+                <form action="" className='flex flex-col w-6/12 m-auto'>
                     <h1 className='font-sans text-neutral-600 text-3xl font-bold leading-loose py-4'>歡迎回到 Woodsy</h1>
 
-                    <input className={inputStyle.form_input} 
-                    onChange={e => {handleSetValue(e, setAccount)}} 
-                    value={account} placeholder='請輸入帳號' type="text" />
+                    <input className={emailWarning? inputStyle.form_input_warning : inputStyle.form_input} 
+                    onChange={handleSetEmail} 
+                    value={email} placeholder='請輸入 e-mail' type="text" />
+                    {!emailWarning && <p className='px-2 py-0.5 h-8 text-gray-400'>請填寫格式為 user@example.com</p>}
+                    {emailWarning && <p className={inputStyle.form_input_warningMsg}>{emailWarning}</p>}
 
-                    <input className={inputStyle.form_input} 
+                    <input className={passwordWarning? inputStyle.form_input_warning : inputStyle.form_input} 
                     value={password} 
-                    onChange={e => {handleSetValue(e, setPassword)}} 
+                    onChange={handleSetPassword} 
                     placeholder='請輸入密碼' type="password" />
-
+                    {!passwordWarning && <p className='px-2 py-0.5 h-8 text-gray-400'>需為8位以上的英文 + 數字組合</p>}
+                    {passwordWarning && <p className={inputStyle.form_input_warningMsg}>{passwordWarning}</p>}
 
                     {isFetching && <button className='m-auto w-40 h-10 border rounded-lg' disabled onClick={handleSubmitLogin}>登入</button>}
 
@@ -69,3 +100,10 @@ export default function LoginPanel ({ handleLogin }: IuserProps) {
         </>
     )
 }
+
+let canSubmit = true
+
+function setCantSubmit () {
+    canSubmit = false
+}
+

@@ -56,12 +56,12 @@ db.Subscriptions = Subscriptions
 //       file.indexOf('.test.js') === -1
 //     );
 //   })
-//   .forEach(file => {
-//     // const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-//     const model = require(__dirname + '/../models/' + file)(sequelize, Sequelize.DataTypes);
+  // .forEach(file => {
+  //   // const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+  //   const model = require(__dirname + '/../models/' + file)(sequelize, Sequelize.DataTypes);
 
-//     db[model.name] = model;
-//   });
+  //   db[model.name] = model;
+  // });
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

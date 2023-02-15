@@ -1,6 +1,7 @@
 import NextAuth, { DefaultSession } from "next-auth"
 import { type } from "os"
 import { ReactNode } from "react"
+import { Articles } from "./models"
 
 
 export interface Iuser {
@@ -8,7 +9,7 @@ export interface Iuser {
     name: string
     email: string
     password?: string
-    account: string
+    account?: string
     articleCounts?: number
     subHollows?: number
     createdAt?: string
@@ -16,7 +17,7 @@ export interface Iuser {
     role: string
 }; 
 export interface ILoginuser{
-    account: string
+    email: string
     password: string
 }; 
 
@@ -185,7 +186,6 @@ declare module "next-auth" {
       /** The user's postal address. */
       id: number
       name: string
-      account: string
       email: string
       role: string
     } & DefaultSession["user"]

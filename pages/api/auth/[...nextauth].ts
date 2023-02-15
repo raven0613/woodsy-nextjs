@@ -20,7 +20,7 @@ export default NextAuth({
             id: 'credentials',
             name: 'emailAndPassword',
             credentials: {
-                account: {
+                email: {
                     label: 'account',
                     type: 'account',
                     placeholder: 'jsmith',
@@ -29,7 +29,7 @@ export default NextAuth({
             },
             async authorize(credentials, req) {  //確認授權的邏輯
                 const payload: ILoginuser = {
-                    account: credentials?.account || '',
+                    email: credentials?.email || '',
                     password: credentials?.password || '',
                 }
                 const res = await userLogin('/auth/signin', payload)
@@ -60,8 +60,8 @@ export default NextAuth({
         },
         async session({ session, token }) {
             const userJSON = JSON.parse(JSON.stringify(token.payload))
-            const { id, name, account, email, role } = userJSON
-            session.user = { id, name, account, email, role }
+            const { id, name, email, role } = userJSON
+            session.user = { id, name, email, role }
             session.accessToken = token.accessToken
 
             return session

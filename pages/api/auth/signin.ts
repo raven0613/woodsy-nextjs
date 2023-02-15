@@ -10,11 +10,10 @@ const { Users } = DB;
 
 export default async function signin(req: NextApiRequest, res: NextApiResponse<successResult | errorResult> ) {
   const userData = req.body
-
   try {
     let existUser = await Users.findOne({
       where: {
-        account: userData.account
+        email: userData.email
       },
       raw: true,
       nest: true
@@ -25,7 +24,7 @@ export default async function signin(req: NextApiRequest, res: NextApiResponse<s
     if (!isCorrect) return res.status(403).json({ error: '請確認您的登入資訊' })
 
     const user = await Users.findOne({
-      where: { account: userData.account }
+      where: { email: userData.email }
     })
     if (!user) return res.status(403).json({ error: '登入失敗' })
 
