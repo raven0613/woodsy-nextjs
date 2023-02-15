@@ -9,7 +9,7 @@ export interface Iuser {
     name: string
     email: string
     password?: string
-    account: string
+    account?: string
     articleCounts?: number
     subHollows?: number
     createdAt?: string
