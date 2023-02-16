@@ -4,8 +4,6 @@ import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../t
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows } = DB;
-import bcrypt from 'bcrypt';
-const saltRounds = 10;
 
 
 export default function handleUsers(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {

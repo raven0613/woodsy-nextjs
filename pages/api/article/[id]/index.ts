@@ -7,8 +7,6 @@ import db from '../../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Collections, Likeships } = DB;
 
-
-
 export default function handleArticles(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'GET':

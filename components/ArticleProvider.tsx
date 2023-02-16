@@ -84,7 +84,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   }
 
   // context value 區
-  const articlecontextValue: IArticleContext = {
+  const articleContextValue: IArticleContext = {
     currentArticleId,
     currentCommentId,
     handleIdChange,
@@ -99,7 +99,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   return (
     <>
       <UIContext.Provider value={UIcontextValue}>
-        <articleContext.Provider value={articlecontextValue}>
+        <articleContext.Provider value={articleContextValue}>
 
           <main>{children}</main>
           {isConfirmOpen && <ConfirmWindow 

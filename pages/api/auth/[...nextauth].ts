@@ -1,17 +1,17 @@
 import type { Adapter, AdapterUser } from "next-auth/adapters"
 import { JWT, getToken } from "next-auth/jwt"
 
-
 import NextAuth, { Session, User, DefaultSession  } from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import EmailProvider from "next-auth/providers/email"
 import CredentialsProvider from "next-auth/providers/credentials"
 
-
 import { userRegister, userLogin } from '../../../api_helpers/apis/user'
 import { ILoginuser } from "../../../type-config"
 
-export default NextAuth({
+import type { NextAuthOptions } from 'next-auth'
+
+export const authOptions: NextAuthOptions = ({
     session: {
         strategy: "jwt",
     },
@@ -60,14 +60,13 @@ export default NextAuth({
         },
         async session({ session, token }) {
             const userJSON = JSON.parse(JSON.stringify(token.payload))
-            const { id, name, email, role } = userJSON
-            session.user = { id, name, email, role }
+            const { id, name, email, role, createdAt } = userJSON
+            session.user = { id, name, email, role, createdAt }
             session.accessToken = token.accessToken
-
             return session
         }
     },
     debug: true
 })
 
-
+export default NextAuth(authOptions)

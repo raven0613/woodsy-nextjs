@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext, useRef } from 'react'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
@@ -13,12 +13,12 @@ import { getHollows } from '../api_helpers/apis/hollow'
 import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection, subPayload } from '../type-config';
-import { getCsrfToken, getSession, useSession } from 'next-auth/react';
+import { getCsrfToken } from 'next-auth/react';
 import { CtxOrReq } from 'next-auth/client/_utils';
 import { formattedArticles, formattedHollows } from '../helpers/helpers'
 
 import { articleContext, UIContext } from '../components/ArticleProvider'
-import { useContext, useRef } from 'react'
+import { userContext } from '../components/UserProvider'
 
 import useArticleRecord from '../components/hooks/useArticleRecord'
 import useHollowRecord from '../components/hooks/useHollowRecord';
@@ -28,14 +28,11 @@ const inter = Inter({ subsets: ['latin'] })
 const arg = { page: 1, limit: 10 }
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
+    const { currentUser } = useContext(userContext)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
-    const { data: session, status } = useSession()
-    const currentUser: Iuser = session? { ...session.user } : {
-        id: 0, name: '', email: '', account: '', role: ''
-    }
-    const currentUserId = currentUser.id
+    const currentUserId = currentUser?.id
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     const [newArticle, setNewArticle] = useState<Iarticle>()
     const [articles, setArticles] = useState<Iarticle[]>([])
@@ -193,69 +190,69 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         handleEditWindow(article)
     }
     return (
-    <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
-        <div className='hidden sm:block mt-20 mx-2 w-full'>
-            {csrfToken && <ArticleInput 
-            hollows={hollows} 
-            currentUser={currentUser} 
-            handleAddArt={handleAddArt}/>}
+        <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
+            <div className='hidden sm:block mt-20 mx-2 w-full'>
+                {currentUser && csrfToken && <ArticleInput 
+                hollows={hollows} 
+                currentUser={currentUser} 
+                handleAddArt={handleAddArt}/>}
 
-            <HollowCreatePanel 
-            currentUser={currentUser} 
-            hollows={hollows} 
-            handleAddHollow={handleAddHollow}/>
-        </div>
-
-        <div className='pt-6 mx-2 w-full'>
-            <div className='flex justify-between'>
-                <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
-                <Link href={`/hollows`}>
-                    <span>查看所有樹洞</span>
-                </Link>
+                {currentUser && csrfToken && <HollowCreatePanel 
+                currentUser={currentUser} 
+                hollows={hollows} 
+                handleAddHollow={handleAddHollow}/>}
             </div>
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                {hollows && hollows.map(hollow => {
+
+            <div className='pt-6 mx-2 w-full'>
+                <div className='flex justify-between'>
+                    <h1 className='text-slate-300 text-xl font-semibold'>大家關心的樹洞</h1>
+                    <Link href={`/hollows`}>
+                        <span>查看所有樹洞</span>
+                    </Link>
+                </div>
+                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                    {hollows && hollows.map(hollow => {
+                        return (
+                            <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
+                                <HollowCard hollow={hollow} handleSub={handleSub} />
+                            </Link>
+                        )
+                    })}
+                </div>
+            </div>  
+            
+            <div className='pt-6 mx-2 w-full'>
+                <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
+                <div className='flex-col justify-center w-full'>
+                    {newArticle && <ArticleCardController 
+                        article={newArticle} key={newArticle.id} 
+                        handleCollect={handleCollect}
+                        handleLike={handleLike}
+                        handleClickMore={handleClickMore}
+                        handleCloseMore={handleCloseMore}
+                        handleClickDelete={handleClickDelete}
+                        moreShowingId={moreShowingId} 
+                        currentUser={currentUser}
+                        handleEdit={handleEdit}
+                        isDetail={false} />}
+
+                    {articles && articles.map(art => {
                     return (
-                        <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-                            <HollowCard hollow={hollow} handleSub={handleSub} />
-                        </Link>
+                        <ArticleCardController article={art} key={art.id} 
+                        handleCollect={handleCollect}
+                        handleLike={handleLike}
+                        handleClickMore={handleClickMore}
+                        handleCloseMore={handleCloseMore}
+                        handleClickDelete={handleClickDelete}
+                        moreShowingId={moreShowingId} 
+                        currentUser={currentUser}
+                        handleEdit={handleEdit}
+                        isDetail={false} />
                     )
-                })}
+                    })}
+                </div>
             </div>
-        </div>  
-        
-        <div className='pt-6 mx-2 w-full'>
-            <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
-            <div className='flex-col justify-center w-full'>
-                {newArticle && <ArticleCardController 
-                    article={newArticle} key={newArticle.id} 
-                    handleCollect={handleCollect}
-                    handleLike={handleLike}
-                    handleClickMore={handleClickMore}
-                    handleCloseMore={handleCloseMore}
-                    handleClickDelete={handleClickDelete}
-                    moreShowingId={moreShowingId} 
-                    currentUser={currentUser}
-                    handleEdit={handleEdit}
-                    isDetail={false} />}
-
-                {articles && articles.map(art => {
-                return (
-                    <ArticleCardController article={art} key={art.id} 
-                    handleCollect={handleCollect}
-                    handleLike={handleLike}
-                    handleClickMore={handleClickMore}
-                    handleCloseMore={handleCloseMore}
-                    handleClickDelete={handleClickDelete}
-                    moreShowingId={moreShowingId} 
-                    currentUser={currentUser}
-                    handleEdit={handleEdit}
-                    isDetail={false} />
-                )
-                })}
-            </div>
-        </div>
-    </main>
+        </main>
     )
 }
 

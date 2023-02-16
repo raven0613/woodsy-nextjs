@@ -9,7 +9,7 @@ interface hollowProps {
     currentHollow?: Ihollow
     hollows: Ihollow[]
     handleAddArt: (article: Iarticle) => void
-    currentUser: Iuser
+    currentUser?: Iuser
 }
 
 
@@ -58,7 +58,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
         e.preventDefault()
         e.stopPropagation()
         if (!article.hollow_id) return console.log('請選擇樹洞')
-        if (!currentUser.id) return
+        if (!currentUser?.id) return
         handleAddArt({ ...article, user_id: currentUser.id})
         setInputVal('')
         setTextVal('')
@@ -69,7 +69,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
     return (
         <main className='w-full border rounded-lg relative'>
             
-            {!currentUser.id && <div className='z-0 absolute inset-0'>
+            {!currentUser?.id && <div className='z-0 absolute inset-0'>
                 <div className='z-0 absolute inset-5 bg-black opacity-50 flex items-center rounded-md'>
                     <p className='w-full text-center text-lg text-slate-300'>請先登入</p>
                 </div>

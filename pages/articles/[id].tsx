@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import useSWR, { Key, Fetcher } from 'swr'
 import useSWRMutation from 'swr/mutation'
 import Navbar from '../../components/navbar'
@@ -12,23 +12,18 @@ import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetc
 import { formattedArticles, formattedComments } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
-import { useSession } from 'next-auth/react'
 import useArticleRecord from '../../components/hooks/useArticleRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider'
-import { useContext, useRef } from 'react'
+import { userContext } from '../../components/UserProvider'
 
 const params: param = { page: 1, limit: 15 }
 
 export default function Article () {
+    const { currentUser, handleSetCurrentUser } = useContext(userContext)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
-    const { data: session, status } = useSession()
-
-    const currentUser: Iuser = session? { ...session.user } : {
-        name: '', email: '', role: ''
-    }
-    const currentUserId = currentUser.id
+    const currentUserId = currentUser?.id
     
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     

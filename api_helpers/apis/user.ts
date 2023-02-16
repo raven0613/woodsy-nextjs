@@ -1,9 +1,12 @@
 import { apiHelper } from '../config'
 import { Iarticle, Icomment, Iuser, ILoginuser, param, collectionPayload, likePayload, subPayload } from '../../type-config'
-import { AxiosResponse } from 'axios'
 
 export function getUsers (url: string, page: number, limit: number) {
     return apiHelper.get(url, { params: { page, limit } })
+}
+
+export function getCurrentUser (url: string) {
+    return apiHelper.get(url)
 }
 
 export function getUser (url: string, userId: string) {
@@ -11,7 +14,7 @@ export function getUser (url: string, userId: string) {
 }
 
 export function editUser (url: string, user: Iuser) {
-    return apiHelper.put(`${url}/${user.id}`, user)
+    return apiHelper.put(`${url}`, user)
 }
 
 export function blockUser (url: string, userId: string) {
@@ -51,6 +54,11 @@ export function deleteUserSub (url: string, payload: subPayload) {
     return apiHelper.delete(url, {data: payload})
 }
 
+//get
 export function getUserSubs (url: string, page: number, limit: number) {
+    return apiHelper.get(url, { params: { page, limit } })
+}
+
+export function getUserCollections (url: string, page: number, limit: number) {
     return apiHelper.get(url, { params: { page, limit } })
 }

@@ -18,7 +18,7 @@ type props = {
   handleCollect: (articleId: number, isCollected: boolean) => void
   handleLike: (articleId: number, commentId: number, isLiked: boolean) => void
   handleEdit: (article: Iarticle) => void
-  currentUser: Iuser
+  currentUser?: Iuser
   isDetail: boolean
 }
 

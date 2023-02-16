@@ -4,7 +4,7 @@ import { Iarticle, Icomment, Iuser } from '../../type-config'
 
 interface IcommentProps {
   handleAddComment: (article: Icomment) => void,
-  currentUser: Iuser
+  currentUser?: Iuser
   article: Iarticle
 }
 
@@ -13,10 +13,10 @@ export default function CommentInput ({ handleAddComment, currentUser, article }
     const [comment, setComment] = useState<Icomment>({
         id: 0,
         article_id: article.id || 0,
-        user_id: currentUser.id || 0,
+        user_id: currentUser?.id || 0,
         User: {
-            id: currentUser.id || 0,
-            name: currentUser.name || 'user'},
+            id: currentUser?.id || 0,
+            name: currentUser?.name || 'user'},
         content: '',
         likedCounts: 0,
         reportedCounts: 0,

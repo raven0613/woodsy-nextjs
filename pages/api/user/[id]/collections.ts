@@ -27,10 +27,13 @@ async function getUserCollections (req: NextApiRequest, res: NextApiResponse<err
     const page = Number(p), limit = Number(l), idNum = Number(id)
     if (!id || !p || !l) return res.status(500).json({ error: '請確認請求資料' })
     try {
-        const collections = await Collections.findAll({
-            where: { user_id: idNum },
+        const collections = await Articles.findAll({
             include: [
-                { model: Articles }],
+                { model: Users},
+                { model: Users, as: 'CollectedUsers', where: { id: idNum }},
+                { model: Users, as: 'LikedUsers'},
+                { model: Hollows},
+            ],
             limit,
             offset: getOffset(page, limit),
             nest: true

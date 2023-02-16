@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import useSWRMutation from 'swr/mutation'
 import { Ihollow, Iarticle, Iuser, userArg, ILoginuser, successResult } from '../type-config'
 import { userRegister } from '../api_helpers/apis/user'
@@ -7,8 +7,10 @@ import LoginPanel from '../components/loginPanel';
 import RegisterPanel from '../components/registerPanel';
 import { useSession, signIn } from "next-auth/react"
 import { handleLogin } from './login'
+import { userContext } from '../components/UserProvider'
 
 export default function Register () {
+    const { currentUser, handleSetCurrentUser } = useContext(userContext)
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const [password, setPassword] = useState<string>('')
 

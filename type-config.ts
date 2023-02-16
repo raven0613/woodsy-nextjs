@@ -12,7 +12,7 @@ export interface Iuser {
     account?: string
     articleCounts?: number
     subHollows?: number
-    createdAt?: string
+    createdAt?: Date
     updatedAt?: string
     role: string
 }; 
@@ -188,6 +188,7 @@ declare module "next-auth" {
       name: string
       email: string
       role: string
+      createdAt: Date
     } & DefaultSession["user"]
   }
 }
@@ -213,7 +214,6 @@ export interface IArticleContext {
     currentArticleId?: number
     currentCommentId?: number
     handleIdChange?: (id: string) => void
-//   handleArticleReFetch?: (trigger: () => void) => void
     refetchTrigger?: boolean 
     handleRefetchTrigger?: () => void
     
@@ -222,4 +222,9 @@ export interface IArticleContext {
 export interface IUIContext {
     handleConfirmWindow?: () => void
     handleEditWindow?: (article: Iarticle) => void
+}
+
+export interface IUserContext {
+    currentUser?: Iuser
+    handleSetCurrentUser?: (user: Iuser) => void
 }

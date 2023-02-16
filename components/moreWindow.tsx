@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Iarticle } from '../type-config'
-import { useSession, signOut } from "next-auth/react"
 import React from 'react'
 
 type props = {
