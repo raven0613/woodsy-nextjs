@@ -32,6 +32,7 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successResult
     const { id } = req.query
     const idNum = Number(id)
     const { name, email, password, role } = req.body
+    console.log(req.body)
 
     if (idNum !== session.user.id && session.user.role !== 'admin') return res.status(401).json({ error: '使用者身分不符' })
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {

@@ -69,8 +69,6 @@ interface hollow {
     name: string
 }
 
-
-
 export interface Icomment {
     id?: number
     article_id: number

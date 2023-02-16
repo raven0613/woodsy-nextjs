@@ -94,10 +94,11 @@ export default function User() {
     useEffect(() => {
         if (!refetchTrigger) return
         collectionsTrigger(arg)
+        userArtsTrigger(arg)
         return () => {
             handleRefetchTrigger && handleRefetchTrigger()
         }
-    }, [refetchTrigger, collectionsTrigger, handleRefetchTrigger])
+    }, [refetchTrigger, collectionsTrigger, userArtsTrigger, handleRefetchTrigger])
 
 
     function handleClickMore (artId: string) {
@@ -146,7 +147,6 @@ export default function User() {
     }
     function handleEditUser (user: Iuser) {
         if (!user) return
-        console.log(user)
         userEditTrigger(user)
     }
 

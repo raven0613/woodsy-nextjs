@@ -27,7 +27,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   //刪除文章
   const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle, {onSuccess: (data: successResult) => { 
     const path = location.pathname;
-    if (!path.includes('home') && !path.includes('hollows')) return router.push('/home')
+    if (!path.includes('home') && !path.includes('hollows') && !path.includes('users')) return router.push('/home')
     setRefetchTrigger(true)
   }});
   // 編輯文章
