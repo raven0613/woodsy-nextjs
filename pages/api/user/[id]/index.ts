@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../../auth/[...nextauth]'
+
 import { Sequelize } from 'sequelize';
 import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
@@ -23,10 +26,14 @@ export default function handleUser(req: NextApiRequest, res: NextApiResponse<suc
 }
 
 async function editUser (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { id } = req.query
     const idNum = Number(id)
     const { name, email, password, role } = req.body
 
+    if (idNum !== session.user.id && session.user.role !== 'admin') return res.status(401).json({ error: '使用者身分不符' })
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'

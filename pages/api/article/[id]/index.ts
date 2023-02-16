@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../../auth/[...nextauth]'
+
 import { Sequelize, Model, DataTypes, CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize';
 import {Op} from "sequelize";
 import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
@@ -47,6 +50,9 @@ async function getArticle (req: NextApiRequest, res: NextApiResponse<successResu
 }
 
 async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { id } = req.query
     const idNum = Number(id)
     const { title, content, hollow_id } = req.body
@@ -71,13 +77,21 @@ async function editArticle (req: NextApiRequest, res: NextApiResponse<errorResul
 }
 
 async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { id } = req.query
     const idNum = Number(id)
+
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
     try {
+        const article = await Articles.findByPk(idNum, { transaction: t })
+        if (!article) return res.status(500).json({ error: '此文章不存在' })
+        if (article.user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+
         const comments = await Comments.findAll({ where: { article_id: idNum } }, { transaction: t });
         const commentIds = comments.map((c: { id: number }) => c.id);
         
@@ -96,8 +110,7 @@ async function deleteArticle (req: NextApiRequest, res: NextApiResponse<errorRes
             where: { article_id: idNum }
         }, { transaction: t })
 
-        const article = await Articles.findByPk(idNum, { transaction: t })
-        if (!article) return res.status(500).json({ error: '此文章不存在' })
+
 
         const hollow = await Hollows.findByPk(article.hollow_id, { transaction: t })
         if (hollow) {

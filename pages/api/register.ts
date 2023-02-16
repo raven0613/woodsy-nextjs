@@ -21,8 +21,7 @@ export default async function register(req: NextApiRequest, res: NextApiResponse
 
     let existUser = await Users.findOne({
       where: {
-        email: userData.email,
-        account: userData.account
+        email: userData.email
       },
       raw: true,
       nest: true

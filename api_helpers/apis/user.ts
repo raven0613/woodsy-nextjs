@@ -62,3 +62,7 @@ export function getUserSubs (url: string, page: number, limit: number) {
 export function getUserCollections (url: string, page: number, limit: number) {
     return apiHelper.get(url, { params: { page, limit } })
 }
+
+export function getUserArticles (url: string, page: number, limit: number) {
+    return apiHelper.get(url, { params: { page, limit } })
+}

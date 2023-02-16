@@ -22,7 +22,7 @@ type props = {
   isDetail: boolean
 }
 
-export default function ArticleCardController ({ currentUser, article, moreShowingId, handleClickMore, handleClickDelete, handleCloseMore, handleCollect, handleLike, handleEdit, isDetail }: props) {
+export default function ArticleCardController ({ article, moreShowingId, handleClickMore, handleClickDelete, handleCloseMore, handleCollect, handleLike, handleEdit, isDetail }: props) {
     // console.log(article)
     const [isCardShowMore, setIsCardShowMore] = useState<boolean>(false)
     const id = article.id

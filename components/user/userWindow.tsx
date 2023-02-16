@@ -28,7 +28,7 @@ export default function UserWindow ({ id, handleCloseUser }: props) {
     return (
         <>
             <div className='w-28 border absolute top-20 right-5 rounded-2xl flex flex-col z-10 bg-white'>
-                <button className='py-2.5 rounded-b-2xl hover:bg-stone-100 ease-out duration-200' onClick={onClickUser}>個人資料</button>
+                <button className='py-2.5 rounded-t-2xl hover:bg-stone-100 ease-out duration-200' onClick={onClickUser}>個人資料</button>
                 <button className='py-2.5 rounded-b-2xl hover:bg-stone-100 ease-out duration-200' onClick={handleLogout}>登出</button>
             </div>
             <div className='fixed inset-0 z-0' onMouseDown={onClickClose}></div>

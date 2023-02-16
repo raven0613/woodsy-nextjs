@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, useRef } from 'react'
 import Link from 'next/link'
 import useSWRMutation from 'swr/mutation'
 import { getHollows } from '../../api_helpers/apis/hollow'
-import { fetchCurrentUser, fetchEditUser, fetchUserLike, fetchDeleteUserLike, fetchGetUserCollections, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../../api_helpers/fetchers'
+import { fetchCurrentUser, fetchEditUser, fetchGetUserArts, fetchUserLike, fetchDeleteUserLike, fetchGetUserCollections, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../../api_helpers/fetchers'
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection, subPayload } from '../../type-config';
 import UserPanel from '../../components/user/userPanel'
 import { formattedArticles, formattedHollows } from '../../helpers/helpers'
@@ -22,13 +22,14 @@ export default function User() {
 
     const currentUserId = currentUser?.id
     const [moreShowingId, setMoreShowingId] = useState<string>('')
+    const [userArticles, setUserArticles] = useState<Iarticle[]>([])
     const [collectedArticles, setCollectedArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
 
     // 抓取一包收藏文章
     const { trigger: collectionsTrigger, data: collectionsData, error: collectionsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/collections`, fetchGetUserCollections);
     // 抓取目前使用者的文章
-    const { trigger: userArtsTrigger, data: userArtsData, error: userArtsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/collections`, fetchGetUserCollections);
+    const { trigger: userArtsTrigger, data: userArtsData, error: userArtsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/articles`, fetchGetUserArts);
     // 抓取一包樹洞
     const { trigger: hotHollowTrigger, data: hotHollowData, error: hotHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
     // 抓取一篇文章
@@ -51,22 +52,32 @@ export default function User() {
     function onSuccessCallback (data: successResult) {
         collectionsTrigger(arg)
         hotHollowTrigger(arg)
+        userArtsTrigger(arg)
     }
 
     // 有 userId 才 fetch API
     useEffect(() => {
         if (!currentUserId) return
+        userArtsTrigger(arg)
         collectionsTrigger(arg)
-    }, [currentUserId, collectionsTrigger])
-
-    // 抓回來一整包的文章資料
+    }, [currentUserId, collectionsTrigger, userArtsTrigger])
+    // 抓回來一整包的使用者文章資料
+    useEffect(() => {
+        if (!currentUserId) return
+        if (!userArtsData) return
+        
+        const artRows = userArtsData?.payload as Iarticle[]
+        const arts = formattedArticles(currentUserId, artRows)
+        console.log(arts)
+        setUserArticles(arts)
+    }, [currentUserId, userArtsData])
+    // 抓回來一整包的使用者收藏文章資料
     useEffect(() => {
         if (!currentUserId) return
         if (!collectionsData) return
         
         const artRows = collectionsData?.payload as Iarticle[]
         const arts = formattedArticles(currentUserId, artRows)
-        console.log(arts)
         setCollectedArticles(arts)
     }, [currentUserId, collectionsData])
     // 抓回來一整包的樹洞資料
@@ -166,7 +177,7 @@ export default function User() {
             <div className='pt-6 mx-2 w-full'>
                 <h1 className='text-slate-300 text-xl font-semibold'>開啟的話題</h1>
                 <div className='flex-col justify-center w-full'>
-                    {collectedArticles && collectedArticles.map(art => {
+                    {userArticles && userArticles.map(art => {
                     return (
                         <ArticleCardController article={art} key={art.id} 
                         handleCollect={handleCollect}

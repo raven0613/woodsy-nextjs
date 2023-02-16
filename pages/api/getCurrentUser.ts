@@ -9,7 +9,7 @@ import { authOptions } from './auth/[...nextauth]'
 
 
 export default async function getCurrentUser(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
-
+    try {
         const session = await getServerSession(req, res, authOptions)
 
         if (!session) return res.status(401).json({ error: '請先登入' })
@@ -26,7 +26,7 @@ export default async function getCurrentUser(req: NextApiRequest, res: NextApiRe
         const userResult = { ...user, articleCounts: articleCounts? articleCounts : 0 }
 
         res.status(200).json({ success: '查詢成功', payload: userResult })
-    try {
+    
     } catch (err) {
         return res.status(500).json({ error: '伺服器錯誤' })
     }
