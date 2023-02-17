@@ -7,9 +7,10 @@ import HollowCreatePanel from "../../components/hollow/hollowCreatePanel"
 import HollowCard from '../../components/hollow/hollowCard'
 import { fetchGetUserSubs, fetchHotHollows, fetchAddHollow, fetchHollow, fetchHotArticles, fetchAddArt } from '../../api_helpers/fetchers'
 import { formattedArticles, formattedHollows } from '../../helpers/helpers'
-import { useSession } from 'next-auth/react';
+
 import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
+import { userContext } from '../../components/UserProvider'
 
 //樹洞可以選擇顯示簡單版或複雜版
 //複雜版有顯示熱門文章
@@ -17,7 +18,8 @@ import { articleContext, UIContext } from '../../components/ArticleProvider';
 const arg: param = { page: 1, limit: 15 }
 
 export default function HollowList () {
-    const { data: session, status } = useSession()
+    const { currentUser, handleSetCurrentUser } = useContext(userContext)
+
 
     const [hollows, setHollows] = useState<Ihollow[]>([])
     const [subHollows, setSubHollows] = useState<Ihollow[]>([])
@@ -25,10 +27,7 @@ export default function HollowList () {
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
-    const currentUser: Iuser = session? { ...session.user } : {
-        name: '', email: '', account: '', role: ''
-    }
-    const currentUserId = currentUser.id || 0
+    const currentUserId = currentUser?.id || 0
     // 關注的 fetch hook
     const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 

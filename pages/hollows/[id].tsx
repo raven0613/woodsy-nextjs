@@ -13,10 +13,12 @@ import { useSession } from 'next-auth/react';
 import useArticleRecord from '../../components/hooks/useArticleRecord'
 import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
+import { userContext } from '../../components/UserProvider'
 
 const arg: param = { page: 1, limit: 15 }
 
 export default function Hollow () {
+    const { currentUser, handleSetCurrentUser } = useContext(userContext)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
@@ -28,10 +30,7 @@ export default function Hollow () {
 
     const { data: session, status } = useSession()
 
-    const currentUser: Iuser = session? { ...session.user } : {
-        name: '', email: '', account: '', role: ''
-    }
-    const currentUserId = currentUser.id
+    const currentUserId = currentUser?.id
 
     const router = useRouter()
     const { id } = router.query || ''

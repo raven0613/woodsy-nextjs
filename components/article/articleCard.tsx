@@ -20,7 +20,8 @@ type props = {
 
 export default function ArticleCard ({ article, handleClickDelete, handleCloseMore, isCardShowMore, handleClickEdit, handleClickMoreBtn, handleClickLike, handleClickCollect }: props) {
     const id = article.id
-
+    const userId = article.user_id
+    
     function onClickMoreBtn (e: React.MouseEvent) {
         e.stopPropagation()
         e.preventDefault()
@@ -48,7 +49,7 @@ export default function ArticleCard ({ article, handleClickDelete, handleCloseMo
                 handleClickEdit={handleClickEdit} 
                 handleClickDelete={handleClickDelete}
                 handleCloseMore={handleCloseMore} 
-                id={id? id : 0}/>}
+                id={id? id : 0} userId={userId} />}
             </div>
 
             <Link href={`/articles/${article.id}`} className='pt-2'>

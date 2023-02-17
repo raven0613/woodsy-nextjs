@@ -1,14 +1,29 @@
-import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload } from '../type-config'
-import { addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, addUserSub, deleteUserSub, getUserSubs } from '../api_helpers/apis/user'
+import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload, userArg } from '../type-config'
+import { getCurrentUser, getUser, getUserArticles, editUser, addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, getUserCollections, addUserSub, deleteUserSub, getUserSubs } from '../api_helpers/apis/user'
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
 import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
 import { getHollows, getHollow, addHollow } from '../api_helpers/apis/hollow'
-import { getUser } from '../api_helpers/apis/user'
 
+export async function fetchCurrentUser (url: string) {
+    try {
+        const { data } = await getCurrentUser(url)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
 export async function fetchUser (url: string, id: string) {
     try {
         const res = await getUser(url, id)
         return res
+    } catch (err) {
+        console.log(err)
+    }
+}
+export async function fetchEditUser (url: string, { arg }: userArg) {
+    try {
+        const { data } = await editUser(url, arg)
+        return data
     } catch (err) {
         console.log(err)
     }
@@ -26,6 +41,26 @@ export async function fetchUserLike (url: string, { arg }: payloadArg) {
 export async function fetchDeleteUserLike (url: string, { arg }: payloadArg) {
     try {
         const { data } = await deleteUserLike(url, arg)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchGetUserArts (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
+    try {
+        const { data } = await getUserArticles(url, page, limit)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export async function fetchGetUserCollections (url: string, { arg }: paramArg) {
+    const { page, limit } = arg
+    try {
+        const { data } = await getUserCollections(url, page, limit)
         return data
     } catch (err) {
         console.log(err)

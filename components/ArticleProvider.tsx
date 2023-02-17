@@ -27,7 +27,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   //刪除文章
   const { trigger: deleteArtTrigger, isMutating: deleteArtIsMutating, data: deletedArtData, error: deletedArtError } = useSWRMutation<successResult, Error>(`article`, fetchDeleteArticle, {onSuccess: (data: successResult) => { 
     const path = location.pathname;
-    if (!path.includes('home') && !path.includes('hollows')) return router.push('/home')
+    if (!path.includes('home') && !path.includes('hollows') && !path.includes('users')) return router.push('/home')
     setRefetchTrigger(true)
   }});
   // 編輯文章
@@ -84,7 +84,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   }
 
   // context value 區
-  const articlecontextValue: IArticleContext = {
+  const articleContextValue: IArticleContext = {
     currentArticleId,
     currentCommentId,
     handleIdChange,
@@ -99,7 +99,7 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
   return (
     <>
       <UIContext.Provider value={UIcontextValue}>
-        <articleContext.Provider value={articlecontextValue}>
+        <articleContext.Provider value={articleContextValue}>
 
           <main>{children}</main>
           {isConfirmOpen && <ConfirmWindow 

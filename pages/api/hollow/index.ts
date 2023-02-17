@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../auth/[...nextauth]'
+
 import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 import { subscribeCallback } from 'swr/_internal';
@@ -45,6 +48,9 @@ async function getHollows(req: NextApiRequest, res: NextApiResponse<successResul
 }
 
 async function addHollow (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { name, type, article_counts, sub_counts, reported_counts, user_id } = req.body
     console.log(req.body)
         const hollow = await Hollows.create({

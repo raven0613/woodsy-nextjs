@@ -21,6 +21,7 @@ interface props {
 export default function CommentCard ({ comment, handleClickDelete, handleClickLike, handleClickEdit, handleClickMoreBtn, isCardShowMore, handleCloseMore, commentTime, handleSubmit, handleCancel, isEditing }: props) {
     const [content, setContent] = useState<string>(comment.content)
     const id = comment.id
+    const userId = comment.user_id
 
     function handleContentChange (event: React.FormEvent<HTMLTextAreaElement>) {
         const value = event.currentTarget.value
@@ -61,9 +62,8 @@ export default function CommentCard ({ comment, handleClickDelete, handleClickLi
                 handleClickEdit={handleClickEdit} 
                 handleClickDelete={handleClickDelete} 
                 handleCloseMore={handleCloseMore}
-                id={id? id : 0}/>}
+                id={id? id : 0} userId={userId} />}
             </div>
-
 
             {!isEditing && <p className='py-2 whitespace-pre-wrap'>
                 {comment.content}

@@ -9,12 +9,12 @@ export interface Iuser {
     name: string
     email: string
     password?: string
-    account?: string
     articleCounts?: number
     subHollows?: number
-    createdAt?: string
+    createdAt?: Date
     updatedAt?: string
     role: string
+    birthday?: Date
 }; 
 export interface ILoginuser{
     email: string
@@ -49,6 +49,7 @@ export interface Iarticle {
     isLiked?: boolean
     reportedAt?: string
     createdAt?: string
+    adultOnly: boolean
     hollowName?: string
     description?: string
     comments?: ReactNode
@@ -68,8 +69,6 @@ interface hollow {
     id: number
     name: string
 }
-
-
 
 export interface Icomment {
     id?: number
@@ -188,6 +187,7 @@ declare module "next-auth" {
       name: string
       email: string
       role: string
+      createdAt: Date
     } & DefaultSession["user"]
   }
 }
@@ -213,7 +213,6 @@ export interface IArticleContext {
     currentArticleId?: number
     currentCommentId?: number
     handleIdChange?: (id: string) => void
-//   handleArticleReFetch?: (trigger: () => void) => void
     refetchTrigger?: boolean 
     handleRefetchTrigger?: () => void
     
@@ -222,4 +221,9 @@ export interface IArticleContext {
 export interface IUIContext {
     handleConfirmWindow?: () => void
     handleEditWindow?: (article: Iarticle) => void
+}
+
+export interface IUserContext {
+    currentUser?: Iuser
+    handleSetCurrentUser?: (user: Iuser) => void
 }

@@ -74,10 +74,9 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
         if (password !== passwordForCheck) return setCheckPasswordWarning('確認密碼與密碼不符')
         if (!canSubmit) return
         
-
         setIsFetching(true)
         handleAddUser && handleAddUser({
-            name, email, password, role: 'user', account: ''
+            name, email, password, role: 'user'
         })
         setName('')
         setEmail('')
@@ -133,7 +132,6 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
                         <button className='' type='button' onClick={handleChangeToLogin}>登入</button>
                     </div>
                 </form>
-                
             </div>
         </>
     )

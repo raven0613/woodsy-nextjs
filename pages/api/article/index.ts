@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../auth/[...nextauth]'
+
 import { Sequelize } from 'sequelize';
 import { Iarticle, Icomment, Iuser, errorResult, successResult } from '../../../type-config'
 
@@ -51,6 +54,9 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
 }
 
 async function addArticle (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
   const { title, hollow_id, content, user_id } = req.body
   const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
       host: process.env.MYSQL_HOST,

@@ -1,12 +1,15 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../auth/[...nextauth]'
+
 import { Sequelize } from 'sequelize';
 import { Ihollow, Icomment, Iuser, ILikeship, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 const DB: any = db;
 const { Users, Articles, Comments, Hollows, Likeships } = DB;
 
-export default function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+export default async function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
         case 'POST':
             addLikeship(req, res)
@@ -21,7 +24,11 @@ export default function handleLikeship(req: NextApiRequest, res: NextApiResponse
 }
 
 async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { user_id, comment_id, article_id } = req.body
+    
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'
@@ -75,7 +82,12 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
 }
 
 async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+
     const { user_id, comment_id, article_id } = req.body
+    if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'
@@ -103,6 +115,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
                 }
             }, { transaction: t })
             if (!existLike) return res.status(500).json({ error: '此紀錄不存在' })
+            if (existLike.user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
 
             const comment = await Comments.findByPk(comment_id, { transaction: t })
             if (comment) {

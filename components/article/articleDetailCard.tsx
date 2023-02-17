@@ -20,6 +20,7 @@ type props = {
 
 export default function ArticleDetailCard ({ article, isCardShowMore, handleClickMoreBtn, handleClickEdit, handleClickLike, handleClickCollect, handleClickDelete, handleCloseMore }: props) {
     const id = article.id
+    const userId = article.user_id
 
     function onClickMoreBtn (e: React.MouseEvent) {
         e.stopPropagation()
@@ -51,7 +52,7 @@ export default function ArticleDetailCard ({ article, isCardShowMore, handleClic
                 handleClickEdit={handleClickEdit}
                 handleClickDelete={handleClickDelete}
                 handleCloseMore={handleCloseMore}
-                id={id? id : 0}/>}
+                id={id? id : 0} userId={userId} />}
             </div>
 
             <article className='whitespace-pre-wrap py-2'>{article.content}</article>

@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '../../auth/[...nextauth]'
+
 import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../../type-config'
 import db from '../../../../models/index';
 const DB: any = db;
@@ -40,6 +43,10 @@ async function getHollow (req: NextApiRequest, res: NextApiResponse<successResul
 }
 
 async function editHollow (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: '請先登入' })
+    if (session.user.role !== 'admin') return res.status(401).json({ error: '只有管理員可以操作' })
+
     const { id } = req.query
     const { name, type } = req.body
     try {
