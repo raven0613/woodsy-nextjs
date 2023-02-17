@@ -25,7 +25,7 @@ async function getUsers(req: NextApiRequest, res: NextApiResponse<successResult 
   if (!session) return res.status(401).json({ error: '請先登入' })
   try {
     const users: Iuser[] = await Users.findAll({
-      attributes: ['id', 'name', 'account', 'email', 'role', 'createdAt', 'updatedAt'],
+      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
       include: { model: Articles, attributes: ['id'] },
       where: { role: 'user' },
       nest: true,

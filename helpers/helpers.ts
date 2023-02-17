@@ -40,6 +40,7 @@ export const formattedHollows = (currentUserId: number, hollows: Ihollow[]): Iho
 
 
 export function emailCheck (email: string, setWarning: SetState, setCantSubmit: () => void) {
+    if (!email) return rejectSubmit('請輸入 e-mail', setWarning, setCantSubmit)
     const msg = 'x e-mail 格式不正確'
     let at: number = 0
     let dot:number = 0
@@ -97,6 +98,7 @@ function rejectSubmit (msg: string, setWarning: SetState, setCantSubmit: () => v
 }
 
 export function passWordCheck (password: string, setWarning: SetState, setCantSubmit: () => void) {
+    if (!password) return rejectSubmit('請輸入密碼', setWarning, setCantSubmit)
     const msg = 'x 密碼格式不正確'
     if (password.length < 8) return rejectSubmit(msg, setWarning, setCantSubmit)
     let en = false

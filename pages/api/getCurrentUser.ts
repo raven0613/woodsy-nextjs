@@ -15,7 +15,7 @@ export default async function getCurrentUser(req: NextApiRequest, res: NextApiRe
         if (!session) return res.status(401).json({ error: '請先登入' })
 
         const user = await Users.findByPk(session.user.id, {
-            attributes: ['id', 'name', 'account', 'email', 'role', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'name', 'email', 'birthday', 'role', 'createdAt', 'updatedAt'],
             raw: true,
             nest: true
         })

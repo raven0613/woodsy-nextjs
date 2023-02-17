@@ -36,6 +36,7 @@ export default function User() {
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleId}`, fetchArticle);
     // 抓取目前 user
     const { trigger: userTrigger, data: userData, error: userError } = useSWRMutation<successResult, Error>(`getCurrentUser`, fetchCurrentUser);
+    const currentUserDetail = userData?.payload as Iuser
     // 修改 user 資料
     const { trigger: userEditTrigger, data: userEditData, error: userEditError } = useSWRMutation<successResult, Error>(`user/${currentUserId}`, fetchEditUser, { onSuccess: (data: successResult) => {
         const payload = data.payload as Iuser
@@ -54,7 +55,10 @@ export default function User() {
         hotHollowTrigger(arg)
         userArtsTrigger(arg)
     }
-
+    // 初次渲染就可抓取目前使用者
+    useEffect(() => {
+        userTrigger()
+    }, [userTrigger])
     // 有 userId 才 fetch API
     useEffect(() => {
         if (!currentUserId) return
@@ -68,7 +72,6 @@ export default function User() {
         
         const artRows = userArtsData?.payload as Iarticle[]
         const arts = formattedArticles(currentUserId, artRows)
-        console.log(arts)
         setUserArticles(arts)
     }, [currentUserId, userArtsData])
     // 抓回來一整包的使用者收藏文章資料
@@ -152,7 +155,7 @@ export default function User() {
 
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
-            <UserPanel currentUser={currentUser} userEditData={userEditData} handleEditUser={handleEditUser} />
+            <UserPanel currentUserDetail={currentUserDetail} handleEditUser={handleEditUser} />
 
             <div className='pt-6 mx-2 w-full'>
                 <h1 className='text-slate-300 text-xl font-semibold'>收藏的話題</h1>

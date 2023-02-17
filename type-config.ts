@@ -9,12 +9,12 @@ export interface Iuser {
     name: string
     email: string
     password?: string
-    account?: string
     articleCounts?: number
     subHollows?: number
     createdAt?: Date
     updatedAt?: string
     role: string
+    birthday?: Date
 }; 
 export interface ILoginuser{
     email: string
@@ -49,6 +49,7 @@ export interface Iarticle {
     isLiked?: boolean
     reportedAt?: string
     createdAt?: string
+    adultOnly: boolean
     hollowName?: string
     description?: string
     comments?: ReactNode

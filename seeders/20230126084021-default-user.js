@@ -6,7 +6,6 @@ const { hashSync, genSaltSync } = bcrypt
 const saltRounds = 10;
 const SEED_USER = {
   name: 'root',
-  account: 'root',
   email: 'root@example.com',
   password: '12345678',
   role: 'admin'
@@ -17,7 +16,6 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const userId = await queryInterface.bulkInsert('Users', [{
       name: SEED_USER.name,
-      account: SEED_USER.account,
       email: SEED_USER.email,
       password: hashSync(SEED_USER.password, genSaltSync(saltRounds), null),
       role: SEED_USER.role,

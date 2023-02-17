@@ -31,8 +31,7 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successResult
 
     const { id } = req.query
     const idNum = Number(id)
-    const { name, email, password, role } = req.body
-    console.log(req.body)
+    const { name, email, password, role, birthday } = req.body
 
     if (idNum !== session.user.id && session.user.role !== 'admin') return res.status(401).json({ error: '使用者身分不符' })
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
@@ -47,11 +46,11 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successResult
             editedPassword = await bcrypt.hash(password, saltRounds)
         }
         // 密碼沒變的話就沿用原本的
-        user.set({ name, email, password: editedPassword || user.password, role }, { transaction: t })
+        user.set({ name, email, password: editedPassword || user.password, role, birthday }, { transaction: t })
         await user.save({ transaction: t })
         await t.commit();
 
-        const userWithoutPassword: Iuser = { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt }
+        const userWithoutPassword: Iuser = { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt, birthday: user.birthday }
         
         res.status(200).json({ success: '編輯使用者資料成功', payload: userWithoutPassword })
         
@@ -66,7 +65,7 @@ async function getUser (req: NextApiRequest, res: NextApiResponse<successResult 
     const idNum = Number(id)
     try {
         const user = await Users.findByPk(idNum, {
-            attributes: ['id', 'name', 'account', 'email', 'role', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
             raw: true,
             nest: true
         })

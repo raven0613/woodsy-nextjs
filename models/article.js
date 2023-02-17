@@ -56,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     collectedCounts: DataTypes.INTEGER,
     likedCounts: DataTypes.INTEGER,
     reportedCounts: DataTypes.INTEGER,
+    adultOnly: DataTypes.BOOLEAN,
   }, {
     sequelize,
     // modelName: 'Articles',

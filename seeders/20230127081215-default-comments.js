@@ -24,7 +24,8 @@ module.exports = {
           User_id: user[0].id,
           Article_id: article[i].id,
           created_at: new Date(),
-          updated_at: new Date()
+          updated_at: new Date(),
+          adult_only: false
         })
       ), {});
   },

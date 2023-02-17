@@ -76,7 +76,7 @@ export default function RegisterPanel ({ handleAddUser, type }: IuserProps) {
         
         setIsFetching(true)
         handleAddUser && handleAddUser({
-            name, email, password, role: 'user', account: ''
+            name, email, password, role: 'user'
         })
         setName('')
         setEmail('')
