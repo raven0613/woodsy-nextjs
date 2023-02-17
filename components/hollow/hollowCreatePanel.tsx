@@ -78,7 +78,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
             </div>}
 
             <input
-                className='outline-0 border w-64 h-12 px-2.5'
+                className='outline-0 border w-64 h-12 px-2.5 rounded-md'
                 value={inputVal}
                 onChange={e => {
                     handleInputHollow(e)

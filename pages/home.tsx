@@ -37,6 +37,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     const [newArticle, setNewArticle] = useState<Iarticle>()
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    const [isHollowPanelOpen, setIsHollowPanelOpen] = useState<boolean>(false)
 
     // 抓取一包文章
     const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError } = useSWRMutation<successResult, Error>(`article`, fetchHotArticles);
@@ -189,15 +190,20 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         if (!article || !handleEditWindow) return
         handleEditWindow(article)
     }
+    function handleHollowPanel () {
+        setIsHollowPanelOpen(!isHollowPanelOpen)
+    }
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
-            <div className='hidden sm:block mt-20 mx-2 w-full'>
+
+            <div className='hidden sm:block mt-20 mx-2 w-full border rounded-lg transition-height ease-out duration-300'>
                 {currentUser && csrfToken && <ArticleInput 
                 hollows={hollows} 
                 currentUser={currentUser} 
-                handleAddArt={handleAddArt}/>}
+                handleAddArt={handleAddArt}
+                handleHollowPanel={handleHollowPanel}/>}
 
-                {currentUser && csrfToken && <HollowCreatePanel 
+                {currentUser && csrfToken && isHollowPanelOpen && <HollowCreatePanel 
                 currentUser={currentUser} 
                 hollows={hollows} 
                 handleAddHollow={handleAddHollow}/>}

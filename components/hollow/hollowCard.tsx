@@ -16,7 +16,7 @@ export default function HollowCard ({ hollow, handleSub }: hollowProps) {
         handleSub(hollow.id, hollow.isSub)
     }
     return (
-        <div className='bg-gray-50 rounded-lg py-3 px-4 h-28'>
+        <div className='border rounded-lg py-3 px-4 h-28 hover:bg-gray-50 ease-out duration-300'>
             <div className='flex justify-between'>
                 <h1 className='text-gray-600 text-lg font-bold'>{hollow.name}</h1>
                 {!hollow.isSub && <button onClick={handleClick} className='w-6 h-6 border'></button>}
