@@ -42,7 +42,6 @@ export default function User() {
         const payload = data.payload as Iuser
         handleSetCurrentUser && handleSetCurrentUser(payload)
     } });
-
     // 喜歡和收藏的 fetch hook
     const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
     // 關注的 fetch hook

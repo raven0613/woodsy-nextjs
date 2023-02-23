@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from '../auth/[...nextauth]'
 
+import { Op } from 'sequelize'
 import { Ihollow, Icomment, Iuser, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
 import { subscribeCallback } from 'swr/_internal';
@@ -29,10 +30,11 @@ export default function handleHollows(req: NextApiRequest, res: NextApiResponse<
 
 async function getHollows(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
   try {
-    const { page: p, limit: l } = req.query;
+    const { page: p, limit: l, keyword } = req.query;
     const page = Number(p), limit = Number(l)
 
     const hollows = await Hollows.findAndCountAll({
+      where: { name: {[Op.like]: `%${keyword}%`} },
       include: [
         { model: Users, attributes: ['id', 'name'] },
         { model: Users, as: 'SubUsers', attributes: ['id', 'name'] }
@@ -43,6 +45,7 @@ async function getHollows(req: NextApiRequest, res: NextApiResponse<successResul
     })
     res.status(200).json({ success: '查詢成功', payload: hollows })  //回傳的是 count 和 data
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ error: '伺服器錯誤' })
   }
 }

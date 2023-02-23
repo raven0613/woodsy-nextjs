@@ -140,6 +140,7 @@ export interface likePayload {
 export interface param {
     page: number
     limit: number
+    keyword: string
 }
 
 export type serverProps = {

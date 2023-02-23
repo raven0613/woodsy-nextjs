@@ -28,6 +28,8 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
     if (!session) return res.status(401).json({ error: '請先登入' })
 
     const { user_id, comment_id, article_id } = req.body
+    if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !article_id || !comment_id) return res.status(400).json({ error: '請確認請求資料' })
     
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
@@ -41,7 +43,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
                     user_id, article_id
                 }
             }, { transaction: t })
-            if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
+            if (existLike) return res.status(409).json({ error: '已存在相同紀錄' })
 
             like = await Likeships.create({
                 user_id, article_id
@@ -59,7 +61,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
                     user_id, comment_id
                 }
             }, { transaction: t })
-            if (existLike) return res.status(403).json({ error: '已存在相同紀錄' })
+            if (existLike) return res.status(409).json({ error: '已存在相同紀錄' })
 
             like = await Likeships.create({
                 user_id, comment_id
@@ -87,6 +89,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
 
     const { user_id, comment_id, article_id } = req.body
     if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !article_id || !comment_id) return res.status(400).json({ error: '請確認請求資料' })
 
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
@@ -95,13 +98,14 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
 
     try {
         let existLike
+
         if (article_id) {
             existLike = await Likeships.destroy({
                 where: {
                     user_id, article_id
                 }
             }, { transaction: t })
-            if (!existLike) return res.status(500).json({ error: '此紀錄不存在' })
+            if (!existLike) return res.status(404).json({ error: '此紀錄不存在' })
 
             const article = await Articles.findByPk(article_id, { transaction: t })
             if (article) {
@@ -114,8 +118,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
                     user_id, comment_id
                 }
             }, { transaction: t })
-            if (!existLike) return res.status(500).json({ error: '此紀錄不存在' })
-            if (existLike.user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+            if (!existLike) return res.status(404).json({ error: '此紀錄不存在' })
 
             const comment = await Comments.findByPk(comment_id, { transaction: t })
             if (comment) {

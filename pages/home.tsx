@@ -25,7 +25,7 @@ import useHollowRecord from '../components/hooks/useHollowRecord';
 
 const inter = Inter({ subsets: ['latin'] })
 
-const arg = { page: 1, limit: 10 }
+const arg = { page: 1, limit: 10, keyword: '' }
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
     const { currentUser } = useContext(userContext)
@@ -37,12 +37,20 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     const [newArticle, setNewArticle] = useState<Iarticle>()
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    const [keyHollows, setKeyHollows] = useState<Ihollow[]>([])
     const [isHollowPanelOpen, setIsHollowPanelOpen] = useState<boolean>(false)
 
     // 抓取一包文章
     const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError } = useSWRMutation<successResult, Error>(`article`, fetchHotArticles);
     // 抓取一包樹洞
     const { trigger: hotHollowTrigger, data: hotHollowData, error: hotHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
+    // 抓取一包關鍵字樹洞
+    const { trigger: keyHollowTrigger, data: keyHollowData, error: keyHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows, {
+        onSuccess: (data: successResult) => {
+            const { rows } = data.payload as rows
+            setKeyHollows(rows as Ihollow[])
+        }
+    });
     // 抓取一篇文章
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleId}`, fetchArticle);
     // 新增一則文章
@@ -87,8 +95,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }, [articleRows, hollowRows, currentUserId])
     // 抓回來一整包的文章資料
     useEffect(() => {
-        if (!currentUserId) return
-        if (!hotArtData) return
+        if (!currentUserId || !hotArtData) return
         const artRows = hotArtData?.payload as rows
         const artDatas = artRows.rows as Iarticle[]
         const arts = formattedArticles(currentUserId, artDatas)
@@ -96,8 +103,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }, [currentUserId, hotArtData])
     // 抓回來一整包的樹洞資料
     useEffect(() => {
-        if (!currentUserId) return
-        if (!hotHollowData) return
+        if (!currentUserId || !hotHollowData) return
         const hollowRows = hotHollowData?.payload as rows
         const hollowDatas = hollowRows.rows as Ihollow[]
         const hollows = formattedHollows(currentUserId, hollowDatas)
@@ -105,8 +111,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }, [currentUserId, hotHollowData])
     // 抓回來一篇的文章資料
     useEffect(() => {
-        if (!currentUserId) return
-        if (!artData) return
+        if (!currentUserId || !artData) return
         const payload = artData.payload as Iarticle
         if (currentArticleIdRef.current !== payload.id) return
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
@@ -193,6 +198,11 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     function handleHollowPanel () {
         setIsHollowPanelOpen(!isHollowPanelOpen)
     }
+    function handleKeyword (keyword: string) {
+        if (!keyword) return setKeyHollows([])
+        arg.keyword = keyword
+        keyHollowTrigger(arg)
+    }
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
 
@@ -201,7 +211,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                 hollows={hollows} 
                 currentUser={currentUser} 
                 handleAddArt={handleAddArt}
-                handleHollowPanel={handleHollowPanel}/>}
+                handleHollowPanel={handleHollowPanel}
+                handleKeyword={handleKeyword}
+                keyHollows={keyHollows} />}
 
                 {currentUser && csrfToken && isHollowPanelOpen && <HollowCreatePanel 
                 currentUser={currentUser} 

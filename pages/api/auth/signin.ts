@@ -18,17 +18,12 @@ export default async function signin(req: NextApiRequest, res: NextApiResponse<s
       raw: true,
       nest: true
     })
-    if (!existUser) return res.status(403).json({ error: '請確認您的登入資訊' })
+    if (!existUser) return res.status(401).json({ error: '請確認您的登入資訊' })
 
     let isCorrect = await bcrypt.compare(userData.password, existUser.password)
-    if (!isCorrect) return res.status(403).json({ error: '請確認您的登入資訊' })
+    if (!isCorrect) return res.status(401).json({ error: '請確認您的登入資訊' })
 
-    const user = await Users.findOne({
-      where: { email: userData.email }
-    })
-    if (!user) return res.status(403).json({ error: '登入失敗' })
-
-    return res.status(200).json({ success: '登入成功', payload: user })
+    return res.status(200).json({ success: '登入成功', payload: existUser })
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }

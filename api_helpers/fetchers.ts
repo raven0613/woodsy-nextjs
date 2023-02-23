@@ -134,9 +134,9 @@ export async function fetchHollow (id: string) {
 }
 
 export async function fetchHotHollows (url: string, { arg }: paramArg) {
-    const { page, limit } = arg
+    const { page, limit, keyword } = arg
     try {
-        const { data } = await getHollows(url, page, limit)
+        const { data } = await getHollows(url, page, limit, keyword)
         return data
     } catch (err) {
         console.log(err)

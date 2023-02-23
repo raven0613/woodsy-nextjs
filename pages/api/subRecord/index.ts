@@ -28,6 +28,9 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorR
     if (!session) return res.status(401).json({ error: '請先登入' })
 
     const { user_id, hollow_id } = req.body
+    if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !hollow_id) return res.status(400).json({ error: '請確認請求資料' })
+
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'
@@ -39,12 +42,12 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorR
                 user_id, hollow_id
             }
         }, { transaction: t })
-        if (existSub) return res.status(403).json({ error: '已存在相同紀錄' })
+        if (existSub) return res.status(409).json({ error: '已存在相同紀錄' })
 
         const sub = await Subscriptions.create({
             user_id, hollow_id
         }, { transaction: t })
-        if (!sub) return res.status(500).json({ error: '關注失敗' })
+        if (!sub) return res.status(500).json({ error: '記錄新增失敗' })
 
         const hollow = await Hollows.findByPk(hollow_id, { transaction: t })
         if (hollow) {
@@ -66,6 +69,7 @@ async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<err
 
     const { user_id, hollow_id } = req.body
     if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !hollow_id) return res.status(400).json({ error: '請確認請求資料' })
 
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
@@ -78,7 +82,7 @@ async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<err
                 user_id, hollow_id
             }
         }, { transaction: t })
-        if (!existSub) return res.status(500).json({ error: '此紀錄不存在' })
+        if (!existSub) return res.status(404).json({ error: '此紀錄不存在' })
 
         const hollow = await Hollows.findByPk(hollow_id, { transaction: t })
         if (hollow) {

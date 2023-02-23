@@ -57,7 +57,7 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<successResu
     const session = await getServerSession(req, res, authOptions)
     if (!session) return res.status(401).json({ error: '請先登入' })
 
-  const { title, hollow_id, content, user_id } = req.body
+  const { title, hollow_id, content, user_id, adultOnly } = req.body
   const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
       host: process.env.MYSQL_HOST,
       dialect: 'mysql'
@@ -76,6 +76,7 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<successResu
       content,
       hollow_id, 
       user_id, 
+      adultOnly
     }, { transaction: t })
     if (!article) return res.status(500).json({ error: '新增文章失敗' })
 
@@ -101,6 +102,7 @@ async function addArticle (req: NextApiRequest, res: NextApiResponse<successResu
     res.status(200).json({ success: '新增文章成功', payload: resultArticle })
     
   } catch (err) {
+    console.log(err)
     await t.rollback();
     return res.status(500).json({ error: '伺服器錯誤' })
   }

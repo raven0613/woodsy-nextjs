@@ -5,8 +5,8 @@ export function getHollow (id: string) {
     return apiHelper.get(`hollow/${id}`)
 }
 
-export function getHollows (url: string, page: number, limit: number) {
-    return apiHelper.get(url, { params: { page, limit } })
+export function getHollows (url: string, page: number, limit: number, keyword: string) {
+    return apiHelper.get(url, { params: { page, limit, keyword } })
 }
 
 export function addHollow (url: string, hollow: Ihollow) {

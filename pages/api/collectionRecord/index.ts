@@ -30,11 +30,13 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorRes
     if (!session) return res.status(401).json({ error: '請先登入' })
 
     const { user_id, article_id } = req.body
+    if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !article_id) return res.status(400).json({ error: '請確認請求資料' })
+
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
         dialect: 'mysql'
     }).transaction();
-    if (!user_id || !article_id) return res.status(500).json({ error: '請確認請求資料' })
 
     try {
         const existCollection = await Collections.findOne({
@@ -68,6 +70,7 @@ async function deleteCollection (req: NextApiRequest, res: NextApiResponse<error
 
     const { user_id, article_id } = req.body
     if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
+    if (!user_id || !article_id) return res.status(500).json({ error: '請確認請求資料' })
 
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
@@ -80,7 +83,7 @@ async function deleteCollection (req: NextApiRequest, res: NextApiResponse<error
                 user_id, article_id
             }
         }, { transaction: t })
-        if (!existCollection) return res.status(500).json({ error: '此紀錄不存在' })
+        if (!existCollection) return res.status(404).json({ error: '此紀錄不存在' })
 
         const article = await Articles.findByPk(article_id, { transaction: t })
         if (article) {
@@ -88,7 +91,7 @@ async function deleteCollection (req: NextApiRequest, res: NextApiResponse<error
         }
         
         await t.commit();
-        return res.status(200).json({ success: '關注紀錄刪除成功', payload: { article_id } as ILikeship })
+        return res.status(200).json({ success: '收藏紀錄刪除成功', payload: { article_id } as ILikeship })
         
     } catch (err) {
         await t.rollback();
