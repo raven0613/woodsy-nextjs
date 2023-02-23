@@ -15,8 +15,10 @@ import hollowStyle from '../../styles/hollow.module.css';
 import useArticleRecord from '../../components/hooks/useArticleRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider'
 import { userContext } from '../../components/UserProvider'
+import randomstring from 'randomstring'
 
-const params: param = { page: 1, limit: 15 }
+const params: param = { page: 1, limit: 15, keyword: '' }
+const randomMap = new Map()  // userId: tempId
 
 export default function Article () {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)
@@ -75,8 +77,23 @@ export default function Article () {
     useEffect(() => {
         if (!currentUserId || !commentsData) return
         const payload = commentsData? commentsData.data.payload.rows : []
-        const com = formattedComments(currentUserId as number, payload as Icomment[])
-        setComments(com)
+        const coms = formattedComments(currentUserId as number, payload as Icomment[])
+        const comWithTempId = coms.map(com => {
+            let tempId = ''
+            if (com.user_id === currentUserId) {
+                tempId = '原PO'
+                randomMap.set(com.user_id, tempId)
+            }
+            if (!randomMap.get(com.user_id)) {
+                tempId = randomstring.generate(5)
+                randomMap.set(com.user_id, tempId)
+            }
+            else {
+                tempId = randomMap.get(com.user_id)
+            }
+            return { ...com, User: {...com.User, tempId} }
+        }) as Icomment[]
+        setComments(comWithTempId)
     }, [commentsData, currentUserId])
     
     // 新增一條回覆

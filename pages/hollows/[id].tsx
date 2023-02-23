@@ -15,7 +15,7 @@ import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 import { userContext } from '../../components/UserProvider'
 
-const arg: param = { page: 1, limit: 15 }
+const arg = { page: 1, limit: 10, keyword: '' }
 
 export default function Hollow () {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)
@@ -49,6 +49,8 @@ export default function Hollow () {
         user_id: 0,
     })
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    const [keyHollows, setKeyHollows] = useState<Ihollow[]>([])
+    const [isHollowPanelOpen, setIsHollowPanelOpen] = useState<boolean>(false)
     const isSub: boolean = hollow.isSub || false
 
     // 抓取現在樹洞
@@ -59,6 +61,13 @@ export default function Hollow () {
 
     // 抓取一包樹洞(給 input 用)
     const { trigger: hollowsTrigger, data: hollowsData, error: hollowsError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
+    // 抓取一包關鍵字樹洞
+    const { trigger: keyHollowTrigger, data: keyHollowData, error: keyHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows, {
+        onSuccess: (data: successResult) => {
+            const { rows } = data.payload as rows
+            setKeyHollows(rows as Ihollow[])
+        }
+    });
     // 新增一個樹洞
     const { trigger: addHollowTrigger, isMutating: addHollowIsMutating, data: addedHollowData, error: addedHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchAddHollow, { onSuccess: (data: successResult) => { 
         // const payload = data.payload as Ihollow
@@ -192,6 +201,14 @@ export default function Hollow () {
         if (!article || !handleEditWindow) return
         handleEditWindow(article)
     }
+    function handleHollowPanel () {
+        setIsHollowPanelOpen(!isHollowPanelOpen)
+    }
+    function handleKeyword (keyword: string) {
+        if (!keyword) return setKeyHollows([])
+        arg.keyword = keyword
+        keyHollowTrigger(arg)
+    }
     function handleScroll () {
 
     }
@@ -215,7 +232,10 @@ export default function Hollow () {
                 currentHollow={hollow}
                 handleAddArt={handleAddArt} 
                 currentUser={currentUser} 
-                hollows={hollows} />
+                hollows={hollows}
+                handleHollowPanel={handleHollowPanel}
+                handleKeyword={handleKeyword}
+                keyHollows={keyHollows} />
                 
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {articles && articles.map(art => {

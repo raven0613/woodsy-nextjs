@@ -13,7 +13,7 @@ import useHollowRecord from '../../components/hooks/useHollowRecord';
 import ArticleCardController from '../../components/article/articleCardController'
 // 修改個人資料 
 
-const arg = { page: 1, limit: 10 }
+const arg: param = { page: 1, limit: 10, keyword: '' }
 
 export default function User() {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)

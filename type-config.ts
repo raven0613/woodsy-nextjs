@@ -64,6 +64,7 @@ export interface Iarticle {
 interface user {
     id: number
     name: string
+    tempId?: string
 }
 interface hollow {
     id: number

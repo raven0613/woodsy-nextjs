@@ -34,10 +34,10 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
     const { name: currName, email: currEmail, birthday: currBirthday } = currentUserDetail as Iuser || ''
 
     useEffect(() => {
-        if (!currName || !currEmail || !currBirthday) return
         setName(currName)
         setEmail(currEmail)
 
+        if (!currBirthday) return
         const localDate = dayjs.utc(currBirthday).local()
         setYear(localDate.year())
         setMonth(localDate.month() + 1)
@@ -79,10 +79,7 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
             }
             // 如果任何一個選到0就 set 回 currentUser 的生日
             if (!year || !month || !day) {
-                const localDate = dayjs.utc(currBirthday).local()
-                setYear(localDate.year())
-                setMonth(localDate.month() + 1)
-                setDay(localDate.date())
+                resetBirthToCurrUser()
             }
             handleEditUser({ ...currentUserDetail, id: currentUserDetail.id, name, email, birthday: dateObj })
         }
@@ -101,17 +98,15 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
     function onClickCancel (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
-        
-        const localDate = dayjs.utc(currBirthday).local()
-        setYear(localDate.year())
-        setMonth(localDate.month() + 1)
-        setDay(localDate.date())
 
         setEditingStatus('')
         setNameWarning('')
         setEmailWarning('')
         setPasswordWarning('')
         setCheckPasswordWarning('')
+
+        if (!currBirthday) return
+        resetBirthToCurrUser()
     }
     function onNameChange (e: React.FormEvent<HTMLInputElement>) {
         const value = e.currentTarget.value

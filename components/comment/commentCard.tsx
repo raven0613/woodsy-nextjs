@@ -19,6 +19,7 @@ interface props {
 }
 
 export default function CommentCard ({ comment, handleClickDelete, handleClickLike, handleClickEdit, handleClickMoreBtn, isCardShowMore, handleCloseMore, commentTime, handleSubmit, handleCancel, isEditing }: props) {
+    // console.log(comment)
     const [content, setContent] = useState<string>(comment.content)
     const id = comment.id
     const userId = comment.user_id
@@ -56,7 +57,7 @@ export default function CommentCard ({ comment, handleClickDelete, handleClickLi
 
             <div className='w-full h-8 flex relative items-center'>
                 <span className='text-base text-gray-700 pr-2'>{comment.User?.name || ''}</span>
-                <span className='text-sm text-slate-300 flex-1'>@Vg2X8</span>
+                <span className='text-sm text-slate-300 flex-1'>@{comment.User?.tempId || ''}</span>
                 {!isCardShowMore && <button className='w-8 h-8 border rounded-full' onClick={onClickMoreBtn}>…</button>}
                 {isCardShowMore && <MoreWindow 
                 handleClickEdit={handleClickEdit} 

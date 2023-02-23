@@ -29,7 +29,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
 
     const { user_id, comment_id, article_id } = req.body
     if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
-    if (!user_id || !article_id || !comment_id) return res.status(400).json({ error: '請確認請求資料' })
+    if (!user_id) return res.status(400).json({ error: '請確認請求資料' })
     
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
@@ -89,7 +89,7 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
 
     const { user_id, comment_id, article_id } = req.body
     if (user_id !== session.user.id) return res.status(401).json({ error: '使用者身分不符' })
-    if (!user_id || !article_id || !comment_id) return res.status(400).json({ error: '請確認請求資料' })
+    if (!user_id) return res.status(400).json({ error: '請確認請求資料' })
 
     const t = await new Sequelize(process.env.MYSQL_DATABASE || '', process.env.MYSQL_USER || '', process.env.MYSQL_PASSWORD, {
         host: process.env.MYSQL_HOST,
