@@ -34,6 +34,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
   const page = Number(p), limit = Number(l)
 
   try {
+    const total = await Articles.count()
     const articles = await Articles.findAndCountAll({
       include: [
         { model: Users, attributes: ['id', 'name'] }, 
@@ -45,9 +46,12 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
       limit,
       offset: getOffset(page, limit),
       nest: true, 
+      order: [
+        ['comment_counts', 'DESC'],
+        ['id', 'ASC']
+      ]
     })
-
-    res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
+    res.status(200).json({ success: '查詢成功', payload: {...articles, total} })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }

@@ -2,15 +2,12 @@ import { useEffect, useState, useContext, useRef } from 'react'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
-import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation'
 import HollowCard from '../components/hollow/hollowCard'
 import ArticleCardController from '../components/article/articleCardController'
 import ArticleInput from '../components/article/articleInput'
-import ToTopButton from '../components/toTopButton'
 import HollowCreatePanel from "../components/hollow/hollowCreatePanel"
-import { getHollows } from '../api_helpers/apis/hollow'
-import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
+import { fetchUserLike, fetchDeleteUserLike, fetchUserCollect, fetchDeleteUserCollect, fetchUser, fetchHollow, fetchAddHollow, fetchHotHollows, fetchHotArticles, fetchArticle, fetchAddArt, fetchEditArticle, fetchDeleteArticle } from '../api_helpers/fetchers'
 import { type } from 'os';
 import { Iuser, Ihollow, Iarticle, Icomment, param, serverProps,  articleArg, deleteArg, successResult, likePayload, paramArg, rows, IArticleContext, ILikeship, ICollection, subPayload } from '../type-config';
 import { getCsrfToken } from 'next-auth/react';
@@ -26,22 +23,26 @@ import useHollowRecord from '../components/hooks/useHollowRecord';
 const inter = Inter({ subsets: ['latin'] })
 
 const arg = { page: 1, limit: 10, keyword: '' }
+const keyArg = { page: 1, limit: 10, keyword: '' }
+const artMap = new Map()
 
-export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }: serverProps) {
+export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken, total }: serverProps) {
     const { currentUser } = useContext(userContext)
-    const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
+    const { handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
     const currentUserId = currentUser?.id
     const [moreShowingId, setMoreShowingId] = useState<string>('')
-    const [newArticle, setNewArticle] = useState<Iarticle>()
+    const [newArticles, setNewArticles] = useState<Iarticle[]>([])
     const [articles, setArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
     const [keyHollows, setKeyHollows] = useState<Ihollow[]>([])
     const [isHollowPanelOpen, setIsHollowPanelOpen] = useState<boolean>(false)
+    const [page, setPage] = useState<number>(2)
+    const currentArticleIdRef = useRef<number>()
 
     // 抓取一包文章
-    const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError } = useSWRMutation<successResult, Error>(`article`, fetchHotArticles);
+    const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError, isMutating: hotArtIsMutating } = useSWRMutation<successResult, Error>(`article`, fetchHotArticles);
     // 抓取一包樹洞
     const { trigger: hotHollowTrigger, data: hotHollowData, error: hotHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
     // 抓取一包關鍵字樹洞
@@ -52,12 +53,12 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         }
     });
     // 抓取一篇文章
-    const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleId}`, fetchArticle);
+    const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleIdRef.current}`, fetchArticle);
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successResult, Error>(`article`, fetchAddArt, { onSuccess: (data: successResult) => { 
         const payload = data.payload as Iarticle
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
-        setNewArticle(art)
+        setNewArticles(arts => [art, ...arts])
     }});
     // 新增一個樹洞
     const { trigger: addHollowTrigger, isMutating: addHollowIsMutating, data: addedHollowData, error: addedHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchAddHollow, { onSuccess: (data: successResult) => { 
@@ -65,33 +66,36 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         hotHollowTrigger(arg)
     }});
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onArtRecordSuccess})
     // 關注的 fetch hook
     const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
-    const currentArticleIdRef = useRef<number>()
-
     function onSuccessCallback (data: successResult) {
-        // 按讚之後 newArt 會被蓋掉
-        // const { article_id } = data.payload as ICollection
-        // // console.log('newArticle', newArticle)
-        // // console.log('article_id', article_id)
-        // // console.log('currentArticleIdRef.current', currentArticleIdRef.current)
-        // if (article_id === currentArticleIdRef.current) {
-        //     // return artTrigger()
-        // }  //TODO: 新增文章的邏輯還沒調整好
-        hotArtTrigger(arg)
         hotHollowTrigger(arg)
     }
+    function onArtRecordSuccess (data: successResult) {
+        const { article_id } = data.payload as ICollection | ILikeship
+        if (!article_id) return
+        artTrigger()
+    }
+
     // server props 的文章樹洞資料
     useEffect(() => {
+        artMap.clear()
         if (!currentUserId) return
         const hotHollows: Ihollow[] = hollowRows? hollowRows : []
         const hotArticles: Iarticle[] = articleRows? articleRows : []
         const arts = formattedArticles(currentUserId, hotArticles)
+        const noRepeatArts = []
+        for (let item in arts) {
+            if (!artMap.get(arts[item].id)) {
+                artMap.set(arts[item].id, 1)
+                noRepeatArts.push(arts[item])
+            }
+        }
         const hollows = formattedHollows(currentUserId, hotHollows)
         setHollows(hollows)
-        setArticles(arts)
+        setArticles(noRepeatArts)
     }, [articleRows, hollowRows, currentUserId])
     // 抓回來一整包的文章資料
     useEffect(() => {
@@ -99,7 +103,15 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         const artRows = hotArtData?.payload as rows
         const artDatas = artRows.rows as Iarticle[]
         const arts = formattedArticles(currentUserId, artDatas)
-        setArticles(arts)
+        const noRepeatArts: Iarticle[] = []
+        for (let item in arts) {
+            if (!artMap.get(arts[item].id)) {
+                artMap.set(arts[item].id, 1)
+                noRepeatArts.push(arts[item])
+            }
+        }
+        console.log(arts)
+        setArticles(articles => [...articles, ...noRepeatArts])
     }, [currentUserId, hotArtData])
     // 抓回來一整包的樹洞資料
     useEffect(() => {
@@ -115,7 +127,26 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         const payload = artData.payload as Iarticle
         if (currentArticleIdRef.current !== payload.id) return
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
-        setNewArticle(art)
+        // 按讚的是在熱門文章列表中
+        if (artMap.get(art.id)) {
+            return setArticles(arts => {
+                return arts.map(article => {
+                    if (article.id === art.id) {
+                        return art;
+                    }
+                    return article;
+                });
+            })
+        }
+        // 按讚的是在新文章列表中
+        setNewArticles(arts => {
+            return arts.map(article => {
+                if (article.id === art.id) {
+                    return art;
+                }
+                return article;
+            });
+        })
     }, [currentUserId, artData])
     
     // 刪除文章後重新 fetch API
@@ -126,12 +157,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             handleRefetchTrigger && handleRefetchTrigger()
         }
     }, [refetchTrigger, hotArtTrigger, handleRefetchTrigger])
-
-    // useEffect(() => {
-    //     if (!refetchTrigger) return
-    //     artTrigger()
-    // }, [refetchTrigger, artTrigger])
-
 
     function handleAddArt (article: Iarticle) {
         addArtTrigger(article)
@@ -200,9 +225,43 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     }
     function handleKeyword (keyword: string) {
         if (!keyword) return setKeyHollows([])
-        arg.keyword = keyword
-        keyHollowTrigger(arg)
+        keyArg.keyword = keyword
+        keyHollowTrigger(keyArg)
     }
+    const artSize = articles.length
+    // 節流
+    useEffect(() => {
+        let ishandling = false
+        function handleScroll () {
+            if (ishandling) return
+            ishandling = true
+
+            const { clientHeight, scrollTop, scrollHeight } = document.documentElement
+            if ((clientHeight + scrollTop) / scrollHeight >= 0.9) {
+                if (artSize < total) {
+                    const arg = { page, limit: 10, keyword: '' }
+                    hotArtTrigger(arg)
+                    setPage(page + 1)
+                }
+            }
+            ishandling = false
+        }
+        function throttle (callback: () => void, time: number) {
+            let timer: NodeJS.Timeout | null = null
+            return function () {
+                if (timer) return
+                timer = setTimeout(() => {
+                    callback()
+                    timer = null
+                }, time)
+            }
+        }
+        const throttleArt = throttle(handleScroll, 1000)
+        document.addEventListener('scroll', throttleArt)
+        return () => { document.removeEventListener('scroll', throttleArt) }
+    }, [hotArtTrigger, page, artSize, total])
+
+
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
 
@@ -242,8 +301,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
             <div className='pt-6 mx-2 w-full'>
                 <h1 className='text-slate-300 text-xl font-semibold'>大家關心的話題</h1>
                 <div className='flex-col justify-center w-full'>
-                    {newArticle && <ArticleCardController 
-                        article={newArticle} key={newArticle.id} 
+                    {newArticles && newArticles.map(art => {
+                    return (
+                        <ArticleCardController article={art} key={art.id} 
                         handleCollect={handleCollect}
                         handleLike={handleLike}
                         handleClickMore={handleClickMore}
@@ -252,7 +312,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                         moreShowingId={moreShowingId} 
                         currentUser={currentUser}
                         handleEdit={handleEdit}
-                        isDetail={false} />}
+                        isDetail={false} />
+                    )
+                    })}
 
                     {articles && articles.map(art => {
                     return (
@@ -268,6 +330,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                         isDetail={false} />
                     )
                     })}
+                    {artSize >= total && <p className='text-center text-stone-400 pb-4'>已沒有其他話題</p>}
                 </div>
             </div>
         </main>
@@ -280,11 +343,11 @@ export async function getServerSideProps(context: CtxOrReq) {
             fetchHotArticles('article', { arg }),
             fetchHotHollows('hollow', { arg })
         ])
-        const { count: articleCounts, rows: articleRows } = articles?.payload
+        const { count: articleCounts, rows: articleRows, total } = articles?.payload
         const { count: hollowCounts, rows: hollowRows } = hollows?.payload
         const csrfToken = await getCsrfToken(context)
         return {
-            props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken }
+            props: { articleCounts, articleRows, hollowCounts, hollowRows, csrfToken, total }
         }
     } catch (err) {
         console.log(err)

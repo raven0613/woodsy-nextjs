@@ -150,6 +150,7 @@ export type serverProps = {
     articleRows: Iarticle[]
     hollowRows: Ihollow[]
     csrfToken: string
+    total: number
 }
 export type userArg = {
     arg: Iuser
