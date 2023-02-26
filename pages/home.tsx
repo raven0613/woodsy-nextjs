@@ -19,12 +19,14 @@ import { userContext } from '../components/UserProvider'
 
 import useArticleRecord from '../components/hooks/useArticleRecord'
 import useHollowRecord from '../components/hooks/useHollowRecord';
+import useThrottle from '../components/hooks/useThrottle';
 
 const inter = Inter({ subsets: ['latin'] })
 
 const arg = { page: 1, limit: 10, keyword: '' }
 const keyArg = { page: 1, limit: 10, keyword: '' }
 const artMap = new Map()
+const newArtMap = new Map()
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken, total }: serverProps) {
     const { currentUser } = useContext(userContext)
@@ -59,6 +61,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         const payload = data.payload as Iarticle
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
         setNewArticles(arts => [art, ...arts])
+        if (!newArtMap.get(art.id)) {
+            newArtMap.set(art.id, 1)
+        }
     }});
     // 新增一個樹洞
     const { trigger: addHollowTrigger, isMutating: addHollowIsMutating, data: addedHollowData, error: addedHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchAddHollow, { onSuccess: (data: successResult) => { 
@@ -70,6 +75,9 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
     // 關注的 fetch hook
     const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
+    const artSize = articles.length
+    useThrottle({hotArtTrigger, page, setPage, artSize, total})
+
     function onSuccessCallback (data: successResult) {
         hotHollowTrigger(arg)
     }
@@ -78,10 +86,11 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         if (!article_id) return
         artTrigger()
     }
-
     // server props 的文章樹洞資料
     useEffect(() => {
+        newArtMap.clear()
         artMap.clear()
+        setPage(2)
         if (!currentUserId) return
         const hotHollows: Ihollow[] = hollowRows? hollowRows : []
         const hotArticles: Iarticle[] = articleRows? articleRows : []
@@ -110,7 +119,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                 noRepeatArts.push(arts[item])
             }
         }
-        console.log(arts)
         setArticles(articles => [...articles, ...noRepeatArts])
     }, [currentUserId, hotArtData])
     // 抓回來一整包的樹洞資料
@@ -228,40 +236,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         keyArg.keyword = keyword
         keyHollowTrigger(keyArg)
     }
-    const artSize = articles.length
-    // 節流
-    useEffect(() => {
-        let ishandling = false
-        function handleScroll () {
-            if (ishandling) return
-            ishandling = true
-
-            const { clientHeight, scrollTop, scrollHeight } = document.documentElement
-            if ((clientHeight + scrollTop) / scrollHeight >= 0.9) {
-                if (artSize < total) {
-                    const arg = { page, limit: 10, keyword: '' }
-                    hotArtTrigger(arg)
-                    setPage(page + 1)
-                }
-            }
-            ishandling = false
-        }
-        function throttle (callback: () => void, time: number) {
-            let timer: NodeJS.Timeout | null = null
-            return function () {
-                if (timer) return
-                timer = setTimeout(() => {
-                    callback()
-                    timer = null
-                }, time)
-            }
-        }
-        const throttleArt = throttle(handleScroll, 1000)
-        document.addEventListener('scroll', throttleArt)
-        return () => { document.removeEventListener('scroll', throttleArt) }
-    }, [hotArtTrigger, page, artSize, total])
-
-
+    const artsWithoutNewarts = articles.filter(art => !newArtMap.get(art.id))
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
 
@@ -316,7 +291,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                     )
                     })}
 
-                    {articles && articles.map(art => {
+                    {artsWithoutNewarts && artsWithoutNewarts.map(art => {
                     return (
                         <ArticleCardController article={art} key={art.id} 
                         handleCollect={handleCollect}

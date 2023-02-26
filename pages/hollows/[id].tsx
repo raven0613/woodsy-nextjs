@@ -1,45 +1,42 @@
 import { useRouter } from 'next/router'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation'
 import { getHollow } from '../../api_helpers/apis/hollow';
 import Link from 'next/link'
-import { deleteArg, Iarticle, ICollection, Ihollow, Iuser, param, rows, subPayload, successResult } from '../../type-config'
+import { deleteArg, Iarticle, ICollection, Ihollow, ILikeship, Iuser, param, rows, subPayload, successResult } from '../../type-config'
 import ArticleCardController from '../../components/article/articleCardController'
 import ArticleInput from '../../components/article/articleInput'
-import { fetchHotHollows, fetchAddHollow, fetchHollow, fetchHotArticles, fetchAddArt } from '../../api_helpers/fetchers'
+import { fetchHotHollows, fetchAddHollow, fetchHollow, fetchHotArticles, fetchAddArt, fetchArticle } from '../../api_helpers/fetchers'
 import { formattedArticles, formattedHollows } from '../../helpers/helpers'
 import { useSession } from 'next-auth/react';
 import useArticleRecord from '../../components/hooks/useArticleRecord'
 import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 import { userContext } from '../../components/UserProvider'
+import useThrottle from '../../components/hooks/useThrottle';
 
 const arg = { page: 1, limit: 10, keyword: '' }
+const keyArg = { page: 1, limit: 10, keyword: '' }
+const artMap = new Map()
+const newArtMap = new Map()
+let total = 0
 
 export default function Hollow () {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll)
-        return () => { window.removeEventListener('scroll', handleScroll) }
-    }, [])
-
-
-    const { data: session, status } = useSession()
-
     const currentUserId = currentUser?.id
 
     const router = useRouter()
     const { id } = router.query || ''
-    // const { data, error } = useSWR(id, fetchHollow);
-    // const hollowData = data?.data.payload
     
-
+    const currentArticleIdRef = useRef<number>()
+    const [page, setPage] = useState<number>(2)
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     const [articles, setArticles] = useState<Iarticle[]>([])
+    const [newArticles, setNewArticles] = useState<Iarticle[]>([])
     const [hollow, setHollow] = useState<Ihollow>({
         id: Number(id)? Number(id) : 0,
         name: "",
@@ -54,10 +51,10 @@ export default function Hollow () {
     const isSub: boolean = hollow.isSub || false
 
     // 抓取現在樹洞
-    const { trigger:  hollowTrigger, data: hollowData, error: hollowError } = useSWRMutation<successResult, Error>(id, fetchHollow);
+    const { trigger: hollowTrigger, data: hollowData, error: hollowError } = useSWRMutation<successResult, Error>(id, fetchHollow);
 
     // 得到該樹洞的所有文章
-    const { trigger: articlesTrigger, data: articlesData, error: articlesError } = useSWRMutation<successResult, Error>(`hollow/${id}/articles`, fetchHotArticles);
+    const { trigger: hotArtTrigger, data: hotArtData, error: hotArtError } = useSWRMutation<successResult, Error>(`hollow/${id}/articles`, fetchHotArticles);
 
     // 抓取一包樹洞(給 input 用)
     const { trigger: hollowsTrigger, data: hollowsData, error: hollowsError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
@@ -76,35 +73,44 @@ export default function Hollow () {
 
     // 新增一則文章
     const { trigger: addArtTrigger, isMutating: addArtIsMutating, data: addedArtData, error: addedArtError } = useSWRMutation<successResult, Error>(`article`, fetchAddArt, { onSuccess: (data: successResult) => { 
-        // const payload = data.payload as Iarticle
-        // const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
-        // setNewArticle(art)
+        const payload = data.payload as Iarticle
+        const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
+        setNewArticles(arts => [art, ...arts])
+        if (!newArtMap.get(art.id)) {
+            newArtMap.set(art.id, 1)
+        }
     }});
+    // 抓取一篇文章
+    const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleIdRef.current}`, fetchArticle);
+
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onArtRecordSuccess})
     // 關注的 fetch hook
     const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
+    const artSize = articles.length
+    
+    useThrottle({hotArtTrigger, page, setPage, artSize, total})
+
+    function onArtRecordSuccess (data: successResult) {
+        const { article_id } = data.payload as ICollection | ILikeship
+        if (!article_id) return
+        artTrigger()
+    }
     function onSuccessCallback (data: successResult) {
-        // 按讚之後 newArt 會被蓋掉
-        // const { article_id } = data.payload as ICollection
-        // console.log('newArticle', newArticle)
-        // console.log('article_id', article_id)
-        // console.log('currentArticleIdRef.current', currentArticleIdRef.current)
-        // if (article_id === currentArticleIdRef.current) {
-        //     // return artTrigger()
-        // }  //TODO: 新增文章的邏輯還沒調整好
-        articlesTrigger(arg)
+        hotArtTrigger(arg)
         hollowTrigger()
     }
     useEffect(() => {
+        artMap.clear()
+        setPage(2)
         hollowsTrigger(arg)
     }, [hollowsTrigger])
     useEffect(() => {
-        if (!id || !articlesTrigger || !hollowTrigger) return
+        if (!id || !hotArtTrigger || !hollowTrigger) return
         hollowTrigger()
-        articlesTrigger(arg)
-    }, [id, articlesTrigger, hollowTrigger])
+        hotArtTrigger(arg)
+    }, [id, hotArtTrigger, hollowTrigger])
 
     //熱門樹洞
     useEffect(() => {
@@ -123,21 +129,57 @@ export default function Hollow () {
     }, [hollowData, currentUserId])
     // 熱門文章
     useEffect(() => {
-        if (!currentUserId || !articlesData) return
-        const artRows = articlesData?.payload as rows
+        if (!currentUserId || !hotArtData) return
+        const artRows = hotArtData?.payload as rows
         const artDatas = artRows.rows as Iarticle[]
         const arts = formattedArticles(currentUserId, artDatas)
-        setArticles(arts)
-    }, [articlesData, currentUserId])
+        const noRepeatArts: Iarticle[] = []
+        for (let item in arts) {
+            if (!artMap.get(arts[item].id)) {
+                artMap.set(arts[item].id, 1)
+                noRepeatArts.push(arts[item])
+            }
+        }
+        setArticles(articles => [...articles, ...noRepeatArts])
+        total = artRows.total || 0
+    }, [hotArtData, currentUserId])
 
     // 刪除文章後重新 fetch API
     useEffect(() => {
         if (!refetchTrigger) return
-        articlesTrigger(arg)
+        hotArtTrigger(arg)
         return () => {
             handleRefetchTrigger && handleRefetchTrigger()
         }
-    }, [refetchTrigger, articlesTrigger, handleRefetchTrigger])
+    }, [refetchTrigger, hotArtTrigger, handleRefetchTrigger])
+
+    // 抓回來一篇的文章資料
+    useEffect(() => {
+        if (!currentUserId || !artData) return
+        const payload = artData.payload as Iarticle
+        if (currentArticleIdRef.current !== payload.id) return
+        const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
+        // 按讚的是在熱門文章列表中
+        if (artMap.get(art.id)) {
+            return setArticles(arts => {
+                return arts.map(article => {
+                    if (article.id === art.id) {
+                        return art;
+                    }
+                    return article;
+                });
+            })
+        }
+        // 按讚的是在新文章列表中
+        setNewArticles(arts => {
+            return arts.map(article => {
+                if (article.id === art.id) {
+                    return art;
+                }
+                return article;
+            });
+        })
+    }, [currentUserId, artData])
 
     function handleAddArt (article: Iarticle) {
         addArtTrigger(article)
@@ -164,7 +206,7 @@ export default function Hollow () {
     function handleLike (articleId: number, _commentId: number, isLiked: boolean) {
         if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
-
+        currentArticleIdRef.current = articleId
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isLiked) {
@@ -176,6 +218,7 @@ export default function Hollow () {
     function handleCollect (articleId: number, isCollected: boolean) {
         if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
         if (!currentUserId) return console.log('請先登入')
+        currentArticleIdRef.current = articleId
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isCollected) {
@@ -209,9 +252,8 @@ export default function Hollow () {
         arg.keyword = keyword
         keyHollowTrigger(arg)
     }
-    function handleScroll () {
-        console.log()
-    }
+
+    const artsWithoutNewarts = articles.filter(art => !newArtMap.get(art.id))
     return (
         <>
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-6/12'>
@@ -238,7 +280,21 @@ export default function Hollow () {
                 keyHollows={keyHollows} />
                 
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
-                {articles && articles.map(art => {
+                {newArticles && newArticles.map(art => {
+                return (
+                    <ArticleCardController article={art} key={art.id} 
+                    handleCollect={handleCollect}
+                    handleLike={handleLike}
+                    handleClickMore={handleClickMore}
+                    handleCloseMore={handleCloseMore}
+                    handleClickDelete={handleClickDelete}
+                    moreShowingId={moreShowingId} 
+                    currentUser={currentUser}
+                    handleEdit={handleEdit}
+                    isDetail={false} />
+                )
+                })}
+                {artsWithoutNewarts && artsWithoutNewarts.map(art => {
                     return (
                         <ArticleCardController article={art} key={art.id} 
                         handleCollect={handleCollect}
@@ -252,7 +308,8 @@ export default function Hollow () {
                         isDetail={false} />
                     )
                 })}
-                {articles.length < 1 && <p className=''>這個樹洞目前是空的</p>}
+                {artSize >= total && <p className='text-center text-stone-400 pb-4'>已沒有其他話題</p>}
+                {articles.length < 1 && <p className='text-center text-stone-400 pb-4'>這個樹洞目前是空的</p>}
             </div>
         </>
     )

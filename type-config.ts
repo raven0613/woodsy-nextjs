@@ -209,6 +209,7 @@ export interface successResult {
 export interface rows {
     count: number
     rows: Iarticle[] | Icomment[] | Ihollow[]
+    total?: number
 }
 
 
