@@ -43,12 +43,17 @@ export default function User() {
         handleSetCurrentUser && handleSetCurrentUser(payload)
     } });
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onArtRecordSuccess})
     // 關注的 fetch hook
     const { hollowRecordTrigger, getHollowRecordIsMutating } = useHollowRecord({onSuccessCallback})
 
     const currentArticleIdRef = useRef<number>()
 
+    function onArtRecordSuccess (data: successResult) {
+        const { article_id } = data.payload as ICollection | ILikeship
+        if (!article_id) return
+        artTrigger()
+    }
     function onSuccessCallback (data: successResult) {
         collectionsTrigger(arg)
         hotHollowTrigger(arg)
