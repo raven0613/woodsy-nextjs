@@ -30,7 +30,7 @@ async function getUserArticles (req: NextApiRequest, res: NextApiResponse<errorR
 
     const { page: p, limit: l, id } = req.query;
     const page = Number(p), limit = Number(l), idNum = Number(id)
-    if (!id || !p || !l) return res.status(500).json({ error: '請確認請求資料' })
+    if (!id || !p || !l) return res.status(400).json({ error: '請確認請求資料' })
 
     if (idNum !== session.user.id && session.user.role !== 'admin') return res.status(401).json({ error: '使用者身分不符' })
     try {

@@ -15,7 +15,7 @@ import { userContext } from '../../components/UserProvider'
 //樹洞可以選擇顯示簡單版或複雜版
 //複雜版有顯示熱門文章
 
-const arg: param = { page: 1, limit: 15 }
+const arg: param = { page: 1, limit: 15, keyword: '' }
 
 export default function HollowList () {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)

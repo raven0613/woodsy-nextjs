@@ -23,6 +23,11 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
   const { page: p, limit: l, id } = req.query;
   const page = Number(p), limit = Number(l), idNum = Number(id)
   try {
+    const total = await Articles.count({
+      where: {
+        hollow_id: idNum
+      }
+    })
     const articles = await Articles.findAndCountAll({
       where: {
         hollow_id: idNum
@@ -38,7 +43,7 @@ export async function getArticles(req: NextApiRequest, res: NextApiResponse<succ
       offset: getOffset(page, limit),
       nest: true, 
     })
-    res.status(200).json({ success: '查詢成功', payload: articles })  //回傳的是 count 和 data
+    res.status(200).json({ success: '查詢成功', payload: {...articles, total} })  //回傳的是 count 和 data
   } catch (err) {
     return res.status(500).json({ error: '伺服器錯誤' })
   }

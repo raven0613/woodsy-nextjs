@@ -64,6 +64,7 @@ export interface Iarticle {
 interface user {
     id: number
     name: string
+    tempId?: string
 }
 interface hollow {
     id: number
@@ -140,6 +141,7 @@ export interface likePayload {
 export interface param {
     page: number
     limit: number
+    keyword: string
 }
 
 export type serverProps = {
@@ -148,6 +150,7 @@ export type serverProps = {
     articleRows: Iarticle[]
     hollowRows: Ihollow[]
     csrfToken: string
+    total: number
 }
 export type userArg = {
     arg: Iuser
@@ -206,6 +209,7 @@ export interface successResult {
 export interface rows {
     count: number
     rows: Iarticle[] | Icomment[] | Ihollow[]
+    total?: number
 }
 
 
