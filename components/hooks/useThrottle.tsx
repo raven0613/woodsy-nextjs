@@ -21,7 +21,7 @@ export default function useThrottle({ hotArtTrigger, page, setPage, artSize, tot
             ishandling = true
 
             const { clientHeight, scrollTop, scrollHeight } = document.documentElement
-            if ((clientHeight + scrollTop) / scrollHeight >= 0.9) {
+            if ((clientHeight + scrollTop) / scrollHeight >= 0.8) {
                 if (artSize < total) {
                     const arg = { page, limit: 10, keyword: '' }
                     hotArtTrigger(arg)

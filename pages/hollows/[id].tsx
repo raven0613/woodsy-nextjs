@@ -102,6 +102,7 @@ export default function Hollow () {
         hollowTrigger()
     }
     useEffect(() => {
+        newArtMap.clear()
         artMap.clear()
         setPage(2)
         hollowsTrigger(arg)

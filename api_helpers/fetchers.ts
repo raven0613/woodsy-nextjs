@@ -1,7 +1,7 @@
 import { Iarticle, Icomment, Iuser, param, paramArg, commentArg, articleArg, deleteArg, hollowArg, likePayload, collectionPayload, payloadArg, subPayload, userArg } from '../type-config'
 import { getCurrentUser, getUser, getUserArticles, editUser, addUserLike, deleteUserLike, addUserCollect, deleteUserCollect, getUserCollections, addUserSub, deleteUserSub, getUserSubs } from '../api_helpers/apis/user'
 import { getArticles, getArticle, addArticle, editArticle, deleteArticle } from '../api_helpers/apis/article'
-import { getComments, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
+import { getComments, getComment, addComment, editComment, deleteComment } from '../api_helpers/apis/comments'
 import { getHollows, getHollow, addHollow } from '../api_helpers/apis/hollow'
 
 export async function fetchCurrentUser (url: string) {
@@ -198,7 +198,14 @@ export async function fetchComments (url: string, { page, limit }: param) {
     }
 }
 
-
+export async function fetchComment (url: string) {
+    try {
+        const { data } = await getComment(url)
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 export async function fetchAddComments (url: string, { arg }: commentArg) {
     try {

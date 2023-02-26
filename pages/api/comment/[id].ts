@@ -11,6 +11,9 @@ const { Users, Articles, Comments, Hollows, Likeships } = DB;
 
 export default async function handleComments(req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
     switch (req.method) {
+        case 'GET':
+            getComment(req, res)
+            break
         case 'PUT':
             editComment(req, res)
             break
@@ -21,6 +24,26 @@ export default async function handleComments(req: NextApiRequest, res: NextApiRe
             res.status(405).end() //Method Not Allowed
             break
     }
+}
+
+async function getComment (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {
+    const { id } = req.query
+    const idNum = Number(id)
+    try {
+        const comment: Iarticle = await Comments.findByPk(idNum, {
+            nest: true,
+            include: [
+                { model: Users, as: 'User', attributes: ['id', 'name'] }, 
+                { model: Users, as: 'LikedUsers', attributes: ['id', 'name'] },
+            ]
+        })
+        if (!comment) return res.status(500).json({ error: '找不到文章' } )
+        res.status(200).json({ success: '查詢成功', payload: comment })
+    
+    } catch (err) {
+        return res.status(500).json({ error: '伺服器錯誤' } )
+    }
+
 }
 
 async function editComment (req: NextApiRequest, res: NextApiResponse<successResult | errorResult>) {

@@ -3,12 +3,12 @@ import { useState, useEffect, useContext, useRef } from 'react'
 import useSWR, { Key, Fetcher } from 'swr'
 import useSWRMutation from 'swr/mutation'
 import Navbar from '../../components/navbar'
-import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg, successResult } from '../../type-config'
+import { Iarticle, Icomment, Iuser, param, commentArg, articleArg, deleteArg, successResult, ICollection, ILikeship } from '../../type-config'
 import CommentCardController from "../../components/comment/commentCardController"
 import CommentInput from "../../components/comment/commentInput"
 import ArticleCardController from '../../components/article/articleCardController'
 
-import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
+import { fetchArticle, fetchEditArticle, fetchDeleteArticle, fetchComments, fetchComment, fetchAddComments, fetchEditComments, fetchDeleteComments } from '../../api_helpers/fetchers'
 import { formattedArticles, formattedComments } from '../../helpers/helpers'
 import Link from 'next/link'
 import hollowStyle from '../../styles/hollow.module.css';
@@ -19,6 +19,7 @@ import randomstring from 'randomstring'
 
 const params: param = { page: 1, limit: 15, keyword: '' }
 const randomMap = new Map()  // userId: tempId
+const commentMap = new Map()
 
 export default function Article () {
     const { currentUser, handleSetCurrentUser } = useContext(userContext)
@@ -35,6 +36,7 @@ export default function Article () {
     //fetch 回來的文章資料
     const [comments, setComments] = useState<Icomment[]>([])
     const [article, setArticle] = useState<Iarticle | null>()
+    const currentCommentIdRef = useRef<number>()
 
     // 抓取一篇文章
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${id}`, fetchArticle);
@@ -42,13 +44,33 @@ export default function Article () {
     // 得到該文章的所有回覆
     const { trigger: commentsTrigger, data: commentsData, error: commentsError } = useSWRMutation([`article/${id}/comments`, params], ([url, params]) => fetchComments(url, params));
 
+    // 抓取一個回覆
+    const { trigger: commentTrigger, data: commentData, error: commentError } = useSWRMutation<successResult, Error>(`comment/${currentCommentIdRef.current}`, fetchComment);
+    // 新增一條回覆
+    const { trigger: addComTrigger, isMutating: addComIsMutating, data: addedComData, error: addedComError } = useSWRMutation<successResult, Error>(`comment`, fetchAddComments, {onSuccess: onComRecordSuccess});
+    // 刪除一條回覆
+    const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<successResult, Error>(`comment`, fetchDeleteComments, {onSuccess: onComRecordSuccess});
+    // 編輯一條回覆
+    const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
+
     // 喜歡和收藏的 fetch hook
-    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onSuccessCallback})
+    const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onArtRecordSuccess})
 
-
-    function onSuccessCallback (data: successResult) {
-        artTrigger()
+    // 新增 & 刪除回覆成功
+    function onComRecordSuccess (data: successResult) {
+        const payload = data.payload as Icomment
         commentsTrigger()
+        setComments(coms => [...coms, payload])
+    }
+    // 按讚 & 收藏成功
+    function onArtRecordSuccess (data: successResult) {
+        const { article_id, comment_id } = data.payload as ICollection | ILikeship
+        if (article_id) {
+            artTrigger() 
+        }
+        else if (comment_id) {
+            commentTrigger() 
+        }
     }
 
     useEffect(() => {
@@ -66,19 +88,21 @@ export default function Article () {
             handleRefetchTrigger && handleRefetchTrigger()
         }
     }, [refetchTrigger, handleRefetchTrigger, artTrigger, commentsTrigger])
-    // 存進 article
+
+    // 抓回來一篇的文章資料
     useEffect(() => {
         if (!currentUserId || !artData) return
         const payload = artData.payload as Iarticle
         const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
         setArticle(art)
     }, [artData, currentUserId])
-    //存進 comments
+
+    // 抓回來一整包的回覆資料
     useEffect(() => {
         if (!currentUserId || !commentsData) return
         const payload = commentsData? commentsData.data.payload.rows : []
         const coms = formattedComments(currentUserId as number, payload as Icomment[])
-        const comWithTempId = coms.map(com => {
+        const comsWithTempId = coms.map(com => {
             let tempId = ''
             if (com.user_id === currentUserId) {
                 tempId = '原PO'
@@ -93,17 +117,33 @@ export default function Article () {
             }
             return { ...com, User: {...com.User, tempId} }
         }) as Icomment[]
-        setComments(comWithTempId)
-    }, [commentsData, currentUserId])
-    
-    // 新增一條回覆
-    const { trigger: addComTrigger, isMutating: addComIsMutating, data: addedComData, error: addedComError } = useSWRMutation<successResult, Error>(`comment`, fetchAddComments, {onSuccess: onSuccessCallback});
-    // 刪除一條回覆
-    const { trigger: deleteComTrigger, isMutating: deleteComIsMutating, data: deletedComData, error: deletedComError } = useSWRMutation<successResult, Error>(`comment`, fetchDeleteComments, {onSuccess: onSuccessCallback});
-    // 編輯一條回覆
-    const { trigger: editComTrigger, isMutating: editComIsMutating, data: editComData, error: editComError } = useSWRMutation<Icomment, Error>(`comment`, fetchEditComments);
-    
 
+        for (let item in comsWithTempId) {
+            if (!commentMap.get(comsWithTempId[item].id)) {
+                commentMap.set(comsWithTempId[item].id, 1)
+            }
+        }
+        setComments(comsWithTempId)
+    }, [commentsData, currentUserId])
+
+    // 抓回來一篇的回覆資料
+    useEffect(() => {
+        if (!currentUserId || !commentData) return
+        const payload = commentData.payload as Icomment
+        let com = formattedComments(currentUserId as number, [payload] as Icomment[])[0]
+        if (!com.User) return
+        com = {...com, User: {...com.User, tempId: randomMap.get(com.user_id)}}
+        if (commentMap.get(com.id)) {
+            return setComments(comments => {
+                return comments.map(comment => {
+                    if (com.id === comment.id) {
+                        return com
+                    }
+                    return comment;
+                });
+            })
+        }
+    }, [currentUserId, commentData])
 
     // 新增一條回覆
     function handleAddComment (comment: Icomment) {
@@ -142,7 +182,7 @@ export default function Article () {
     function handleLike (articleId: number, commentId: number, isLiked: boolean) {
         if (getRecordIsMutating('like') || getRecordIsMutating('deleteLike')) return
         if (!currentUserId) return console.log('請先登入')
-        // currentArticleIdRef.current = articleId
+        currentCommentIdRef.current = commentId
 
         const payload = articleId ? 
         { user_id: currentUserId, article_id: articleId }
@@ -157,7 +197,6 @@ export default function Article () {
     function handleCollect (articleId: number, isCollected: boolean) {
         if (getRecordIsMutating('collect') || getRecordIsMutating('deleteCollect')) return
         if (!currentUserId) return console.log('請先登入')
-        // currentArticleIdRef.current = articleId
 
         const payload = { user_id: currentUserId, article_id: articleId }
         if (isCollected) {
@@ -172,13 +211,15 @@ export default function Article () {
     }
     return (
         <main className='md:mx-auto md:w-4/5 lg:w-6/12'>
-            {article && <div className='h-screen mx-2 w-full flex flex-col justify-between pb-8'>
+            {article && <div className='h-auto mx-2 w-full flex flex-col justify-between pb-8'>
 
                 <div className='pt-20 flex-1'>
 
                     <div className='flex items-center'>
                         <h2 className='text-lg font-semibold px-4'>{article.User?.name}</h2>
-                        {article.Hollow && <Link className={hollowStyle.hollow_button} href={`/hollows/${article.Hollow.id}`}><p>{article.Hollow.name}</p></Link>}
+                        {article.Hollow && <Link className={hollowStyle.hollow_button} href={`/hollows/${article.Hollow.id}`}>
+                            <p>{article.Hollow.name}</p>
+                        </Link>}
                     </div>
 
                     <ArticleCardController article={article}

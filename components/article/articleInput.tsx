@@ -121,7 +121,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
 
             <div className='w-full border-t py-2 pl-8 pr-4 flex flex-col mt-1'>
                 
-                <div>
+                <div className='flex flex-wrap'>
                     {selectHollow?.name && <button className='border-lime-500 text-lime-500 border rounded-full m-1 px-3 h-10' disabled>{selectHollow.name}</button>}
 
                     {currentHollow && <button 
@@ -132,14 +132,14 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
                     {keyHollowsWithoutCurrent && keyHollowsWithoutCurrent.map(hollow => {
                         return (
                             <button className={hollowStyle.hollow_button} key={hollow.id} onClick={() => {handleSelect(hollow)}}>
-                                <div >{hollow.name}</div>
+                                <p>{hollow.name}</p>
                             </button>
                         )
                     })}
                     {keyHollowsWithoutCurrent.length === 0 && hollowsWithoutCurrent && hollowsWithoutCurrent.map(hollow => {
                         return (
                             <button className={hollowStyle.hollow_button} key={hollow.id} onClick={() => {handleSelect(hollow)}}>
-                                <div >{hollow.name}</div>
+                                <p>{hollow.name}</p>
                             </button>
                         )
                     })}

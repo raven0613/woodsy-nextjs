@@ -55,7 +55,6 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorRes
         if (article) {
             await Articles.increment({collected_counts: 1}, {where: { id: article_id }, transaction: t})
         }
-        
         await t.commit();
         return res.status(200).json({ success: '收藏成功', payload: collection })
     } catch (err) {
