@@ -238,24 +238,7 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
         keyHollowTrigger(keyArg)
     }
     const artsWithoutNewarts = articles.filter(art => !newArtMap.get(art.id))
-    
-    // 實作 React-window 的測試
-    // function MyListItem({ data }) {
-    //     return data.map((art: Iarticle) => {
-    //         return (
-    //             <ArticleCardController article={art} key={art.id} 
-    //             handleCollect={handleCollect}
-    //             handleLike={handleLike}
-    //             handleClickMore={handleClickMore}
-    //             handleCloseMore={handleCloseMore}
-    //             handleClickDelete={handleClickDelete}
-    //             moreShowingId={moreShowingId} 
-    //             currentUser={currentUser}
-    //             handleEdit={handleEdit}
-    //             isDetail={false} />
-    //         )
-    //         })
-    // }
+
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
 
@@ -323,15 +306,6 @@ export default function Home({ articleCounts, articleRows, hollowCounts, hollowR
                         isDetail={false} />
                     )
                     })}
-                    {/* <List    
-                        height={400}
-                        itemCount={artsWithoutNewarts.length}
-                        width={600}
-                        itemData={artsWithoutNewarts}
-                        itemSize={(index: number) => 10}
-                    >
-                        {MyListItem}
-                    </List> */}
                     {artSize >= total && <p className='text-center text-stone-400 pb-4'>已沒有其他話題</p>}
                 </div>
             </div>

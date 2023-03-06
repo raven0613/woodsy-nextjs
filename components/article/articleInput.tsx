@@ -95,7 +95,7 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
     const keyHollowsWithoutCurrent: Ihollow[] = keyHollows && keyHollows.filter(hollow => hollow.id !== selectHollow?.id && hollow.id !== currentHollow?.id)
     
     return (
-        <main className='w-full relative'>
+        <div className='w-full relative'>
             
             {!currentUser?.id && <div className='z-0 absolute inset-0'>
                 <div className='z-0 absolute inset-5 bg-black opacity-50 flex items-center rounded-md'>
@@ -158,6 +158,6 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
                     <button className={articleStyle.confirm_button} type="button" disabled={!title || !content} onClick={handleSubmit}>送出</button>
                 </div>
             </div>
-        </main>
+        </div>
     )
 }

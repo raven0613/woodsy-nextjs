@@ -11,6 +11,7 @@ import { userContext } from '../../components/UserProvider'
 import useArticleRecord from '../../components/hooks/useArticleRecord'
 import useHollowRecord from '../../components/hooks/useHollowRecord';
 import ArticleCardController from '../../components/article/articleCardController'
+import HollowCard from '../../components/hollow/hollowCard'
 // 修改個人資料 
 
 const arg: param = { page: 1, limit: 10, keyword: '' }
@@ -25,11 +26,14 @@ export default function User() {
     const [userArticles, setUserArticles] = useState<Iarticle[]>([])
     const [collectedArticles, setCollectedArticles] = useState<Iarticle[]>([])
     const [hollows, setHollows] = useState<Ihollow[]>([])
+    const [showingPanel, setShowingPanel] = useState<string>('col')  // col / pub / sub
 
     // 抓取一包收藏文章
     const { trigger: collectionsTrigger, data: collectionsData, error: collectionsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/collections`, fetchGetUserCollections);
     // 抓取目前使用者的文章
     const { trigger: userArtsTrigger, data: userArtsData, error: userArtsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/articles`, fetchGetUserArts);
+    // 抓取一包關注樹洞
+    const { trigger: subsTrigger, data: subsData, error: subsError } = useSWRMutation<successResult, Error>(`user/${currentUserId}/subscriptions`, fetchGetUserCollections);
     // 抓取一包樹洞
     const { trigger: hotHollowTrigger, data: hotHollowData, error: hotHollowError } = useSWRMutation<successResult, Error>(`hollow`, fetchHotHollows);
     // 抓取一篇文章
@@ -68,7 +72,8 @@ export default function User() {
         if (!currentUserId) return
         userArtsTrigger(arg)
         collectionsTrigger(arg)
-    }, [currentUserId, collectionsTrigger, userArtsTrigger])
+        subsTrigger(arg)
+    }, [currentUserId, collectionsTrigger, userArtsTrigger, subsTrigger])
     // 抓回來一整包的使用者文章資料
     useEffect(() => {
         if (!currentUserId) return
@@ -90,12 +95,11 @@ export default function User() {
     // 抓回來一整包的樹洞資料
     useEffect(() => {
         if (!currentUserId) return
-        if (!hotHollowData) return
-        const hollowRows = hotHollowData?.payload as rows
-        const hollowDatas = hollowRows.rows as Ihollow[]
-        const hollows = formattedHollows(currentUserId, hollowDatas)
+        if (!subsData) return
+        const hollowRows = subsData?.payload as Ihollow[]
+        const hollows = formattedHollows(currentUserId, hollowRows)
         setHollows(hollows)
-    }, [currentUserId, hotHollowData])
+    }, [currentUserId, subsData])
     
     // 刪除文章後重新 fetch API
     useEffect(() => {
@@ -148,6 +152,19 @@ export default function User() {
             artRecordTrigger('collect', payload)
         }
     }
+    function handleSub (hollowId: number, isSub: boolean) {
+        if (!currentUserId) return
+         if (getHollowRecordIsMutating('sub') || getHollowRecordIsMutating('deleteSub')) return
+
+        const payload: subPayload = { user_id: currentUserId, hollow_id: hollowId }
+       if (isSub) {
+            hollowRecordTrigger('deleteSub', payload)
+        }
+        else {
+            hollowRecordTrigger('sub', payload)
+        }
+    }
+
     function handleEdit (article: Iarticle) {
         if (!article || !handleEditWindow) return
         handleEditWindow(article)
@@ -156,35 +173,34 @@ export default function User() {
         if (!user) return
         userEditTrigger(user)
     }
+    function handleClickPanel (type: string) {
+        if (!type) return
+        setShowingPanel(type)
+    }
 
     return (
         <main className='w-full md:mx-auto md:w-4/5 lg:w-6/12'>
             <UserPanel currentUserDetail={currentUserDetail} handleEditUser={handleEditUser} />
 
-            <div className='pt-6 mx-2 w-full'>
-                <h1 className='text-slate-300 text-xl font-semibold'>收藏的話題</h1>
-                <div className='flex-col justify-center w-full'>
-                    {collectedArticles && collectedArticles.map(art => {
-                    return (
-                        <ArticleCardController article={art} key={art.id} 
-                        handleCollect={handleCollect}
-                        handleLike={handleLike}
-                        handleClickMore={handleClickMore}
-                        handleCloseMore={handleCloseMore}
-                        handleClickDelete={handleClickDelete}
-                        moreShowingId={moreShowingId} 
-                        currentUser={currentUser}
-                        handleEdit={handleEdit}
-                        isDetail={false} />
-                    )
-                    })}
-                </div>
+            <div className='pt-6 w-full flex justify-center'>
+                {showingPanel !== 'col' && <button className='text-slate-300 text-xl font-semibold hover:text-slate-400 cursor-pointer' onClick={() => handleClickPanel('col')}>收藏的話題</button>}
+                {showingPanel === 'col' && <div className='text-slate-600 text-xl font-semibold' onClick={() => handleClickPanel('col')}>收藏的話題</div>}
+
+                <h1 className='text-slate-300 px-4'>/</h1>
+
+                {showingPanel !== 'pub' && <button className='text-slate-300 text-xl font-semibold hover:text-slate-400 cursor-pointer' onClick={() => handleClickPanel('pub')}>開啟的話題</button>}
+                {showingPanel === 'pub' && <div className='text-slate-600 text-xl font-semibold' onClick={() => handleClickPanel('pub')}>開啟的話題</div>}
+
+                <h1 className='text-slate-300 px-4'>/</h1>
+
+                {showingPanel !== 'sub' && <button className='text-slate-300 text-xl font-semibold hover:text-slate-400 cursor-pointer' onClick={() => handleClickPanel('sub')}>關注的樹洞</button>}
+                {showingPanel === 'sub' && <div className='text-slate-600 text-xl font-semibold' onClick={() => handleClickPanel('sub')}>關注的樹洞</div>}
             </div>
 
-            <div className='pt-6 mx-2 w-full'>
-                <h1 className='text-slate-300 text-xl font-semibold'>開啟的話題</h1>
+            <div className='py-6 mx-2 w-full'>
+
                 <div className='flex-col justify-center w-full'>
-                    {userArticles && userArticles.map(art => {
+                    {showingPanel === 'col' && collectedArticles && collectedArticles.map(art => {
                     return (
                         <ArticleCardController article={art} key={art.id} 
                         handleCollect={handleCollect}
@@ -198,6 +214,29 @@ export default function User() {
                         isDetail={false} />
                     )
                     })}
+                    {showingPanel === 'pub' && userArticles && userArticles.map(art => {
+                    return (
+                        <ArticleCardController article={art} key={art.id} 
+                        handleCollect={handleCollect}
+                        handleLike={handleLike}
+                        handleClickMore={handleClickMore}
+                        handleCloseMore={handleCloseMore}
+                        handleClickDelete={handleClickDelete}
+                        moreShowingId={moreShowingId} 
+                        currentUser={currentUser}
+                        handleEdit={handleEdit}
+                        isDetail={false} />
+                    )
+                    })}
+                    <div className='grid gap-4'>
+                        {showingPanel === 'sub' && hollows && hollows.map(hollow => {
+                            return (
+                                <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
+                                    <HollowCard hollow={hollow} handleSub={handleSub} />
+                                </Link>
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
         </main>

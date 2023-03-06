@@ -12,9 +12,6 @@ import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 import { userContext } from '../../components/UserProvider'
 
-//樹洞可以選擇顯示簡單版或複雜版
-//複雜版有顯示熱門文章
-
 const arg: param = { page: 1, limit: 15, keyword: '' }
 
 export default function HollowList () {
@@ -87,7 +84,7 @@ export default function HollowList () {
                 <h1 className='text-3xl font-bold'>Hollow</h1>
                 <input className='border w-60 h-10 px-4 outline-0' type="text" placeholder='請輸入樹洞名稱'/>
 
-                <h1 className='text-2xl font-bold'>關注的樹洞</h1>
+                <h1 className='text-2xl font-bold text-slate-400 my-3'>關注的樹洞</h1>
                 <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
                     {subHollows && subHollows.map(hollow => {
                         return (
@@ -98,18 +95,7 @@ export default function HollowList () {
                     })}
                 </div>
 
-                <h1 className='text-2xl font-bold'>最近去過的樹洞</h1>
-                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                    {/* {dummyHollows && dummyHollows.map(hollow => {
-                        return (
-                            <Link href={`/hollows/${hollow.id}`} key={hollow.id}>
-                                <HollowCard hollow={hollow}/>
-                            </Link>
-                        )
-                    })} */}
-                </div>
-
-                <h1 className='text-2xl font-bold'>所有樹洞</h1>
+                <h1 className='text-2xl font-bold text-slate-400 my-3'>所有樹洞</h1>
                 <div className='grid grid-cols-1 gap-4'>
                     {hollows && hollows.map(hollow => {
                         return (

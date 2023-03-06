@@ -6,8 +6,8 @@ import { authOptions } from '../auth/[...nextauth]'
 import { Sequelize } from 'sequelize';
 import { Ihollow, Icomment, Iuser, ICollection, errorResult, successResult, ILikeship } from '../../../type-config'
 import db from '../../../models/index';
-const DB: any = db;
-const { Users, Articles, Comments, Hollows, Collections } = DB;
+// const DB: any = db;
+const { Users, Articles, Comments, Hollows, Collections } = db;
 
 export default async function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
 
@@ -42,8 +42,9 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorRes
         const existCollection = await Collections.findOne({
             where: {
                 user_id, article_id
-            }
-        }, { transaction: t })
+            },
+            transaction: t
+        })
         if (existCollection) return res.status(403).json({ error: '已存在相同紀錄' })
 
         const collection = await Collections.create({
@@ -56,7 +57,7 @@ async function addCollection (req: NextApiRequest, res: NextApiResponse<errorRes
             await Articles.increment({collected_counts: 1}, {where: { id: article_id }, transaction: t})
         }
         await t.commit();
-        return res.status(200).json({ success: '收藏成功', payload: collection })
+        return res.status(200).json({ success: '收藏成功', payload: JSON.parse(JSON.stringify(collection)) })
     } catch (err) {
         await t.rollback();
         return res.status(500).json({ error: '伺服器錯誤' })
@@ -80,8 +81,9 @@ async function deleteCollection (req: NextApiRequest, res: NextApiResponse<error
         const existCollection = await Collections.destroy({
             where: {
                 user_id, article_id
-            }
-        }, { transaction: t })
+            },
+            transaction: t
+        })
         if (!existCollection) return res.status(404).json({ error: '此紀錄不存在' })
 
         const article = await Articles.findByPk(article_id, { transaction: t })
