@@ -6,8 +6,8 @@ import { authOptions } from '../auth/[...nextauth]'
 import { Sequelize } from 'sequelize';
 import { Ihollow, Icomment, Iuser, ISubcription, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
-const DB: any = db;
-const { Users, Articles, Comments, Hollows, Subscriptions } = DB;
+// const DB: any = db;
+const { Users, Articles, Comments, Hollows, Subscriptions } = db;
 
 export default async function handleSubscriptions(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
@@ -40,8 +40,9 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorR
         const existSub = await Subscriptions.findOne({
             where: {
                 user_id, hollow_id
-            }
-        }, { transaction: t })
+            },
+            transaction: t
+        })
         if (existSub) return res.status(409).json({ error: '已存在相同紀錄' })
 
         const sub = await Subscriptions.create({
@@ -55,7 +56,7 @@ async function addSubscription (req: NextApiRequest, res: NextApiResponse<errorR
         }
 
         await t.commit();
-        return res.status(200).json({ success: '關注成功', payload: sub })
+        return res.status(200).json({ success: '關注成功', payload: JSON.parse(JSON.stringify(sub)) })
 
     } catch (err) {
         await t.rollback();
@@ -80,8 +81,9 @@ async function deleteSubscription (req: NextApiRequest, res: NextApiResponse<err
         const existSub = await Subscriptions.destroy({
             where: {
                 user_id, hollow_id
-            }
-        }, { transaction: t })
+            },
+            transaction: t
+        })
         if (!existSub) return res.status(404).json({ error: '此紀錄不存在' })
 
         const hollow = await Hollows.findByPk(hollow_id, { transaction: t })

@@ -17,7 +17,6 @@ import { userContext } from '../../components/UserProvider'
 import useThrottle from '../../components/hooks/useThrottle';
 
 const arg = { page: 1, limit: 10, keyword: '' }
-const keyArg = { page: 1, limit: 10, keyword: '' }
 const artMap = new Map()
 const newArtMap = new Map()
 let total = 0
@@ -259,7 +258,7 @@ export default function Hollow () {
         <>
             <div className='mt-20 mx-2 w-full md:mx-auto md:w-4/5 lg:w-6/12'>
                 <div className='grid grid-cols-12 h-12'>
-                    <button className=''>←</button>
+                    <button onClick={() => router.back()} className=''>←</button>
 
                     {hollow? 
                         <h1 className='col-start-2 col-span-10 text-2xl font-semibold leading-loose h-full'>{hollow.name}</h1> 
@@ -271,14 +270,16 @@ export default function Hollow () {
                     {hollow.isSub && <button onClick={handleSub}>已關注 {hollow.subCounts}</button>}
                 </div>
 
-                <ArticleInput 
-                currentHollow={hollow}
-                handleAddArt={handleAddArt} 
-                currentUser={currentUser} 
-                hollows={hollows}
-                handleHollowPanel={handleHollowPanel}
-                handleKeyword={handleKeyword}
-                keyHollows={keyHollows} />
+                <div className='hidden sm:block mx-2 w-full border rounded-lg transition-height ease-out duration-300'>
+                    <ArticleInput 
+                    currentHollow={hollow}
+                    handleAddArt={handleAddArt} 
+                    currentUser={currentUser} 
+                    hollows={hollows}
+                    handleHollowPanel={handleHollowPanel}
+                    handleKeyword={handleKeyword}
+                    keyHollows={keyHollows} />
+                </div>
                 
                 <h1 className='text-2xl font-semibold leading-loose h-full pb-2 pt-4 pl-2'>話題</h1>
                 {newArticles && newArticles.map(art => {
@@ -309,7 +310,7 @@ export default function Hollow () {
                         isDetail={false} />
                     )
                 })}
-                {artSize >= total && <p className='text-center text-stone-400 pb-4'>已沒有其他話題</p>}
+                {artSize >= total && articles.length > 10 && <p className='text-center text-stone-400 pb-4'>已沒有其他話題</p>}
                 {articles.length < 1 && <p className='text-center text-stone-400 pb-4'>這個樹洞目前是空的</p>}
             </div>
         </>

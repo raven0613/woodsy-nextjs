@@ -50,9 +50,8 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
         handleAddHollow({...hollow, user_id: currentUser.id})
     }
     return (
-        <div>
+        <div className='w-11/12 m-auto py-4'>
             <p>挖掘一個樹洞</p>
-            <p>樹洞名稱</p>
 
             {existHollow && 
                 <div>
@@ -78,7 +77,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
             </div>}
 
             <input
-                className='outline-0 border w-64 h-12 px-2.5 rounded-md'
+                className='outline-0 border w-64 h-12 px-2.5 rounded-md mr-3'
                 value={inputVal}
                 onChange={e => {
                     handleInputHollow(e)

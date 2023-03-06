@@ -6,8 +6,8 @@ import { authOptions } from '../auth/[...nextauth]'
 import { Sequelize } from 'sequelize';
 import { Ihollow, Icomment, Iuser, ILikeship, errorResult, successResult } from '../../../type-config'
 import db from '../../../models/index';
-const DB: any = db;
-const { Users, Articles, Comments, Hollows, Likeships } = DB;
+// const DB: any = db;
+const { Users, Articles, Comments, Hollows, Likeships } = db;
 
 export default async function handleLikeship(req: NextApiRequest, res: NextApiResponse<errorResult | successResult>) {
     switch (req.method) {
@@ -41,8 +41,9 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
             existLike = await Likeships.findOne({
                 where: {
                     user_id, article_id
-                }
-            }, { transaction: t })
+                },
+                transaction: t
+            })
             if (existLike) return res.status(409).json({ error: '已存在相同紀錄' })
 
             like = await Likeships.create({
@@ -59,8 +60,9 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
             existLike = await Likeships.findOne({
                 where: {
                     user_id, comment_id
-                }
-            }, { transaction: t })
+                },
+                transaction: t
+            })
             if (existLike) return res.status(409).json({ error: '已存在相同紀錄' })
 
             like = await Likeships.create({
@@ -74,7 +76,7 @@ async function addLikeship (req: NextApiRequest, res: NextApiResponse<errorResul
             }
         }
         await t.commit();
-        return res.status(200).json({ success: '喜歡成功', payload: like })
+        return res.status(200).json({ success: '喜歡成功', payload: JSON.parse(JSON.stringify(like)) })
     
 
     } catch (err) {
@@ -103,8 +105,9 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
             existLike = await Likeships.destroy({
                 where: {
                     user_id, article_id
-                }
-            }, { transaction: t })
+                },
+                transaction: t
+            })
             if (!existLike) return res.status(404).json({ error: '此紀錄不存在' })
 
             const article = await Articles.findByPk(article_id, { transaction: t })
@@ -116,8 +119,9 @@ async function deleteLikeship (req: NextApiRequest, res: NextApiResponse<errorRe
             existLike = await Likeships.destroy({
                 where: {
                     user_id, comment_id
-                }
-            }, { transaction: t })
+                },
+                transaction: t
+            })
             if (!existLike) return res.status(404).json({ error: '此紀錄不存在' })
 
             const comment = await Comments.findByPk(comment_id, { transaction: t })
