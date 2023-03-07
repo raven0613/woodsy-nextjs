@@ -51,7 +51,7 @@ async function editUser (req: NextApiRequest, res: NextApiResponse<successResult
         await t.commit();
 
         const userWithoutPassword: Iuser = { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt, birthday: user.birthday }
-        
+
         res.status(200).json({ success: '編輯使用者資料成功', payload: userWithoutPassword })
         
     } catch (err) {

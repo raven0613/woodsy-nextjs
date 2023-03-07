@@ -51,17 +51,17 @@ export default function BirthdayPicker ({ handleSetBirth, year, month, day }: pr
     }
     return (
         <>
-            <select defaultValue={year} onChange={(e) => {onSelect(e, 'y')}} name="" id="" className='outline-0 border w-20 h-10 p-2 rounded-md mr-4'>
+            <select defaultValue={year || '-'} onChange={(e) => {onSelect(e, 'y')}} name="" id="" className='outline-0 border w-20 h-10 p-2 rounded-md mr-4'>
                 <option value='0'>-</option>
                 {options(1920, 2023, 'y', month, year)}
             </select>
 
-            <select defaultValue={month} onChange={(e) => {onSelect(e, 'm')}} name="" id="" className='outline-0 border w-16 h-10 p-2 rounded-md mr-4'>
+            <select defaultValue={month || '-'} onChange={(e) => {onSelect(e, 'm')}} name="" id="" className='outline-0 border w-16 h-10 p-2 rounded-md mr-4'>
                 <option value='0'>-</option>
                 {options(1, 12, 'm', month, year)}
             </select>
 
-            <select defaultValue={day} onChange={(e) => {onSelect(e, 'd')}} name="" id="" className='outline-0 border w-16 h-10 p-2 rounded-md'>
+            <select defaultValue={day || '-'} onChange={(e) => {onSelect(e, 'd')}} name="" id="" className='outline-0 border w-16 h-10 p-2 rounded-md'>
                 <option value='0'>-</option>
                 {options(1, 31, 'd', month, year)}
             </select>

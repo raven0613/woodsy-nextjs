@@ -37,7 +37,12 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
         setName(currName)
         setEmail(currEmail)
 
-        if (!currBirthday) return
+        if (!currBirthday) {
+            setYear(0)
+            setMonth(0)
+            setDay(0)
+            return
+        }
         const localDate = dayjs.utc(currBirthday).local()
         setYear(localDate.year())
         setMonth(localDate.month() + 1)
@@ -176,6 +181,7 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
                     {editingStatus !== 'pw' && <div className='py-1.5'>
                         <p className='text-sm'>生日</p>
                         {!currBirthday && editingStatus !== 'info' && <span className='text-gray-400'>尚未設定</span>}
+
                         {currBirthday && editingStatus !== 'info' && 
                             <div className='py-2'>
                                 <span className='text-gray-700 px-3 border border-transparent'>{year} 年</span>

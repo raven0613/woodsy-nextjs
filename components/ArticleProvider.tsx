@@ -74,7 +74,6 @@ export default function ArticleProvider({ children }: PropsWithChildren) {
     setIsEditOpen(!isEditOpen)
   }
   function handleConfirmEdit (article: Iarticle) {
-    console.log(article)
     editArtTrigger(article)
     setIsEditOpen(false)
   }

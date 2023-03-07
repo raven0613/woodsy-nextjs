@@ -40,7 +40,8 @@ export default function User() {
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${currentArticleId}`, fetchArticle);
     // 抓取目前 user
     const { trigger: userTrigger, data: userData, error: userError } = useSWRMutation<successResult, Error>(`getCurrentUser`, fetchCurrentUser);
-    const currentUserDetail = userData?.payload as Iuser
+    const currentUserDetail = currentUser
+
     // 修改 user 資料
     const { trigger: userEditTrigger, data: userEditData, error: userEditError } = useSWRMutation<successResult, Error>(`user/${currentUserId}`, fetchEditUser, { onSuccess: (data: successResult) => {
         const payload = data.payload as Iuser
