@@ -1,3 +1,6 @@
 .confirm_button {
   @apply border w-20 h-10 rounded-full hover:bg-sky-100 ease-out duration-300;
 }
+.confirm_button_disabled {
+  @apply border w-20 h-10 rounded-full ease-out duration-300 text-slate-400;
+}

@@ -45,6 +45,7 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
         e.preventDefault()
         e.stopPropagation()
         if (!currentUser) return
+        if (!inputVal) return
         setInputVal('')
         setHollow({...hollow, name: ''})
         handleAddHollow({...hollow, user_id: currentUser.id})
@@ -85,7 +86,8 @@ export default function HollowCreatePanel ({ hollows, currentUser, handleAddHoll
                 }}
                 placeholder='請輸入樹洞名稱' type="text" />
 
-            <button className={articleStyle.confirm_button} onClick={handleSubmit}>送出</button>
+            {inputVal && <button className={articleStyle.confirm_button} onClick={handleSubmit} >送出</button>}
+            {!inputVal && <button className={articleStyle.confirm_button_disabled} disabled={!inputVal}>送出</button>}
         </div>
     )
 }

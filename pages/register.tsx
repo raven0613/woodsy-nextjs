@@ -31,7 +31,6 @@ export default function Register () {
         addUserTrigger(user)
         setPassword(user.password)
     }
-    console.log(addedUserData)
     useEffect(() => {
         if (addedUserError) return
         if (!addedUserData?.success || !addedUserData?.payload) return

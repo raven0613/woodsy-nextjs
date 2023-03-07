@@ -170,7 +170,6 @@ export default function Article () {
     }
 
     function handleClickMore (id: string) {
-        console.log(id)
         if (!id || !handleIdChange) return
         setMoreShowingId(id)
         handleIdChange(id)

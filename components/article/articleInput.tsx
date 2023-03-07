@@ -155,7 +155,8 @@ export default function ArticleInput ({ currentHollow, hollows, handleAddArt, cu
                         </div>
                     </div>
 
-                    <button className={articleStyle.confirm_button} type="button" disabled={!title || !content} onClick={handleSubmit}>送出</button>
+                    {title && content && <button className={articleStyle.confirm_button} type="button" onClick={handleSubmit}>送出</button>}
+                    {(!title || !content) && <button className={articleStyle.confirm_button_disabled} type="button" disabled={!title || !content} >送出</button>}
                 </div>
             </div>
         </div>

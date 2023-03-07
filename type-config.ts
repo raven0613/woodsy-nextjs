@@ -202,7 +202,7 @@ export interface errorResult {
 
 export interface successResult {
     success: string
-    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | userSubPayload | rows
+    payload?: Iuser | Iuser[] | Iarticle | Iarticle[] | Ihollow | Ihollow[] | Icomment | Icomment[] | ICollection | ILikeship | IReport | userSubPayload | rows | ISubcription
 }
 
 

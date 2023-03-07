@@ -33,7 +33,6 @@ export default function MoreWindow ({ id, userId, handleCloseMore, handleClickDe
     function onClickReport (e: React.MouseEvent) {
         e.preventDefault()
         e.stopPropagation()
-        console.log('回報')
     }
     function onClickClose (e: React.MouseEvent) {
         e.preventDefault()
