@@ -163,17 +163,21 @@ export default function UserPanel ({ currentUserDetail, handleEditUser }: props)
             <main className='border w-full h-80 mt-20 px-10 py-5 rounded-xl flex flex-col justify-between'>
                 <div className='w-full'>
 
-                    {editingStatus !== 'pw' && <div className='py-1.5'>
+                    {editingStatus !== 'pw' && 
+                    <div className='py-1.5'>
                         <span className='text-sm'>名稱</span>
-                        {!editingStatus && <span className='border border-transparent hover:border-gray-200 ease-out duration-300 py-2 px-3 rounded-md inline-block w-80'>{name}</span>}
+                        {!editingStatus && <span className='border border-transparent hover:border-gray-200 ease-out duration-300 py-2 px-3 rounded-md inline-block w-80 show-name'>{name}</span>}
+
                         {editingStatus && <input type="text" onChange={onNameChange} value={name} className='outline-0 border py-2 px-3 rounded-md w-80' />}
                         {nameWarning && <p className={inputStyle.form_input_warningMsg}>{nameWarning}</p>}
                     </div>}
 
-                    {editingStatus !== 'pw' && <div className='py-1.5'>
+                    {editingStatus !== 'pw' && 
+                    <div className='py-1.5'>
                         <span className='text-sm'>email</span>
                         
                         {!editingStatus && <span className='border border-transparent hover:border-gray-200 ease-out duration-300 py-2 px-3 rounded-md inline-block w-80'>{email}</span>}
+
                         {editingStatus && <input type="text" onChange={onEmailChange} value={email} className='outline-0 border py-2 px-3 rounded-md w-80' />}
                         {emailWarning && <p className={inputStyle.form_input_warningMsg}>{emailWarning}</p>}
                     </div>}
