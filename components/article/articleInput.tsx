@@ -5,6 +5,7 @@ import hollowStyle from '../../styles/hollow.module.css';
 import articleStyle from '../../styles/article.module.css';
 import HollowCreatePanel from '../hollow/hollowCreatePanel';
 
+
 interface hollowProps {
     currentHollow?: Ihollow
     hollows: Ihollow[]
