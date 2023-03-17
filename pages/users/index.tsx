@@ -12,15 +12,17 @@ import useArticleRecord from '../../components/hooks/useArticleRecord'
 import useHollowRecord from '../../components/hooks/useHollowRecord';
 import ArticleCardController from '../../components/article/articleCardController'
 import HollowCard from '../../components/hollow/hollowCard'
+import { useRecoilState } from 'recoil'
+import { currentUserState } from '../../store/user'
 // 修改個人資料 
 
 const arg: param = { page: 1, limit: 10, keyword: '' }
 
 export default function User() {
-    const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    const [currentUser, setCurrentUser] = useRecoilState(currentUserState)
+
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
-
     const currentUserId = currentUser?.id
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     const [userArticles, setUserArticles] = useState<Iarticle[]>([])
@@ -45,7 +47,7 @@ export default function User() {
     // 修改 user 資料
     const { trigger: userEditTrigger, data: userEditData, error: userEditError } = useSWRMutation<successResult, Error>(`user/${currentUserId}`, fetchEditUser, { onSuccess: (data: successResult) => {
         const payload = data.payload as Iuser
-        handleSetCurrentUser && handleSetCurrentUser(payload)
+        setCurrentUser(payload)
     } });
     // 喜歡和收藏的 fetch hook
     const { artRecordTrigger, getRecordIsMutating } = useArticleRecord({onArtRecordSuccess})
@@ -111,7 +113,26 @@ export default function User() {
             handleRefetchTrigger && handleRefetchTrigger()
         }
     }, [refetchTrigger, collectionsTrigger, userArtsTrigger, handleRefetchTrigger])
+    
+    // TODO: 確認這邊的邏輯，目前這個頁面的按讚不會更新
+    // 抓回來一篇的文章資料
+    useEffect(() => {
+        if (!currentUserId || !artData) return
+        const payload = artData.payload as Iarticle
+        if (currentArticleIdRef.current !== payload.id) return
+        const art = formattedArticles(currentUserId as number, [payload] as Iarticle[])[0]
 
+        // if (artMap.get(art.id)) {
+        //     return setArticles(arts => {
+        //         return arts.map(article => {
+        //             if (article.id === art.id) {
+        //                 return art;
+        //             }
+        //             return article;
+        //         });
+        //     })
+        // }
+    }, [currentUserId, artData])
 
     function handleClickMore (artId: string) {
         if (!artId || !handleIdChange) return

@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Iarticle } from '../type-config'
 import React, { useContext } from 'react'
 import { userContext } from '../components/UserProvider'
+import { useRecoilValue } from 'recoil'
+import { currentUserState } from '../store/user'
 
 type props = {
     id: number
@@ -14,7 +16,8 @@ type props = {
 let isBelongsToCurrUser: boolean = false
 
 export default function MoreWindow ({ id, userId, handleCloseMore, handleClickDelete, handleClickEdit }: props) {
-    const { currentUser } = useContext(userContext)
+    // const { currentUser } = useContext(userContext)
+    const currentUser = useRecoilValue(currentUserState)
     isBelongsToCurrUser = currentUser?.id === userId? true : false
 
     function onClickEdit (e: React.MouseEvent) {

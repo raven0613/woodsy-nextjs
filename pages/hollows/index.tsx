@@ -11,12 +11,14 @@ import { formattedArticles, formattedHollows } from '../../helpers/helpers'
 import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 import { userContext } from '../../components/UserProvider'
+import { useRecoilValue } from 'recoil'
+import { currentUserState } from '../../store/user'
 
 const arg: param = { page: 1, limit: 15, keyword: '' }
 
 export default function HollowList () {
-    const { currentUser, handleSetCurrentUser } = useContext(userContext)
-
+    // const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    const currentUser = useRecoilValue(currentUserState)
 
     const [hollows, setHollows] = useState<Ihollow[]>([])
     const [subHollows, setSubHollows] = useState<Ihollow[]>([])
