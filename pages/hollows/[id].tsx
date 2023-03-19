@@ -15,6 +15,8 @@ import useHollowRecord from '../../components/hooks/useHollowRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider';
 import { userContext } from '../../components/UserProvider'
 import useThrottle from '../../components/hooks/useThrottle';
+import { useRecoilValue } from 'recoil'
+import { currentUserState } from '../../store/user'
 
 const arg = { page: 1, limit: 10, keyword: '' }
 const artMap = new Map()
@@ -22,7 +24,8 @@ const newArtMap = new Map()
 let total = 0
 
 export default function Hollow () {
-    const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    // const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    const currentUser = useRecoilValue(currentUserState)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 

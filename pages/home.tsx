@@ -21,6 +21,9 @@ import { VariableSizeList as List } from 'react-window';
 import useArticleRecord from '../components/hooks/useArticleRecord'
 import useHollowRecord from '../components/hooks/useHollowRecord';
 import useThrottle from '../components/hooks/useThrottle';
+import { useRecoilValue } from 'recoil'
+import { currentUserState } from '../store/user'
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,7 +33,8 @@ const artMap = new Map()
 const newArtMap = new Map()
 
 export default function Home({ articleCounts, articleRows, hollowCounts, hollowRows, csrfToken, total }: serverProps) {
-    const { currentUser } = useContext(userContext)
+    // const { currentUser } = useContext(userContext)
+    const currentUser = useRecoilValue(currentUserState)
     const { handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 

@@ -6,6 +6,7 @@ import { Articles } from "./models"
 
 export interface Iuser {
     id?: number
+    role: string
     name: string
     email: string
     password?: string
@@ -13,7 +14,6 @@ export interface Iuser {
     subHollows?: number
     createdAt?: Date
     updatedAt?: string
-    role: string
     birthday?: Date
 }; 
 export interface ILoginuser{

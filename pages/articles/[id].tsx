@@ -16,18 +16,21 @@ import useArticleRecord from '../../components/hooks/useArticleRecord'
 import { articleContext, UIContext } from '../../components/ArticleProvider'
 import { userContext } from '../../components/UserProvider'
 import randomstring from 'randomstring'
+import { useRecoilValue } from 'recoil'
+import { currentUserState } from '../../store/user'
 
 const params: param = { page: 1, limit: 15, keyword: '' }
 const randomMap = new Map()  // userId: tempId
 const commentMap = new Map()
 
 export default function Article () {
-    const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    // const { currentUser, handleSetCurrentUser } = useContext(userContext)
+    const currentUser = useRecoilValue(currentUserState)
     const { currentArticleId, handleIdChange, refetchTrigger, handleRefetchTrigger } = useContext(articleContext)
     const { handleConfirmWindow, handleEditWindow } = useContext(UIContext)
 
     const currentUserId = currentUser?.id
-    
+    console.log(randomMap)
     const [moreShowingId, setMoreShowingId] = useState<string>('')
     
     const router = useRouter()
@@ -37,7 +40,7 @@ export default function Article () {
     const [comments, setComments] = useState<Icomment[]>([])
     const [article, setArticle] = useState<Iarticle | null>()
     const currentCommentIdRef = useRef<number>()
-
+    const artUserId = article?.user_id
     // 抓取一篇文章
     const { trigger: artTrigger, data: artData, error: artError } = useSWRMutation<successResult, Error>(`article/${id}`, fetchArticle);
 
@@ -99,12 +102,12 @@ export default function Article () {
 
     // 抓回來一整包的回覆資料
     useEffect(() => {
-        if (!currentUserId || !commentsData) return
+        if (!artUserId || !commentsData) return
         const payload = commentsData? commentsData.data.payload.rows : []
         const coms = formattedComments(currentUserId as number, payload as Icomment[])
         const comsWithTempId = coms.map(com => {
             let tempId = ''
-            if (com.user_id === currentUserId) {
+            if (com.user_id === artUserId) {
                 tempId = '原PO'
                 randomMap.set(com.user_id, tempId)
             }
@@ -124,7 +127,7 @@ export default function Article () {
             }
         }
         setComments(comsWithTempId)
-    }, [commentsData, currentUserId])
+    }, [commentsData, artUserId, currentUserId])
 
     // 抓回來一篇的回覆資料
     useEffect(() => {
